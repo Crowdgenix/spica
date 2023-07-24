@@ -1,0 +1,32 @@
+[package]
+name = "stable_coin_contract"
+version= "4.0.0-beta"
+authors = ["Brushfam <dominik.krizo@727.ventures>"]
+edition = "2021"
+
+[dependencies]
+ink = { version = "4.2.1", default-features = false}
+
+scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
+scale-info = { version = "2.6", default-features = false, features = ["derive"], optional = true }
+openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts/", tag = "4.0.0-beta", default-features = false, features = ["psp22", "ownable"] }
+
+
+[lib]
+name = "stable_coin_contract"
+path = "lib.rs"
+
+
+[features]
+default = ["std"]
+std = [
+    "ink/std",
+    "scale/std",
+    "scale-info/std",
+    # These dependencies
+    "openbrush/std",
+]
+ink-as-dependency = []
+
+[profile.dev]
+codegen-units = 16

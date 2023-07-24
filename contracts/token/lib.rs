@@ -1,0 +1,177 @@
+#![cfg_attr(not(feature = "std"), no_std, no_main)]
+#![feature(min_specialization)]
+#![allow(clippy::let_unit_value)]
+
+// pub use crate::token::selectors::*;
+pub use self::token::*;
+
+#[openbrush::contract]
+pub mod token {
+    use ink::{
+        codegen::{EmitEvent, Env},
+        prelude::string::String,
+        reflect::ContractEventBase,
+    };
+    use openbrush::{
+        contracts::{
+            ownable::*,
+            psp22::{
+                self,
+                *,
+                extensions::{burnable, metadata, mintable},
+                psp22::Internal,
+                PSP22Error,
+            },
+        },
+        modifiers,
+        traits::Storage,
+    };
+
+    /// Result type
+    pub type Result<T> = core::result::Result<T, PSP22Error>;
+
+    /// Event type
+    pub type Event = <Token as ContractEventBase>::Type;
+
+    pub(super) mod selectors {
+        // Selectors for the methods of interest on PSP22.
+        // NOTE: They can be found in `target/ink/metadata.json` after building the contract.
+        pub const TOTAL_SUPPLY_SELECTOR: [u8; 4] = [0x16, 0x2d, 0xf8, 0xc2];
+        pub const TRANSFER_TO_SELECTOR: [u8; 4] = [0xdb, 0x20, 0xf9, 0xf5];
+        pub const TRANSFER_FROM_SELECTOR: [u8; 4] = [0x54, 0xb3, 0xc7, 0x6e];
+        pub const BALANCE_OF_SELECTOR: [u8; 4] = [0x65, 0x68, 0x38, 0x2f];
+        pub const APPROVE_ALLOWANCE_SELECTOR: [u8; 4] = [0xb2, 0x0f, 0x1b, 0xbd];
+        pub const INCREASE_ALLOWANCE_SELECTOR: [u8; 4] = [0x96, 0xd6, 0xb5, 0x7a];
+        pub const MINT_SELECTOR: [u8; 4] = [0xfc, 0x3c, 0x75, 0xd4];
+        pub const BURN_SELECTOR: [u8; 4] = [0x7a, 0x9d, 0xa5, 0x10];
+    }
+
+    #[ink(storage)]
+    #[derive(Default, Storage)]
+    pub struct Token {
+        #[storage_field]
+        psp22: psp22::Data,
+        #[storage_field]
+        metadata: metadata::Data,
+        #[storage_field]
+        ownable: ownable::Data,
+    }
+
+    impl Token {
+        #[ink(constructor)]
+        pub fn new(owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance) -> Self {
+            let mut instance = Self::default();
+
+            instance.metadata.name = Some(name);
+            instance.metadata.symbol = Some(symbol);
+            instance.metadata.decimals = decimals;
+            instance._init_with_owner(owner);
+
+            // Mint initial supply to the caller.
+            instance
+                .psp22
+                ._mint_to(Self::env().caller(), total_supply)
+                .unwrap();
+
+            instance
+        }
+
+        #[ink(constructor)]
+        pub fn new_no_initial_supply(name: String, symbol: String, decimals: u8) -> Self {
+            let mut instance = Self::default();
+
+            instance.metadata.name = Some(name);
+            instance.metadata.symbol = Some(symbol);
+            instance.metadata.decimals = decimals;
+            instance._init_with_owner(Self::env().caller());
+
+            instance
+        }
+
+        // Emit event abstraction. Otherwise ink! deserializes events incorrectly when there are events from more than one contract.
+        pub fn emit_event<EE: EmitEvent<Self>>(emitter: EE, event: Event) {
+            emitter.emit_event(event);
+        }
+    }
+
+    // We have to implement the "main trait" for our contract to have the PSP22 methods available.
+    impl PSP22 for Token {}
+
+    // And `PSP22Metadata` to get metadata-related methods.
+    impl metadata::PSP22Metadata for Token {}
+
+    // And so on...
+    impl Ownable for Token {}
+    //
+    // impl mintable::PSP22Mintable for Token {
+    //     #[ink(message)]
+    //     #[modifiers(only_owner)]
+    //     /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
+    //     fn mint(&mut self, account: AccountId, amount: Balance) -> Result<()> {
+    //         self._mint_to(account, amount)
+    //     }
+    // }
+    //
+    // impl burnable::PSP22Burnable for Token {
+    //     #[ink(message)]
+    //     #[modifiers(only_owner)]
+    //     /// Burns the `amount` of underlying tokens from the balance of `account` recipient.
+    //     fn burn(&mut self, account: AccountId, amount: Balance) -> Result<()> {
+    //         self._burn_from(account, amount)
+    //     }
+    // }
+
+    // Overwrite the `psp22::Internal` trait to emit the events as described in the PSP22 spec:
+    // https://github.com/w3f/PSPs/blob/master/PSPs/psp-22.md#transfer
+    impl psp22::Internal for Token {
+        fn _emit_transfer_event(
+            &self,
+            _from: Option<AccountId>,
+            _to: Option<AccountId>,
+            _amount: Balance,
+        ) {
+            Token::emit_event(
+                self.env(),
+                Event::Transfer(Transfer {
+                    from: _from,
+                    to: _to,
+                    value: _amount,
+                }),
+            )
+        }
+
+        fn _emit_approval_event(&self, _owner: AccountId, _spender: AccountId, _amount: Balance) {
+            Token::emit_event(
+                self.env(),
+                Event::Approval(Approval {
+                    owner: _owner,
+                    spender: _spender,
+                    value: _amount,
+                }),
+            )
+        }
+    }
+
+    /// Event emitted when a token transfer occurs.
+    #[ink(event)]
+    #[derive(Debug)]
+    pub struct Transfer {
+        #[ink(topic)]
+        pub from: Option<AccountId>,
+        #[ink(topic)]
+        pub to: Option<AccountId>,
+        pub value: Balance,
+    }
+
+    /// Event emitted when an approval occurs that `spender` is allowed to withdraw
+    /// up to the amount of `value` tokens from `owner`.
+    #[ink(event)]
+    #[derive(Debug)]
+    pub struct Approval {
+        #[ink(topic)]
+        owner: AccountId,
+        #[ink(topic)]
+        spender: AccountId,
+        value: Balance,
+    }
+}
