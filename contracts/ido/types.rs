@@ -1,12 +1,11 @@
 use ink::storage::Mapping;
-use ink::prelude::vec::Vec;
 use openbrush::{
     traits::{
         AccountId,
         ZERO_ADDRESS,
     },
 };
-use openbrush::traits::{Balance, Hash};
+use openbrush::traits::{Balance};
 
 
 pub const STORAGE_KEY: u32 = openbrush::storage_unique_key!(Data);

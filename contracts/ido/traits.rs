@@ -6,8 +6,7 @@ use openbrush::{
 };
 use ink::prelude::string::String;
 use openbrush::contracts::traits::ownable;
-use openbrush::traits::{Hash, Storage, Timestamp};
-use crate::ido::ido::ClaimToken;
+use openbrush::traits::{Timestamp};
 
 #[openbrush::wrapper]
 pub type IdoRef = dyn Ido;
