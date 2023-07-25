@@ -6,7 +6,7 @@ use openbrush::{
 };
 use ink::prelude::string::String;
 use openbrush::traits::{Hash, Storage};
-use ido::ido::traits::{IDOError};
+use ido::traits::{IDOError};
 
 #[openbrush::wrapper]
 pub type FactoryRef = dyn Factory;

@@ -2,9 +2,9 @@
 #![feature(min_specialization)]
 
 mod helpers;
-mod traits;
+pub mod traits;
 mod types;
-pub use self::ido::IdoContractRef;
+pub use traits::{*};
 
 #[openbrush::contract]
 pub mod ido {

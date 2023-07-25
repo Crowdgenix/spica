@@ -8,3 +8,6 @@
 # More information here http://doc.crates.io/guide.html#cargotoml-vs-cargolock
 Cargo.lock
 contracts/**/target
+node_modules
+.idea
+types

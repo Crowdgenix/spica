@@ -1,0 +1,7 @@
+{
+  "projectFiles": ["contracts/**/*.toml"],
+  "typechainGeneratedPath": "types",
+  "artifactsPath": "artifacts",
+  "isWorkspace": true,
+  "workspacePath": "./"
+}

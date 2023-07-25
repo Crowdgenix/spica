@@ -1,0 +1,19 @@
+{
+  "devDependencies": {
+    "@727-ventures/typechain-polkadot": "1.1.0",
+    "typescript": "5.1.6",
+    "@727-ventures/typechain-compiler": "1.1.1",
+    "@727-ventures/typechain-types": "1.1.0",
+    "@types/node": "17.0.34",
+    "ts-node": "10.7.0",
+    "@polkadot/api": "9.13.4",
+    "@polkadot/api-contract": "9.13.4",
+    "@polkadot/keyring": "10.4.2",
+    "@types/bn.js": "5.1.0"
+  },
+  "scripts": {
+    "typechain": "yarn typechain-polkadot --input path/to/abis --output path/to/output",
+    "typechain:compile": "yarn build && yarn typechain-compiler --config ./typechain.config.json --noCompile",
+    "build": "./build.sh"
+  }
+}
