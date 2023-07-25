@@ -11,10 +11,13 @@ pub mod token {
         codegen::{EmitEvent, Env},
         prelude::string::String,
         reflect::ContractEventBase,
+        storage::Mapping,
     };
+
     use openbrush::{
         contracts::{
             ownable::*,
+            pausable::*,
             psp22::{
                 self,
                 *,
@@ -55,6 +58,21 @@ pub mod token {
         metadata: metadata::Data,
         #[storage_field]
         ownable: ownable::Data,
+        #[storage_field]
+        pausable: pausable::Data,
+        black_list: Mapping<AccountId, bool>,
+    }
+
+    impl psp22::Transfer for Token {
+        #[modifiers(when_not_paused)]
+        fn _before_token_transfer(
+            &mut self,
+            _from: Option<&AccountId>,
+            _to: Option<&AccountId>,
+            _amount: &Balance
+        ) -> Result<()> {
+            Ok(())
+        }
     }
 
     impl Token {
@@ -65,6 +83,7 @@ pub mod token {
             instance.metadata.name = Some(name);
             instance.metadata.symbol = Some(symbol);
             instance.metadata.decimals = decimals;
+            instance.black_list = Mapping::default();
             instance._init_with_owner(owner);
 
             // Mint initial supply to the caller.
@@ -92,6 +111,17 @@ pub mod token {
         pub fn emit_event<EE: EmitEvent<Self>>(emitter: EE, event: Event) {
             emitter.emit_event(event);
         }
+
+        #[ink(message)]
+        #[modifiers(only_owner)]
+        pub fn change_pause_state(&mut self) -> Result<()> {
+            if self.paused() {
+                self._unpause()
+            } else {
+                self._pause()
+            }
+        }
+
     }
 
     // We have to implement the "main trait" for our contract to have the PSP22 methods available.
@@ -102,24 +132,26 @@ pub mod token {
 
     // And so on...
     impl Ownable for Token {}
-    //
-    // impl mintable::PSP22Mintable for Token {
-    //     #[ink(message)]
-    //     #[modifiers(only_owner)]
-    //     /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
-    //     fn mint(&mut self, account: AccountId, amount: Balance) -> Result<()> {
-    //         self._mint_to(account, amount)
-    //     }
-    // }
-    //
-    // impl burnable::PSP22Burnable for Token {
-    //     #[ink(message)]
-    //     #[modifiers(only_owner)]
-    //     /// Burns the `amount` of underlying tokens from the balance of `account` recipient.
-    //     fn burn(&mut self, account: AccountId, amount: Balance) -> Result<()> {
-    //         self._burn_from(account, amount)
-    //     }
-    // }
+
+    impl Pausable for Token {}
+
+    impl mintable::PSP22Mintable for Token {
+        #[ink(message)]
+        #[modifiers(only_owner)]
+        /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
+        fn mint(&mut self, account: AccountId, amount: Balance) -> Result<()> {
+            self._mint_to(account, amount)
+        }
+    }
+
+    impl burnable::PSP22Burnable for Token {
+        #[ink(message)]
+        #[modifiers(only_owner)]
+        /// Burns the `amount` of underlying tokens from the balance of `account` recipient.
+        fn burn(&mut self, account: AccountId, amount: Balance) -> Result<()> {
+            self._burn_from(account, amount)
+        }
+    }
 
     // Overwrite the `psp22::Internal` trait to emit the events as described in the PSP22 spec:
     // https://github.com/w3f/PSPs/blob/master/PSPs/psp-22.md#transfer
