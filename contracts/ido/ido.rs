@@ -201,8 +201,15 @@ pub mod ido {
         }
 
         #[ink(message)]
-        fn admin_set_price(&mut self, new_price: u128) {
+        #[modifiers(only_owner)]
+        fn admin_set_price(&mut self, new_price: u128) -> Result<(), ownable::OwnableError> {
             self.ido.price = new_price;
+            Ok(())
+        }
+
+        #[ink(message)]
+        fn get_price(&self) -> u128 {
+            self.ido.price
         }
     }
 
@@ -259,6 +266,51 @@ pub mod ido {
         #[ink(message)]
         pub fn verify_signature(&self, signature: [u8; 65], msg: String) -> bool {
             self._verify(msg, self.ido.signer, signature)
+        }
+    }
+
+
+    #[cfg(test)]
+    mod tests {
+        use ink::{
+            env::test::default_accounts,
+            primitives::Hash,
+        };
+        use openbrush::traits::AccountIdExt;
+        use crate::Ido;
+
+        use super::*;
+
+        #[ink::test]
+        fn initialize_works() {
+            let accounts = default_accounts::<ink::env::DefaultEnvironment>();
+            let mut ido = IdoContract::new(accounts.alice);
+            &ido.init_ido(accounts.bob, accounts.alice, 10, 1);
+            assert_eq!(ido.ido.ido_token, accounts.bob);
+            assert_eq!(ido.ido.price, 10);
+            assert_eq!(ido.ido.price_decimals, 1);
+            assert_eq!(ido.ido.signer, accounts.alice);
+        }
+
+        #[ink::test]
+        fn set_signer_works() {
+            let accounts = default_accounts::<ink::env::DefaultEnvironment>();
+            let mut ido = IdoContract::new(accounts.alice);
+            &ido.init_ido(accounts.bob, accounts.alice, 10, 1);
+            &ido.set_signer(accounts.bob);
+            assert_eq!(ido.ido.signer, accounts.bob);
+        }
+
+        #[ink::test]
+        fn admin_set_price_works() {
+            let accounts = default_accounts::<ink::env::DefaultEnvironment>();
+            let mut ido = IdoContract::new(accounts.bob);
+            &ido.init_ido(accounts.bob, accounts.alice, 10, 1);
+            &ido.admin_set_price(20);
+            assert_eq!(ido.ido.price, 10);
+            ink::env::test::set_caller::<Environment>(accounts.bob);
+            &ido.admin_set_price(20);
+            assert_eq!(ido.ido.price, 20);
         }
     }
 }

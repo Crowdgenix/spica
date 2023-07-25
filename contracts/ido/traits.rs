@@ -5,6 +5,7 @@ use openbrush::{
     },
 };
 use ink::prelude::string::String;
+use openbrush::contracts::traits::ownable;
 use openbrush::traits::{Hash, Storage, Timestamp};
 use crate::ido::ido::ClaimToken;
 
@@ -26,7 +27,10 @@ pub trait Ido {
     fn claim_ido_token(&mut self, deadline: Timestamp, amount: Balance, signature: [u8; 65]) -> Result<(), IDOError>;
 
     #[ink(message)]
-    fn admin_set_price(&mut self, new_price: u128);
+    fn admin_set_price(&mut self, new_price: u128) -> Result<(), ownable::OwnableError>;
+
+    #[ink(message)]
+    fn get_price(&self) -> Balance;
 }
 
 pub trait Internal {
