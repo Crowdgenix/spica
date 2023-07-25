@@ -47,6 +47,30 @@ mod staking {
         pub new_tier: u128,
     }
 
+
+    pub trait Internal {
+        fn _emit_staking_event(&mut self, account: AccountId, amount: u128, new_tier: u128);
+        fn _emit_unstaking_event(&mut self, account: AccountId, amount: u128, new_tier: u128);
+    }
+
+    impl Internal for Staking {
+        fn _emit_staking_event(&mut self, account: AccountId, amount: u128, new_tier: u128) {
+            self.env().emit_event(StakingEvent {
+                staker: account,
+                amount,
+                new_tier,
+            })
+        }
+
+        fn _emit_unstaking_event(&mut self, account: AccountId, amount: u128, new_tier: u128) {
+            self.env().emit_event(UnstakingEvent {
+                staker: account,
+                amount,
+                new_tier,
+            })
+        }
+    }
+
     impl Staking {
         #[ink(constructor)]
         pub fn new(stake_token: AccountId, tier_configs: Vec<u128>) -> Self {
@@ -83,6 +107,8 @@ mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
+            self._emit_staking_event(caller, amount, tier);
+
             Ok(())
         }
 
@@ -107,6 +133,7 @@ mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
+            self._emit_unstaking_event(caller, amount, tier);
             Ok(())
         }
 
@@ -176,26 +203,3 @@ mod staking {
         }
     }
 }
-//
-// pub trait Internal {
-//     fn _emit_staking_event(&mut self, account: AccountId, amount: u128, new_tier: u128);
-//     fn _emit_unstaking_event(&mut self, account: AccountId, amount: u128, new_tier: u128);
-// }
-//
-// impl Internal for Staking {
-//     fn _emit_staking_event(&mut self, account: AccountId, amount: u128, new_tier: u128) {
-//         self.env().emit_event(StakingEvent {
-//             staker: account,
-//             amount,
-//             new_tier,
-//         })
-//     }
-//
-//     fn _emit_unstaking_event(&mut self, account: AccountId, amount: u128, new_tier: u128) {
-//         self.env().emit_event(UnstakingEvent {
-//             staker: account,
-//             amount,
-//             new_tier,
-//         })
-//     }
-// }
