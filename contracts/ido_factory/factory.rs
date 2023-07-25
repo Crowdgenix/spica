@@ -53,7 +53,7 @@ pub mod factory {
         }
 
         #[ink(message)]
-        fn create_pool(&mut self, ido_token: AccountId, signer: AccountId, price: u128, price_decimals: u128) -> Result<AccountId, FactoryError> {
+        fn create_pool(&mut self, ido_token: AccountId, signer: AccountId, price: u128, price_decimals: u32) -> Result<AccountId, FactoryError> {
             ensure!(
                 self.factory.get_pool.get(&ido_token)
                     .is_none(),

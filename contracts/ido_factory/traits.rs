@@ -28,7 +28,7 @@ pub trait Factory {
         ido_token: AccountId,
         signer: AccountId,
         price: u128,
-        price_decimals: u128,
+        price_decimals: u32,
     ) -> Result<AccountId, FactoryError>;
 
     #[ink(message)]

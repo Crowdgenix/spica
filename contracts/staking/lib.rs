@@ -1,16 +1,19 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
-#[ink::contract]
+#[openbrush::contract]
 mod staking {
+    use hex::*;
     use ink::storage::Mapping;
-    use token::{TokenRef};
     use ink::{
         env::{
-            call::{build_call, ExecutionInput, FromAccountId, Selector},
-            DefaultEnvironment, Error as InkEnvError,
+            hash,
         },
-        LangError,
-        prelude::vec::Vec
+        codegen::{
+            EmitEvent,
+            Env,
+        },
+        prelude::vec::Vec,
+        prelude::string::{String, ToString},
     };
     use openbrush::{
         contracts::traits::psp22::{PSP22Ref},
@@ -22,6 +25,7 @@ mod staking {
         TransferFailed,
         InsufficientAllowance,
         InsufficientBalance,
+        InvalidSignature,
     }
 
     #[ink(storage)]
@@ -31,6 +35,7 @@ mod staking {
         staking_amounts: Mapping<AccountId, u128>,
         account_tiers: Mapping<AccountId, u128>,
         tier_configs: Vec<u128>,
+        signer: AccountId,
     }
 
     #[ink(event)]
@@ -49,12 +54,12 @@ mod staking {
 
 
     pub trait Internal {
-        fn _emit_staking_event(&mut self, account: AccountId, amount: u128, new_tier: u128);
-        fn _emit_unstaking_event(&mut self, account: AccountId, amount: u128, new_tier: u128);
+        fn _emit_staking_event(&self, account: AccountId, amount: u128, new_tier: u128);
+        fn _emit_unstaking_event(&self, account: AccountId, amount: u128, new_tier: u128);
     }
 
     impl Internal for Staking {
-        fn _emit_staking_event(&mut self, account: AccountId, amount: u128, new_tier: u128) {
+        fn _emit_staking_event(&self, account: AccountId, amount: u128, new_tier: u128) {
             self.env().emit_event(StakingEvent {
                 staker: account,
                 amount,
@@ -62,7 +67,7 @@ mod staking {
             })
         }
 
-        fn _emit_unstaking_event(&mut self, account: AccountId, amount: u128, new_tier: u128) {
+        fn _emit_unstaking_event(&self, account: AccountId, amount: u128, new_tier: u128) {
             self.env().emit_event(UnstakingEvent {
                 staker: account,
                 amount,
@@ -73,7 +78,7 @@ mod staking {
 
     impl Staking {
         #[ink(constructor)]
-        pub fn new(stake_token: AccountId, tier_configs: Vec<u128>) -> Self {
+        pub fn new(signer: AccountId, stake_token: AccountId, tier_configs: Vec<u128>) -> Self {
             let staking_amounts = Mapping::default();
             let account_tiers = Mapping::default();
             let owner = Self::env().caller();
@@ -83,12 +88,21 @@ mod staking {
                 account_tiers,
                 stake_token,
                 tier_configs,
+                signer,
             }
         }
 
         #[ink(message)]
-        pub fn stake(&mut self, amount: u128) -> Result<(), StakingError> {
+        pub fn stake(&mut self, deadline: Timestamp, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
             let caller = self.env().caller();
+
+            let message = self.gen_msg_for_stake_token(deadline, amount);
+            // verify signature
+            let is_ok = self._verify(message, self.signer, signature);
+
+            if !is_ok {
+                return Err(StakingError::InvalidSignature);
+            }
 
             if PSP22Ref::allowance(&self.stake_token, caller, self.env().account_id()) < amount {
                 return Err(StakingError::InsufficientAllowance)
@@ -113,14 +127,22 @@ mod staking {
         }
 
         #[ink(message)]
-        pub fn unstake(&mut self, amount: u128) -> Result<(), StakingError> {
-            let caller = Self::env().caller();
+        pub fn unstake(&mut self, deadline: Timestamp, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
+            let caller = self.env().caller();
+            let message = self.gen_msg_for_unstake_token(deadline, amount);
+            // verify signature
+            let is_ok = self._verify(message, self.signer, signature);
+
+            if !is_ok {
+                return Err(StakingError::InvalidSignature);
+            }
+
             let stake_amount = self.staking_amounts.get(&caller).unwrap_or(0);
             if stake_amount < amount {
                 return Err(StakingError::InsufficientBalance)
             }
             // ensure the user has enough collateral assets
-            if PSP22Ref::balance_of(&self.stake_token, Self::env().account_id()) < amount {
+            if PSP22Ref::balance_of(&self.stake_token, self.env().account_id()) < amount {
                 return Err(StakingError::InsufficientBalance)
             }
 
@@ -178,6 +200,59 @@ mod staking {
 
             return tier;
         }
+
+        #[ink(message)]
+        pub fn gen_msg_for_stake_token(&self, deadline: Timestamp, stake_amount: Balance) -> String {
+            // generate message = buy_ido + ido_token + buyer + amount
+            let mut message: String = String::from("");
+            message.push_str("stake_token_");
+            message.push_str(encode(&self.env().account_id()).as_str());
+            message.push_str("_");
+            message.push_str(encode(&self.env().caller()).as_str());
+            message.push_str("_");
+            message.push_str(&stake_amount.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&deadline.to_string().as_str());
+            message
+        }
+
+        #[ink(message)]
+        pub fn gen_msg_for_unstake_token(&self, deadline: Timestamp, unstake_amount: Balance) -> String {
+            // generate message = buy_ido + ido_token + buyer + amount
+            let mut message: String = String::from("");
+            message.push_str("unstake_token_");
+            message.push_str(encode(&self.env().account_id()).as_str());
+            message.push_str("_");
+            message.push_str(encode(&self.env().caller()).as_str());
+            message.push_str("_");
+            message.push_str(&unstake_amount.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&deadline.to_string().as_str());
+            message
+        }
+
+        fn _verify(&self, data: String, signer: AccountId, signature: [u8; 65]) -> bool {
+            ink::env::debug_println!("data {:?}", data);
+            ink::env::debug_println!("signer {:?}", signer);
+            ink::env::debug_println!("signature {:?}", signature);
+
+            let mut message_hash = <hash::Blake2x256 as hash::HashOutput>::Type::default();
+            ink::env::hash_bytes::<hash::Blake2x256>(&data.as_bytes(), &mut message_hash);
+
+            ink::env::debug_println!("message_hash {:?}", message_hash);
+
+            let output = self.env().ecdsa_recover(&signature, &message_hash).expect("Failed to recover");
+
+            ink::env::debug_println!("pubkey {:?}", output);
+
+            let mut signature_account_id = <hash::Blake2x256 as hash::HashOutput>::Type::default();
+            ink::env::hash_encoded::<hash::Blake2x256, _>(&output, &mut signature_account_id);
+
+            ink::env::debug_println!("Sig account id {:?}", AccountId::from(signature_account_id));
+
+            signer == AccountId::from(signature_account_id)
+        }
+
     }
 
     #[cfg(test)]
@@ -185,9 +260,6 @@ mod staking {
         use super::*;
         use ink::env::{test, debug_println, DefaultEnvironment};
         use ink::{ToAccountId};
-        use token::{
-            TokenRef,
-        };
 
         #[ink::test]
         fn test() {
