@@ -43,8 +43,20 @@ pub trait Internal {
 #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
 pub enum IDOError {
+    Custom(String),
     SafeTransferError,
     CommonError,
     Expired,
     InsufficientBalance,
+    Initialized,
 }
+
+impl From<ownable::OwnableError> for IDOError {
+    fn from(ownable: ownable::OwnableError) -> Self {
+        match ownable {
+            ownable::OwnableError::CallerIsNotOwner => IDOError::Custom(String::from("O::CallerIsNotOwner")),
+            ownable::OwnableError::NewOwnerIsZero => IDOError::Custom(String::from("O::NewOwnerIsZero")),
+        }
+    }
+}
+

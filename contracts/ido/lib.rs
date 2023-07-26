@@ -60,6 +60,7 @@ pub mod ido {
         ido: types::Data,
         #[storage_field]
         ownable: ownable::Data,
+        isInitialized: bool,
     }
 
     impl traits::Internal for IdoContract {
@@ -113,11 +114,14 @@ pub mod ido {
 
     impl traits::Ido for IdoContract {
         #[ink(message)]
+        #[modifiers(only_owner)]
         fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32) -> Result<(), IDOError> {
+            ensure!(self.isInitialized == false, IDOError::Initialized);
             self.ido.ido_token = _ido_token;
             self.ido.price = _price;
             self.ido.price_decimals = _price_decimals;
             self.ido.signer = _signer;
+            self.isInitialized = true;
 
             self._emit_init_ido_contract_event(_ido_token, _price, _price_decimals, _signer);
             Ok(())
@@ -212,6 +216,7 @@ pub mod ido {
         pub fn new(owner: AccountId) -> Self {
             let mut instance = Self::default();
             instance._init_with_owner(owner);
+            instance.isInitialized = false;
             instance
         }
 

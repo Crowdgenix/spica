@@ -11,3 +11,4 @@ contracts/**/target
 node_modules
 .idea
 types
+.env

@@ -10,8 +10,10 @@ pub mod token {
     use ink::{
         codegen::{EmitEvent, Env},
         prelude::string::String,
+        prelude::vec::Vec,
         reflect::ContractEventBase,
         storage::Mapping,
+        env::transfer,
     };
 
     use openbrush::{
@@ -60,7 +62,9 @@ pub mod token {
         ownable: ownable::Data,
         #[storage_field]
         pausable: pausable::Data,
-        black_list: Mapping<AccountId, bool>,
+        is_required_whiteList: bool,
+        whitelist: Mapping<AccountId, bool>,
+        tax_fee: Balance,
     }
 
     impl psp22::Transfer for Token {
@@ -71,20 +75,26 @@ pub mod token {
             _to: Option<&AccountId>,
             _amount: &Balance
         ) -> Result<()> {
+            let received_value = self.env().transferred_value();
+            if received_value == self.tax_fee {
+                return Err(PSP22Error::Custom(String::from("NotExactTaxFee")));
+            }
             Ok(())
         }
     }
 
     impl Token {
         #[ink(constructor)]
-        pub fn new(owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance) -> Self {
+        pub fn new(owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance, is_require_whitelist: bool, tax_fee: Balance) -> Self {
             let mut instance = Self::default();
 
             instance.metadata.name = Some(name);
             instance.metadata.symbol = Some(symbol);
             instance.metadata.decimals = decimals;
-            instance.black_list = Mapping::default();
+            instance.whitelist = Mapping::default();
+            instance.is_required_whiteList = is_require_whitelist;
             instance._init_with_owner(owner);
+            instance.tax_fee = tax_fee;
 
             // Mint initial supply to the caller.
             instance
@@ -122,6 +132,24 @@ pub mod token {
             }
         }
 
+        #[ink(message)]
+        #[modifiers(only_owner)]
+        /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
+        pub fn force_transfer(&mut self, from_account: AccountId, to_account: AccountId, amount: Balance) -> Result<()> {
+            self._transfer_from_to(from_account, to_account, amount, Vec::new());
+            Ok(())
+        }
+
+        #[ink(message)]
+        #[modifiers(only_owner)]
+        /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
+        pub fn claim_tax_fee(&mut self, to: AccountId, amount: Balance) -> Result<()> {
+            let ok = self.env().transfer(to, amount);
+            if ok.is_err() {
+                return Err(PSP22Error::Custom(String::from("Error while transfer native")));
+            }
+            Ok(())
+        }
     }
 
     // We have to implement the "main trait" for our contract to have the PSP22 methods available.

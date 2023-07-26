@@ -54,12 +54,12 @@ pub mod token_factory {
         }
 
         #[ink(message)]
-        pub fn create_token(&mut self, owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance) -> Result<AccountId, TokenFactoryError> {
+        pub fn create_token(&mut self, owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance, is_require_whitelist: bool, tax_fee: Balance) -> Result<AccountId, TokenFactoryError> {
             let salt = (<Self as DefaultEnv>::env().block_timestamp(), b"token_contract").encode();
             let hash = xxh32(&salt, 0).to_le_bytes();
 
             let pool_hash = self.token_contract_code_hash;
-            let pool = match TokenRef::new(owner, name, symbol, decimals, total_supply)
+            let pool = match TokenRef::new(owner, name, symbol, decimals, total_supply, is_require_whitelist, tax_fee)
                 .endowment(0)
                 .code_hash(pool_hash)
                 .salt_bytes(&hash[..4])
