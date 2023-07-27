@@ -221,6 +221,19 @@ pub mod ido {
         }
 
         #[ink(message)]
+        #[modifiers(only_owner)]
+        pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<(), IDOError> {
+            ink::env::set_code_hash(&code_hash).unwrap_or_else(|err| {
+                panic!(
+                    "Failed to `set_code_hash` to {:?} due to {:?}",
+                    code_hash, err
+                )
+            });
+            ink::env::debug_println!("Switched code hash to {:?}.", code_hash);
+            Ok(())
+        }
+
+        #[ink(message)]
         pub fn gen_msg_for_buy_token(&self, deadline: Timestamp, received_value: Balance) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
             let mut message: String = String::from("");

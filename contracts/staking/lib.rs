@@ -26,6 +26,7 @@ mod staking {
         InsufficientAllowance,
         InsufficientBalance,
         InvalidSignature,
+        OnlyOwner,
     }
 
     #[ink(storage)]
@@ -96,7 +97,7 @@ mod staking {
         pub fn set_signer(&mut self, signer: AccountId) -> Result<(), StakingError> {
             let caller = self.env().caller();
             if caller != self.owner {
-                return Err(StakingError::InvalidSignature.into());
+                return Err(StakingError::OnlyOwner.into());
             }
             self.signer = signer;
             Ok(())
@@ -180,8 +181,13 @@ mod staking {
         }
 
         #[ink(message)]
-        pub fn set_owner(&mut self, new_owner: AccountId) {
-            self.owner = new_owner
+        pub fn set_owner(&mut self, new_owner: AccountId) -> Result<(), StakingError> {
+            let caller = self.env().caller();
+            if caller != self.owner {
+                return Err(StakingError::OnlyOwner.into());
+            }
+            self.owner = new_owner;
+            Ok(())
         }
 
         #[ink(message)]
@@ -201,13 +207,34 @@ mod staking {
         }
 
         #[ink(message)]
-        pub fn set_tiers(&mut self, tiers: Vec<u128>) {
+        pub fn set_tiers(&mut self, tiers: Vec<u128>) -> Result<(), StakingError> {
+            let caller = self.env().caller();
+            if caller != self.owner {
+                return Err(StakingError::OnlyOwner.into());
+            }
             self.tier_configs = tiers;
+            Ok(())
         }
 
         #[ink(message)]
         pub fn get_tiers(&self, tiers: Vec<u128>) -> Result<Vec<u128>, StakingError> {
             Ok(self.tier_configs.clone())
+        }
+
+        #[ink(message)]
+        pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<(), StakingError> {
+            let caller = self.env().caller();
+            if caller != self.owner {
+                return Err(StakingError::OnlyOwner.into());
+            }
+            ink::env::set_code_hash(&code_hash).unwrap_or_else(|err| {
+                panic!(
+                    "Failed to `set_code_hash` to {:?} due to {:?}",
+                    code_hash, err
+                )
+            });
+            ink::env::debug_println!("Switched code hash to {:?}.", code_hash);
+            Ok(())
         }
 
         fn get_tier_from_amount(&self, amount: u128) -> u128 {

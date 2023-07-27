@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x0ab1d67411b8b44ebd93dc793c747df482b8ea9d3b725303e1685127cddfce34",
+    "hash": "0x2a04e9ab42449fe803c8ba5529a31e19746bc8c3c2ee76c32e7a1138d95c936a",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -358,7 +358,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 5
+          "type": 8
         },
         "selector": "0x367facd6"
       },
@@ -436,7 +436,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 5
+          "type": 8
         },
         "selector": "0xba0583d4"
       },
@@ -465,6 +465,30 @@
           "type": 15
         },
         "selector": "0xe1833ef5"
+      },
+      {
+        "args": [
+          {
+            "label": "code_hash",
+            "type": {
+              "displayName": [],
+              "type": 1
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "set_code",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 8
+        },
+        "selector": "0x694fb50f"
       },
       {
         "args": [
@@ -846,6 +870,10 @@
               {
                 "index": 3,
                 "name": "InvalidSignature"
+              },
+              {
+                "index": 4,
+                "name": "OnlyOwner"
               }
             ]
           }

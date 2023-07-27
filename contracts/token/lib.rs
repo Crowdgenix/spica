@@ -190,6 +190,19 @@ pub mod token {
             }
             Ok(())
         }
+
+        #[ink(message)]
+        #[modifiers(only_owner)]
+        pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<()> {
+            ink::env::set_code_hash(&code_hash).unwrap_or_else(|err| {
+                panic!(
+                    "Failed to `set_code_hash` to {:?} due to {:?}",
+                    code_hash, err
+                )
+            });
+            ink::env::debug_println!("Switched code hash to {:?}.", code_hash);
+            Ok(())
+        }
     }
 
     // We have to implement the "main trait" for our contract to have the PSP22 methods available.
