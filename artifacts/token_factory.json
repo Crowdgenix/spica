@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x5441f5933837468c5a6f61e7d7e8b8d17bccacd2044489eb6ea9b2588a0e14dc",
+    "hash": "0x2a89cb7b4ac8aba78d4ad2e6604cb13f639aac454b8d23df25e93e460f85a188",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -208,6 +208,15 @@
                 "Balance"
               ],
               "type": 10
+            }
+          },
+          {
+            "label": "document",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 9
             }
           }
         ],

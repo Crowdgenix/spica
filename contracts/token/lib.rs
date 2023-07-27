@@ -4,6 +4,19 @@
 
 // pub use crate::token::selectors::*;
 pub use self::token::*;
+//
+// #[modifier_definition]
+// pub fn only_whitelisted<T, F, R, E>(instance: &mut T, body: F) -> Result<R, E>
+//     where
+//         T: Storage<token::Token>,
+//         F: FnOnce(&mut T) -> Result<R, E>,
+//         E: From<PSP22Error>,
+// {
+//     if instance.data().is_required_whiteList == true && instance.data(). != T::env().caller() {
+//         return Err(From::from(FactoryError::CallerIsNotFeeSetter))
+//     }
+//     body(instance)
+// }
 
 #[openbrush::contract]
 pub mod token {
@@ -65,6 +78,7 @@ pub mod token {
         is_required_whiteList: bool,
         whitelist: Mapping<AccountId, bool>,
         tax_fee: Balance,
+        document: String,
     }
 
     impl psp22::Transfer for Token {
@@ -75,8 +89,17 @@ pub mod token {
             _to: Option<&AccountId>,
             _amount: &Balance
         ) -> Result<()> {
+            // if enabled whitelist and caller is not whitelisted or recipient is not whitelisted
+            if self.is_required_whiteList == true {
+                if self.whitelist.get(_from.unwrap()).unwrap_or(false) == false {
+                    return Err(PSP22Error::Custom(String::from("Caller is not whitelisted")));
+                }
+                if self.whitelist.get(_to.unwrap()).unwrap_or(false) == false {
+                    return Err(PSP22Error::Custom(String::from("Recipient is not whitelisted")));
+                }
+            }
             let received_value = self.env().transferred_value();
-            if received_value == self.tax_fee {
+            if received_value < self.tax_fee {
                 return Err(PSP22Error::Custom(String::from("NotExactTaxFee")));
             }
             Ok(())
@@ -85,34 +108,23 @@ pub mod token {
 
     impl Token {
         #[ink(constructor)]
-        pub fn new(owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance, is_require_whitelist: bool, tax_fee: Balance) -> Self {
+        pub fn new(owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance, is_require_whitelist: bool, tax_fee: u128, document: String) -> Self {
             let mut instance = Self::default();
 
+            instance._init_with_owner(owner);
             instance.metadata.name = Some(name);
             instance.metadata.symbol = Some(symbol);
             instance.metadata.decimals = decimals;
             instance.whitelist = Mapping::default();
             instance.is_required_whiteList = is_require_whitelist;
-            instance._init_with_owner(owner);
             instance.tax_fee = tax_fee;
+            instance.document = document;
 
             // Mint initial supply to the caller.
             instance
                 .psp22
-                ._mint_to(Self::env().caller(), total_supply)
+                ._mint_to(owner, total_supply)
                 .unwrap();
-
-            instance
-        }
-
-        #[ink(constructor)]
-        pub fn new_no_initial_supply(name: String, symbol: String, decimals: u8) -> Self {
-            let mut instance = Self::default();
-
-            instance.metadata.name = Some(name);
-            instance.metadata.symbol = Some(symbol);
-            instance.metadata.decimals = decimals;
-            instance._init_with_owner(Self::env().caller());
 
             instance
         }
@@ -120,6 +132,16 @@ pub mod token {
         // Emit event abstraction. Otherwise ink! deserializes events incorrectly when there are events from more than one contract.
         pub fn emit_event<EE: EmitEvent<Self>>(emitter: EE, event: Event) {
             emitter.emit_event(event);
+        }
+
+        #[ink(message)]
+        pub fn document(&self) -> String {
+            self.document.clone().into()
+        }
+
+        #[ink(message)]
+        pub fn tax_fee(&self) -> Balance {
+            self.tax_fee
         }
 
         #[ink(message)]
@@ -134,9 +156,27 @@ pub mod token {
 
         #[ink(message)]
         #[modifiers(only_owner)]
+        pub fn add_whitelist(&mut self, users: Vec<AccountId>) -> Result<()> {
+            for user in users {
+                self.whitelist.insert(user, &true);
+            }
+            Ok(())
+        }
+
+        #[ink(message)]
+        #[modifiers(only_owner)]
+        pub fn remove_whitelist(&mut self, users: Vec<AccountId>) -> Result<()> {
+            for user in users {
+                self.whitelist.insert(user, &false);
+            }
+            Ok(())
+        }
+
+        #[ink(message)]
+        #[modifiers(only_owner)]
         /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
         pub fn force_transfer(&mut self, from_account: AccountId, to_account: AccountId, amount: Balance) -> Result<()> {
-            self._transfer_from_to(from_account, to_account, amount, Vec::new());
+            self._transfer_from_to(from_account, to_account, amount, Vec::new())?;
             Ok(())
         }
 

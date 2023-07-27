@@ -93,6 +93,16 @@ mod staking {
         }
 
         #[ink(message)]
+        pub fn set_signer(&mut self, signer: AccountId) -> Result<(), StakingError> {
+            let caller = self.env().caller();
+            if caller != self.owner {
+                return Err(StakingError::InvalidSignature.into());
+            }
+            self.signer = signer;
+            Ok(())
+        }
+
+        #[ink(message)]
         pub fn stake(&mut self, deadline: Timestamp, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
             let caller = self.env().caller();
 
@@ -190,6 +200,16 @@ mod staking {
             }
         }
 
+        #[ink(message)]
+        pub fn set_tiers(&mut self, tiers: Vec<u128>) {
+            self.tier_configs = tiers;
+        }
+
+        #[ink(message)]
+        pub fn get_tiers(&self, tiers: Vec<u128>) -> Result<Vec<u128>, StakingError> {
+            Ok(self.tier_configs.clone())
+        }
+
         fn get_tier_from_amount(&self, amount: u128) -> u128 {
             let mut tier: u128 = 0;
             for i in 0..self.tier_configs.len() {
@@ -262,16 +282,11 @@ mod staking {
         use ink::{ToAccountId};
 
         #[ink::test]
-        fn test() {
-            // let accounts = test::default_accounts::<DefaultEnvironment>();
-            // debug_println!("Hello, world!");
-            // let token = TokenRef::new("TEST".to_string(), "TEST".to_string(), 10, 100000000);
-            // debug_println!("`{:?}` is token address", token.env().account_id());
-            // assert_eq!(token.total_supply(), 100000000);
-
-            // stake_token: AccountId, tier_configs: Vec<u128>
-            // let staking = Staking::new(token_address, vec![100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]);
-            // assert_eq!(staking.get_owner(), token_address);
+        fn set_tiers_works() {
+            let accounts = test::default_accounts::<DefaultEnvironment>();
+            let mut staking = Staking::new(accounts.alice, accounts.alice, Vec::new());
+            staking.set_tiers(vec![100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]);
+            // assert_eq!(staking.get_tiers(c).unwrap(), vec![100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]);
         }
     }
 }
