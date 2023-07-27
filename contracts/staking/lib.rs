@@ -222,7 +222,7 @@ mod staking {
         }
 
         #[ink(message)]
-        pub fn gen_msg_for_stake_token(&self, deadline: Timestamp, stake_amount: Balance) -> String {
+        pub fn gen_msg_for_stake_token(&self, deadline: Timestamp, stake_amount: u128) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
             let mut message: String = String::from("");
             message.push_str("stake_token_");
@@ -237,7 +237,7 @@ mod staking {
         }
 
         #[ink(message)]
-        pub fn gen_msg_for_unstake_token(&self, deadline: Timestamp, unstake_amount: Balance) -> String {
+        pub fn gen_msg_for_unstake_token(&self, deadline: Timestamp, unstake_amount: u128) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
             let mut message: String = String::from("");
             message.push_str("unstake_token_");

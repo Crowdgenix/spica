@@ -481,7 +481,7 @@
             "label": "stake_amount",
             "type": {
               "displayName": [
-                "Balance"
+                "u128"
               ],
               "type": 3
             }
@@ -516,7 +516,7 @@
             "label": "unstake_amount",
             "type": {
               "displayName": [
-                "Balance"
+                "u128"
               ],
               "type": 3
             }
