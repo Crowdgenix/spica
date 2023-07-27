@@ -6,12 +6,13 @@ pub mod factory {
     use ink::{
         codegen::{
             EmitEvent,
-            Env,
         },
         ToAccountId,
     };
     use ink::env::hash::Blake2x256;
-    use openbrush::traits::{Storage, DefaultEnv};
+    use openbrush::modifiers;
+    use openbrush::contracts::ownable::*;
+    use openbrush::traits::{Storage};
     use openbrush::utils::xxhash_rust::const_xxh32::xxh32;
     use scale::Encode;
 
@@ -34,7 +35,11 @@ pub mod factory {
     pub struct FactoryContract {
         #[storage_field]
         factory: FactoryData,
+        #[storage_field]
+        ownable: ownable::Data,
     }
+
+    impl ownable::Ownable for FactoryContract {}
 
     impl Factory for FactoryContract {
         #[ink(message)]
@@ -53,6 +58,7 @@ pub mod factory {
         }
 
         #[ink(message)]
+        #[modifiers(only_owner)]
         fn create_pool(&mut self, ido_token: AccountId, signer: AccountId, price: u128, price_decimals: u32) -> Result<AccountId, FactoryError> {
             ensure!(
                 self.factory.get_pool.get(&ido_token)
@@ -60,8 +66,7 @@ pub mod factory {
                 FactoryError::PoolExists
             );
 
-            let salt = &self.env().hash_encoded::<Blake2x256, _>(&ido_token);
-            let pool_contract = self._instantiate_pool(salt.as_ref())?;
+            let pool_contract = self._instantiate_pool()?;
 
             let result = IdoRef::init_ido(&pool_contract, ido_token, signer, price, price_decimals);
             if result.is_err() {
@@ -93,18 +98,19 @@ pub mod factory {
         pub fn new(pool_code_hash: Hash) -> Self {
             let mut instance = Self::default();
             instance.factory.pool_contract_code_hash = pool_code_hash;
+            instance._init_with_owner(Self::env().caller());
             instance
         }
 
-        fn _instantiate_pool(&mut self, salt_bytes: &[u8]) -> Result<AccountId, FactoryError> {
-            let salt = (<Self as DefaultEnv>::env().block_timestamp(), b"ido_pool").encode();
+        fn _instantiate_pool(&mut self) -> Result<AccountId, FactoryError> {
+            let salt = (self.env().block_timestamp(), b"ido_factory").encode();
             let hash = xxh32(&salt, 0).to_le_bytes();
 
             let pool_hash = self.factory.pool_contract_code_hash;
             let pool = match IdoContractRef::new(self.env().caller())
                 .endowment(0)
                 .code_hash(pool_hash)
-                .salt_bytes(&[1,2,3,4])
+                .salt_bytes(&hash[..4])
                 .try_instantiate()
             {
                 Ok(Ok(res)) => Ok(res),

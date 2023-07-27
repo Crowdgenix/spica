@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x39650babed57b84fd68c660a1126cb43187b67794228026ab8f2b30a9f487b86",
+    "hash": "0x8ccd01648e75875f7b18cd44d80bd0590c73dcd8a38b69af2a63650fc37f2b26",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -43,7 +43,7 @@
             "ink_primitives",
             "ConstructorResult"
           ],
-          "type": 5
+          "type": 6
         },
         "selector": "0x9bae9d5e"
       }
@@ -72,7 +72,7 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 18
+        "type": 23
       },
       "hash": {
         "displayName": [
@@ -85,7 +85,7 @@
         "displayName": [
           "Timestamp"
         ],
-        "type": 10
+        "type": 19
       }
     },
     "events": [
@@ -121,7 +121,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 10
+              "type": 19
             }
           }
         ],
@@ -140,8 +140,10 @@
       {
         "args": [],
         "default": false,
-        "docs": [],
-        "label": "Factory::pool_contract_code_hash",
+        "docs": [
+          " Returns the address of the current owner."
+        ],
+        "label": "Ownable::owner",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -151,14 +153,26 @@
           ],
           "type": 8
         },
-        "selector": "0x3a828d93"
+        "selector": "0x4fa43c8c"
       },
       {
         "args": [],
         "default": false,
-        "docs": [],
-        "label": "Factory::all_pools_length",
-        "mutates": false,
+        "docs": [
+          " Leaves the contract without owner. It will not be possible to call",
+          " owner's functions anymore. Can only be called by the current owner.",
+          "",
+          " NOTE: Renouncing ownership will leave the contract without an owner,",
+          " thereby removing any functionality that is only available to the owner.",
+          "",
+          " On success a `OwnershipTransferred` event is emitted.",
+          "",
+          " # Errors",
+          "",
+          " Panics with `CallerIsNotOwner` error if caller is not owner"
+        ],
+        "label": "Ownable::renounce_ownership",
+        "mutates": true,
         "payable": false,
         "returnType": {
           "displayName": [
@@ -167,24 +181,52 @@
           ],
           "type": 9
         },
-        "selector": "0xb261846e"
+        "selector": "0x5e228753"
       },
       {
         "args": [
           {
-            "label": "token",
+            "label": "new_owner",
             "type": {
               "displayName": [
-                "factory_external",
-                "GetPoolInput1"
+                "ownable",
+                "ownable_external",
+                "TransferOwnershipInput1"
               ],
               "type": 0
             }
           }
         ],
         "default": false,
+        "docs": [
+          " Transfers ownership of the contract to a `new_owner`.",
+          " Can only be called by the current owner.",
+          "",
+          " On success a `OwnershipTransferred` event is emitted.",
+          "",
+          " # Errors",
+          "",
+          " Panics with `CallerIsNotOwner` error if caller is not owner.",
+          "",
+          " Panics with `NewOwnerIsZero` error if new owner's address is zero."
+        ],
+        "label": "Ownable::transfer_ownership",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 9
+        },
+        "selector": "0x11f43efd"
+      },
+      {
+        "args": [],
+        "default": false,
         "docs": [],
-        "label": "Factory::get_pool",
+        "label": "Factory::pool_contract_code_hash",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -192,9 +234,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 11
+          "type": 12
         },
-        "selector": "0x080b44cd"
+        "selector": "0x3a828d93"
       },
       {
         "args": [
@@ -262,7 +304,7 @@
                 "factory_external",
                 "AllPoolsInput1"
               ],
-              "type": 10
+              "type": 19
             }
           }
         ],
@@ -276,9 +318,52 @@
             "ink",
             "MessageResult"
           ],
-          "type": 11
+          "type": 20
         },
         "selector": "0xc61cf18e"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "Factory::all_pools_length",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 22
+        },
+        "selector": "0xb261846e"
+      },
+      {
+        "args": [
+          {
+            "label": "token",
+            "type": {
+              "displayName": [
+                "factory_external",
+                "GetPoolInput1"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "Factory::get_pool",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 20
+        },
+        "selector": "0x080b44cd"
       }
     ]
   },
@@ -328,6 +413,54 @@
                 }
               },
               "name": "factory"
+            },
+            {
+              "layout": {
+                "struct": {
+                  "fields": [
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 0
+                        }
+                      },
+                      "name": "owner"
+                    },
+                    {
+                      "layout": {
+                        "enum": {
+                          "dispatchKey": "0x00000000",
+                          "name": "Option",
+                          "variants": {
+                            "0": {
+                              "fields": [],
+                              "name": "None"
+                            },
+                            "1": {
+                              "fields": [
+                                {
+                                  "layout": {
+                                    "leaf": {
+                                      "key": "0x00000000",
+                                      "ty": 5
+                                    }
+                                  },
+                                  "name": "0"
+                                }
+                              ],
+                              "name": "Some"
+                            }
+                          }
+                        }
+                      },
+                      "name": "_reserved"
+                    }
+                  ],
+                  "name": "Data"
+                }
+              },
+              "name": "ownable"
             }
           ],
           "name": "FactoryContract"
@@ -410,12 +543,20 @@
       "id": 5,
       "type": {
         "def": {
+          "tuple": []
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": {
+        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 6
+                    "type": 5
                   }
                 ],
                 "index": 0,
@@ -436,7 +577,7 @@
         "params": [
           {
             "name": "T",
-            "type": 6
+            "type": 5
           },
           {
             "name": "E",
@@ -446,14 +587,6 @@
         "path": [
           "Result"
         ]
-      }
-    },
-    {
-      "id": 6,
-      "type": {
-        "def": {
-          "tuple": []
-        }
       }
     },
     {
@@ -484,7 +617,7 @@
               {
                 "fields": [
                   {
-                    "type": 4
+                    "type": 0
                   }
                 ],
                 "index": 0,
@@ -505,7 +638,7 @@
         "params": [
           {
             "name": "T",
-            "type": 4
+            "type": 0
           },
           {
             "name": "E",
@@ -563,8 +696,42 @@
       "id": 10,
       "type": {
         "def": {
-          "primitive": "u64"
-        }
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          },
+          {
+            "name": "E",
+            "type": 11
+          }
+        ],
+        "path": [
+          "Result"
+        ]
       }
     },
     {
@@ -574,9 +741,35 @@
           "variant": {
             "variants": [
               {
+                "index": 0,
+                "name": "CallerIsNotOwner"
+              },
+              {
+                "index": 1,
+                "name": "NewOwnerIsZero"
+              }
+            ]
+          }
+        },
+        "path": [
+          "openbrush_contracts",
+          "traits",
+          "errors",
+          "ownable",
+          "OwnableError"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
                 "fields": [
                   {
-                    "type": 12
+                    "type": 4
                   }
                 ],
                 "index": 0,
@@ -597,7 +790,7 @@
         "params": [
           {
             "name": "T",
-            "type": 12
+            "type": 4
           },
           {
             "name": "E",
@@ -606,39 +799,6 @@
         ],
         "path": [
           "Result"
-        ]
-      }
-    },
-    {
-      "id": 12,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "None"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 0
-                  }
-                ],
-                "index": 1,
-                "name": "Some"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 0
-          }
-        ],
-        "path": [
-          "Option"
         ]
       }
     },
@@ -749,27 +909,37 @@
           "variant": {
             "variants": [
               {
+                "fields": [
+                  {
+                    "type": 18,
+                    "typeName": "String"
+                  }
+                ],
                 "index": 0,
-                "name": "CallerIsNotFeeSetter"
+                "name": "Custom"
               },
               {
                 "index": 1,
-                "name": "ZeroAddress"
+                "name": "CallerIsNotFeeSetter"
               },
               {
                 "index": 2,
-                "name": "IdenticalAddresses"
+                "name": "ZeroAddress"
               },
               {
                 "index": 3,
-                "name": "PoolExists"
+                "name": "IdenticalAddresses"
               },
               {
                 "index": 4,
-                "name": "PoolInstantiationFailed"
+                "name": "PoolExists"
               },
               {
                 "index": 5,
+                "name": "PoolInstantiationFailed"
+              },
+              {
+                "index": 6,
                 "name": "PoolInitFailed"
               }
             ]
@@ -784,6 +954,139 @@
     },
     {
       "id": 18,
+      "type": {
+        "def": {
+          "primitive": "str"
+        }
+      }
+    },
+    {
+      "id": 19,
+      "type": {
+        "def": {
+          "primitive": "u64"
+        }
+      }
+    },
+    {
+      "id": 20,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 21
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 7
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 21
+          },
+          {
+            "name": "E",
+            "type": 7
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "None"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 1,
+                "name": "Some"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          }
+        ],
+        "path": [
+          "Option"
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 19
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 7
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 19
+          },
+          {
+            "name": "E",
+            "type": 7
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 23,
       "type": {
         "def": {
           "variant": {}

@@ -7,6 +7,7 @@ use openbrush::{
 use ink::prelude::string::String;
 use openbrush::traits::{Hash, Storage};
 use ido::traits::{IDOError};
+use openbrush::contracts::ownable::*;
 
 #[openbrush::wrapper]
 pub type FactoryRef = dyn Factory;
@@ -39,6 +40,7 @@ pub trait Factory {
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
 pub enum FactoryError {
     // IDOError(IDOError),
+    Custom(String),
     CallerIsNotFeeSetter,
     ZeroAddress,
     IdenticalAddresses,
@@ -46,6 +48,16 @@ pub enum FactoryError {
     PoolInstantiationFailed,
     PoolInitFailed,
 }
+
+impl From<ownable::OwnableError> for FactoryError {
+    fn from(ownable: ownable::OwnableError) -> Self {
+        match ownable {
+            ownable::OwnableError::CallerIsNotOwner => FactoryError::Custom(String::from("O::CallerIsNotOwner")),
+            ownable::OwnableError::NewOwnerIsZero => FactoryError::Custom(String::from("O::NewOwnerIsZero")),
+        }
+    }
+}
+
 //
 // impl From<IDOError> for FactoryError {
 //     fn from(error: IDOError) -> Self {
