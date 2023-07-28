@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x2a89cb7b4ac8aba78d4ad2e6604cb13f639aac454b8d23df25e93e460f85a188",
+    "hash": "0xc714cbcf76b004a005b3fdc02b959fa34483cec97cc1d8d6d127aaba592418e2",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -67,13 +67,13 @@
         "displayName": [
           "BlockNumber"
         ],
-        "type": 17
+        "type": 16
       },
       "chainExtension": {
         "displayName": [
           "ChainExtension"
         ],
-        "type": 18
+        "type": 17
       },
       "hash": {
         "displayName": [
@@ -86,7 +86,7 @@
         "displayName": [
           "Timestamp"
         ],
-        "type": 16
+        "type": 15
       }
     },
     "events": [
@@ -98,9 +98,9 @@
             "label": "owner",
             "type": {
               "displayName": [
-                "Option"
+                "AccountId"
               ],
-              "type": 15
+              "type": 4
             }
           },
           {
@@ -109,16 +109,16 @@
             "label": "address",
             "type": {
               "displayName": [
-                "Option"
+                "AccountId"
               ],
-              "type": 15
+              "type": 4
             }
           }
         ],
         "docs": [
           "Event emitted when a token transfer occurs."
         ],
-        "label": "CreateToken"
+        "label": "TokenCreatedEvent"
       }
     ],
     "lang_error": {
@@ -579,45 +579,12 @@
       "id": 15,
       "type": {
         "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "None"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 4
-                  }
-                ],
-                "index": 1,
-                "name": "Some"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 4
-          }
-        ],
-        "path": [
-          "Option"
-        ]
-      }
-    },
-    {
-      "id": 16,
-      "type": {
-        "def": {
           "primitive": "u64"
         }
       }
     },
     {
-      "id": 17,
+      "id": 16,
       "type": {
         "def": {
           "primitive": "u32"
@@ -625,7 +592,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 17,
       "type": {
         "def": {
           "variant": {}

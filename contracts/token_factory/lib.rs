@@ -68,6 +68,7 @@ pub mod token_factory {
                 _ => Err(TokenFactoryError::CreateTokenFailed),
             }?;
             self.list_of_tokens.push(pool.to_account_id());
+            TokenFactory::emit_event(self.env(), Event::TokenCreatedEvent(TokenCreatedEvent { owner, address: pool.to_account_id() }));
             Ok(pool.to_account_id())
         }
 
@@ -80,11 +81,11 @@ pub mod token_factory {
     /// Event emitted when a token transfer occurs.
     #[ink(event)]
     #[derive(Debug)]
-    pub struct CreateToken {
+    pub struct TokenCreatedEvent {
         #[ink(topic)]
-        pub owner: Option<AccountId>,
+        pub owner: AccountId,
         #[ink(topic)]
-        pub address: Option<AccountId>,
+        pub address: AccountId,
     }
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
