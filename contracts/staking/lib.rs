@@ -143,7 +143,7 @@ mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
-            self._emit_staking_event(caller, amount, tier);
+            self._emit_staking_event(caller, new_amount, tier);
 
             Ok(())
         }
@@ -177,7 +177,7 @@ mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
-            self._emit_unstaking_event(caller, amount, tier);
+            self._emit_unstaking_event(caller, new_amount, tier);
             Ok(())
         }
 
