@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x2cc1d20557e0cd480f6336325f7be4032aca5c5d058dd6d8c296bbb0b3a6cd86",
+    "hash": "0xc5caf5a5662f6d5237f1d9b0b19f7be87b2b5434514874e312897dd16ecdf7be",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -72,13 +72,13 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 23
+        "type": 24
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 22
+        "type": 23
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -403,6 +403,34 @@
       {
         "args": [
           {
+            "label": "new_price",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "AdminSetPriceInput1"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "Ido::admin_set_price",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 9
+        },
+        "selector": "0xdacc7376"
+      },
+      {
+        "args": [
+          {
             "label": "_ido_token",
             "type": {
               "displayName": [
@@ -476,34 +504,6 @@
           "type": 15
         },
         "selector": "0xe6db55e4"
-      },
-      {
-        "args": [
-          {
-            "label": "new_price",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "AdminSetPriceInput1"
-              ],
-              "type": 3
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "Ido::admin_set_price",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 19
-        },
-        "selector": "0xdacc7376"
       },
       {
         "args": [
@@ -595,42 +595,25 @@
         "selector": "0xd38ba04d"
       },
       {
-        "args": [],
-        "default": false,
-        "docs": [
-          " Leaves the contract without owner. It will not be possible to call",
-          " owner's functions anymore. Can only be called by the current owner.",
-          "",
-          " NOTE: Renouncing ownership will leave the contract without an owner,",
-          " thereby removing any functionality that is only available to the owner.",
-          "",
-          " On success a `OwnershipTransferred` event is emitted.",
-          "",
-          " # Errors",
-          "",
-          " Panics with `CallerIsNotOwner` error if caller is not owner"
-        ],
-        "label": "Ownable::renounce_ownership",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 19
-        },
-        "selector": "0x5e228753"
-      },
-      {
         "args": [
           {
-            "label": "new_owner",
+            "label": "role",
             "type": {
               "displayName": [
-                "ownable",
-                "ownable_external",
-                "TransferOwnershipInput1"
+                "access_control",
+                "accesscontrol_external",
+                "HasRoleInput1"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "address",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "HasRoleInput2"
               ],
               "type": 0
             }
@@ -638,18 +621,57 @@
         ],
         "default": false,
         "docs": [
-          " Transfers ownership of the contract to a `new_owner`.",
-          " Can only be called by the current owner.",
+          " Returns `true` if `account` has been granted `role`."
+        ],
+        "label": "AccessControl::has_role",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 17
+        },
+        "selector": "0xc1d9ac18"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "GrantRoleInput1"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "GrantRoleInput2"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Grants `role` to `account`.",
           "",
-          " On success a `OwnershipTransferred` event is emitted.",
+          " On success a `RoleGranted` event is emitted.",
           "",
           " # Errors",
           "",
-          " Panics with `CallerIsNotOwner` error if caller is not owner.",
-          "",
-          " Panics with `NewOwnerIsZero` error if new owner's address is zero."
+          " Returns with `MissingRole` error if caller can't grant the role.",
+          " Returns with `RoleRedundant` error `account` has `role`."
         ],
-        "label": "Ownable::transfer_ownership",
+        "label": "AccessControl::grant_role",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -659,15 +681,27 @@
           ],
           "type": 19
         },
-        "selector": "0x11f43efd"
+        "selector": "0x4ac062fd"
       },
       {
-        "args": [],
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "GetRoleAdminInput1"
+              ],
+              "type": 4
+            }
+          }
+        ],
         "default": false,
         "docs": [
-          " Returns the address of the current owner."
+          " Returns the admin role that controls `role`. See `grant_role` and `revoke_role`."
         ],
-        "label": "Ownable::owner",
+        "label": "AccessControl::get_role_admin",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -675,9 +709,107 @@
             "ink",
             "MessageResult"
           ],
-          "type": 15
+          "type": 22
         },
-        "selector": "0x4fa43c8c"
+        "selector": "0x83da3bb2"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "RevokeRoleInput1"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "RevokeRoleInput2"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Revokes `role` from `account`.",
+          "",
+          " On success a `RoleRevoked` event is emitted.",
+          "",
+          " # Errors",
+          "",
+          " Returns with `MissingRole` error if caller can't grant the `role` or if `account` doesn't have `role`."
+        ],
+        "label": "AccessControl::revoke_role",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 19
+        },
+        "selector": "0x6e4f0991"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "RenounceRoleInput1"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "RenounceRoleInput2"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Revokes `role` from the calling account.",
+          " Roles are often managed via `grant_role` and `revoke_role`: this function's",
+          " purpose is to provide a mechanism for accounts to lose their privileges",
+          " if they are compromised (such as when a trusted device is misplaced).",
+          "",
+          " On success a `RoleRevoked` event is emitted.",
+          "",
+          " # Errors",
+          "",
+          " Returns with `InvalidCaller` error if caller is not `account`.",
+          " Returns with `MissingRole` error if `account` doesn't have `role`."
+        ],
+        "label": "AccessControl::renounce_role",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 19
+        },
+        "selector": "0xeaf1248a"
       }
     ]
   },
@@ -766,12 +898,70 @@
                   "fields": [
                     {
                       "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 0
+                        "root": {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x6a2cd2b4",
+                              "ty": 4
+                            }
+                          },
+                          "root_key": "0x6a2cd2b4"
                         }
                       },
-                      "name": "owner"
+                      "name": "admin_roles"
+                    },
+                    {
+                      "layout": {
+                        "struct": {
+                          "fields": [
+                            {
+                              "layout": {
+                                "root": {
+                                  "layout": {
+                                    "leaf": {
+                                      "key": "0x5d5db175",
+                                      "ty": 5
+                                    }
+                                  },
+                                  "root_key": "0x5d5db175"
+                                }
+                              },
+                              "name": "members"
+                            },
+                            {
+                              "layout": {
+                                "enum": {
+                                  "dispatchKey": "0x00000000",
+                                  "name": "Option",
+                                  "variants": {
+                                    "0": {
+                                      "fields": [],
+                                      "name": "None"
+                                    },
+                                    "1": {
+                                      "fields": [
+                                        {
+                                          "layout": {
+                                            "leaf": {
+                                              "key": "0x00000000",
+                                              "ty": 5
+                                            }
+                                          },
+                                          "name": "0"
+                                        }
+                                      ],
+                                      "name": "Some"
+                                    }
+                                  }
+                                }
+                              },
+                              "name": "_reserved"
+                            }
+                          ],
+                          "name": "Members"
+                        }
+                      },
+                      "name": "members"
                     },
                     {
                       "layout": {
@@ -806,7 +996,7 @@
                   "name": "Data"
                 }
               },
-              "name": "ownable"
+              "name": "access"
             },
             {
               "layout": {
@@ -1374,11 +1564,15 @@
             "variants": [
               {
                 "index": 0,
-                "name": "CallerIsNotOwner"
+                "name": "InvalidCaller"
               },
               {
                 "index": 1,
-                "name": "NewOwnerIsZero"
+                "name": "MissingRole"
+              },
+              {
+                "index": 2,
+                "name": "RoleRedundant"
               }
             ]
           }
@@ -1387,13 +1581,55 @@
           "openbrush_contracts",
           "traits",
           "errors",
-          "ownable",
-          "OwnableError"
+          "access_control",
+          "AccessControlError"
         ]
       }
     },
     {
       "id": 22,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 4
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 4
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 23,
       "type": {
         "def": {
           "composite": {
@@ -1413,7 +1649,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 24,
       "type": {
         "def": {
           "variant": {}

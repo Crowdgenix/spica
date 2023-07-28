@@ -53,10 +53,15 @@ mod staking {
         pub new_tier: u128,
     }
 
+    #[ink(event)]
+    pub struct SetTiersEvent {
+        pub tiers: Vec<u128>,
+    }
 
     pub trait Internal {
         fn _emit_staking_event(&self, account: AccountId, amount: u128, new_tier: u128);
         fn _emit_unstaking_event(&self, account: AccountId, amount: u128, new_tier: u128);
+        fn _emit_set_tiers_event(&self, tiers: Vec<u128>);
     }
 
     impl Internal for Staking {
@@ -73,6 +78,12 @@ mod staking {
                 staker: account,
                 amount,
                 new_tier,
+            })
+        }
+
+        fn _emit_set_tiers_event(&self, tiers: Vec<u128>) {
+            self.env().emit_event(SetTiersEvent {
+                tiers,
             })
         }
     }
@@ -212,7 +223,8 @@ mod staking {
             if caller != self.owner {
                 return Err(StakingError::OnlyOwner.into());
             }
-            self.tier_configs = tiers;
+            self.tier_configs = tiers.clone();
+            self._emit_set_tiers_event(tiers.clone());
             Ok(())
         }
 

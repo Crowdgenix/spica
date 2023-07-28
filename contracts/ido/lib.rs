@@ -24,10 +24,12 @@ pub mod ido {
         traits::Storage,
         contracts::traits::psp22::*,
     };
-    use openbrush::contracts::ownable::*;
+    use openbrush::contracts::access_control::*;
     use openbrush::traits::{DefaultEnv};
     use crate::{ensure, traits, helpers, types};
     use crate::traits::{IDOError, Internal};
+
+    pub const DEPLOYER: RoleType = ink::selector_id!("DEPLOYER");
 
     #[ink(event)]
     pub struct InitIdoContract {
@@ -59,7 +61,7 @@ pub mod ido {
         #[storage_field]
         ido: types::Data,
         #[storage_field]
-        ownable: ownable::Data,
+        access: access_control::Data,
         isInitialized: bool,
     }
 
@@ -114,7 +116,7 @@ pub mod ido {
 
     impl traits::Ido for IdoContract {
         #[ink(message)]
-        #[modifiers(only_owner)]
+        #[modifiers(only_role(DEPLOYER))]
         fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32) -> Result<(), IDOError> {
             ensure!(self.isInitialized == false, IDOError::Initialized);
             self.ido.ido_token = _ido_token;
@@ -197,8 +199,8 @@ pub mod ido {
         }
 
         #[ink(message)]
-        #[modifiers(only_owner)]
-        fn admin_set_price(&mut self, new_price: u128) -> Result<(), ownable::OwnableError> {
+        #[modifiers(only_role(DEPLOYER))]
+        fn admin_set_price(&mut self, new_price: u128) -> Result<(), IDOError> {
             self.ido.price = new_price;
             Ok(())
         }
@@ -209,19 +211,20 @@ pub mod ido {
         }
     }
 
-    impl ownable::Ownable for IdoContract {}
+    impl access_control::AccessControl for IdoContract {}
+
 
     impl IdoContract {
         #[ink(constructor)]
         pub fn new(owner: AccountId) -> Self {
             let mut instance = Self::default();
-            instance._init_with_owner(owner);
+            instance._init_with_admin(owner);
             instance.isInitialized = false;
             instance
         }
 
         #[ink(message)]
-        #[modifiers(only_owner)]
+        #[modifiers(only_role(DEPLOYER))]
         pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<(), IDOError> {
             ink::env::set_code_hash(&code_hash).unwrap_or_else(|err| {
                 panic!(

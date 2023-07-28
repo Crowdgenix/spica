@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 ink = { version = "4.2.0", default-features = false }
-openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts/", tag = "3.1.1", default-features = false, features = ["psp22", "ownable"] }
+openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts/", tag = "3.1.1", default-features = false, features = ["psp22", "access_control"] }
 hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 
 scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }

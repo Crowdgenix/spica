@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x2a04e9ab42449fe803c8ba5529a31e19746bc8c3c2ee76c32e7a1138d95c936a",
+    "hash": "0xa0c1e25f9d93cdb92a84fabb1e714de119e788de4fa825d70cb636694349f0d8",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -184,6 +184,23 @@
         ],
         "docs": [],
         "label": "UnstakingEvent"
+      },
+      {
+        "args": [
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "tiers",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 4
+            }
+          }
+        ],
+        "docs": [],
+        "label": "SetTiersEvent"
       }
     ],
     "lang_error": {

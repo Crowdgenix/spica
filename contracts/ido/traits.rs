@@ -5,7 +5,7 @@ use openbrush::{
     },
 };
 use ink::prelude::string::String;
-use openbrush::contracts::traits::ownable;
+use openbrush::contracts::traits::access_control::AccessControlError;
 use openbrush::traits::{Timestamp};
 
 #[openbrush::wrapper]
@@ -26,7 +26,7 @@ pub trait Ido {
     fn claim_ido_token(&mut self, deadline: Timestamp, amount: Balance, signature: [u8; 65]) -> Result<(), IDOError>;
 
     #[ink(message)]
-    fn admin_set_price(&mut self, new_price: u128) -> Result<(), ownable::OwnableError>;
+    fn admin_set_price(&mut self, new_price: u128) -> Result<(), IDOError>;
 
     #[ink(message)]
     fn get_price(&self) -> Balance;
@@ -51,11 +51,13 @@ pub enum IDOError {
     Initialized,
 }
 
-impl From<ownable::OwnableError> for IDOError {
-    fn from(ownable: ownable::OwnableError) -> Self {
-        match ownable {
-            ownable::OwnableError::CallerIsNotOwner => IDOError::Custom(String::from("O::CallerIsNotOwner")),
-            ownable::OwnableError::NewOwnerIsZero => IDOError::Custom(String::from("O::NewOwnerIsZero")),
+
+impl From<AccessControlError> for IDOError {
+    fn from(error: AccessControlError) -> Self {
+        match error {
+            AccessControlError::InvalidCaller => IDOError::Custom(String::from("AC::InvalidCaller")),
+            AccessControlError::MissingRole => IDOError::Custom(String::from("AC::MissingRole")),
+            AccessControlError::RoleRedundant => IDOError::Custom(String::from("AC::RoleRedundant")),
         }
     }
 }
