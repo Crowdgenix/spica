@@ -150,6 +150,7 @@ pub mod factory {
 
         #[ink::test]
         fn initialize_works() {
+            ink::env::debug_println!("data {:?}", DEPLOYER);
             let accounts = default_accounts::<ink::env::DefaultEnvironment>();
             let mut factory = FactoryContract::new(Hash::default());
             let pool_address = factory.create_pool(accounts.alice, accounts.alice, 100, 10).unwrap();

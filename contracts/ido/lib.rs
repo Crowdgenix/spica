@@ -116,7 +116,6 @@ pub mod ido {
 
     impl traits::Ido for IdoContract {
         #[ink(message)]
-        #[modifiers(only_role(SUB_ADMIN))]
         fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32) -> Result<(), IDOError> {
             ensure!(self.isInitialized == false, IDOError::Initialized);
             self.ido.ido_token = _ido_token;
