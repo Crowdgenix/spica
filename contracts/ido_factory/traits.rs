@@ -7,7 +7,7 @@ use openbrush::{
 use ink::prelude::string::String;
 use openbrush::traits::{Hash, Storage};
 use ido::traits::{IDOError};
-use openbrush::contracts::ownable::*;
+use openbrush::contracts::traits::access_control::AccessControlError;
 
 #[openbrush::wrapper]
 pub type FactoryRef = dyn Factory;
@@ -49,18 +49,12 @@ pub enum FactoryError {
     PoolInitFailed,
 }
 
-impl From<ownable::OwnableError> for FactoryError {
-    fn from(ownable: ownable::OwnableError) -> Self {
-        match ownable {
-            ownable::OwnableError::CallerIsNotOwner => FactoryError::Custom(String::from("O::CallerIsNotOwner")),
-            ownable::OwnableError::NewOwnerIsZero => FactoryError::Custom(String::from("O::NewOwnerIsZero")),
+impl From<AccessControlError> for FactoryError {
+    fn from(error: AccessControlError) -> Self {
+        match error {
+            AccessControlError::InvalidCaller => FactoryError::Custom(String::from("AC::InvalidCaller")),
+            AccessControlError::MissingRole => FactoryError::Custom(String::from("AC::MissingRole")),
+            AccessControlError::RoleRedundant => FactoryError::Custom(String::from("AC::RoleRedundant")),
         }
     }
 }
-
-//
-// impl From<IDOError> for FactoryError {
-//     fn from(error: IDOError) -> Self {
-//         FactoryError::IDOError(error)
-//     }
-// }

@@ -29,7 +29,7 @@ pub mod ido {
     use crate::{ensure, traits, helpers, types};
     use crate::traits::{IDOError, Internal};
 
-    pub const DEPLOYER: RoleType = ink::selector_id!("DEPLOYER");
+    pub const SUB_ADMIN: RoleType = ink::selector_id!("SUB_ADMIN");
 
     #[ink(event)]
     pub struct InitIdoContract {
@@ -116,7 +116,7 @@ pub mod ido {
 
     impl traits::Ido for IdoContract {
         #[ink(message)]
-        #[modifiers(only_role(DEPLOYER))]
+        #[modifiers(only_role(SUB_ADMIN))]
         fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32) -> Result<(), IDOError> {
             ensure!(self.isInitialized == false, IDOError::Initialized);
             self.ido.ido_token = _ido_token;
@@ -199,7 +199,7 @@ pub mod ido {
         }
 
         #[ink(message)]
-        #[modifiers(only_role(DEPLOYER))]
+        #[modifiers(only_role(SUB_ADMIN))]
         fn admin_set_price(&mut self, new_price: u128) -> Result<(), IDOError> {
             self.ido.price = new_price;
             Ok(())
@@ -224,7 +224,7 @@ pub mod ido {
         }
 
         #[ink(message)]
-        #[modifiers(only_role(DEPLOYER))]
+        #[modifiers(only_role(SUB_ADMIN))]
         pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<(), IDOError> {
             ink::env::set_code_hash(&code_hash).unwrap_or_else(|err| {
                 panic!(

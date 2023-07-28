@@ -11,7 +11,7 @@ pub mod factory {
     };
     use ink::env::hash::Blake2x256;
     use openbrush::modifiers;
-    use openbrush::contracts::ownable::*;
+    use openbrush::contracts::access_control::*;
     use openbrush::traits::{Storage};
     use openbrush::utils::xxhash_rust::const_xxh32::xxh32;
     use scale::Encode;
@@ -21,6 +21,8 @@ pub mod factory {
     use crate::types::{self, *};
     use ido::traits::{IdoRef};
     use ido::ido::{IdoContractRef};
+
+    pub const DEPLOYER: RoleType = ink::selector_id!("DEPLOYER");
 
     #[ink(event)]
     pub struct PoolCreated {
@@ -36,10 +38,10 @@ pub mod factory {
         #[storage_field]
         factory: FactoryData,
         #[storage_field]
-        ownable: ownable::Data,
+        access_control: access_control::Data,
     }
 
-    impl ownable::Ownable for FactoryContract {}
+    impl access_control::AccessControl for FactoryContract {}
 
     impl Factory for FactoryContract {
         #[ink(message)]
@@ -58,7 +60,7 @@ pub mod factory {
         }
 
         #[ink(message)]
-        #[modifiers(only_owner)]
+        #[modifiers(only_role(DEPLOYER))]
         fn create_pool(&mut self, ido_token: AccountId, signer: AccountId, price: u128, price_decimals: u32) -> Result<AccountId, FactoryError> {
             ensure!(
                 self.factory.get_pool.get(&ido_token)
@@ -98,7 +100,7 @@ pub mod factory {
         pub fn new(pool_code_hash: Hash) -> Self {
             let mut instance = Self::default();
             instance.factory.pool_contract_code_hash = pool_code_hash;
-            instance._init_with_owner(Self::env().caller());
+            instance._init_with_admin(Self::env().caller());
             instance
         }
 
