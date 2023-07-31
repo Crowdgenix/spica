@@ -190,11 +190,8 @@ pub mod ido {
                 return Err(IDOError::InvalidSignature);
             }
 
-            let old_balances = match self.ido.user_claim_amount.get(&self.env().caller()) {
-                Some(balance) => balance,
-                None => 0 as u128,
-            };
-            let new_balances = old_balances.checked_sub(amount).unwrap();
+            let old_balances = self.ido.user_ido_balances.get(&self.env().caller()).unwrap_or(0);
+            let new_balances = old_balances.checked_sub(amount).unwrap_or(0);
             self.ido.user_ido_balances.insert(self.env().caller(), &new_balances);
 
             let result = helpers::safe_transfer(self.ido.ido_token, caller, amount);
@@ -233,6 +230,12 @@ pub mod ido {
             instance._init_with_admin(owner);
             instance.isInitialized = false;
             instance
+        }
+
+        /// function to get balance of ido token
+        #[ink(message)]
+        pub fn get_ido_token_balance(&self, account: AccountId) -> u128 {
+            return self.ido.user_ido_balances.get(&account).unwrap_or(0 as u128);
         }
 
         // function to update code_hash (logic of IDO contract)

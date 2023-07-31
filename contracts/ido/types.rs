@@ -18,7 +18,6 @@ pub struct Data {
     pub price_decimals: u32,
     pub signer: AccountId,
     pub user_ido_balances: Mapping<AccountId, Balance>,
-    pub user_claim_amount: Mapping<AccountId, Balance>,
 }
 
 impl Default for Data {
@@ -29,7 +28,6 @@ impl Default for Data {
             signer: ZERO_ADDRESS.into(),
             price_decimals: 5,
             user_ido_balances: Mapping::new(),
-            user_claim_amount: Mapping::new(),
         }
     }
 }
