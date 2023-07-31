@@ -89,6 +89,7 @@ mod staking {
     }
 
     impl Staking {
+        /// constructor for staking, admin enter the signer, token for staking and list of tiers
         #[ink(constructor)]
         pub fn new(signer: AccountId, stake_token: AccountId, tier_configs: Vec<u128>) -> Self {
             let staking_amounts = Mapping::default();
@@ -104,6 +105,7 @@ mod staking {
             }
         }
 
+        /// the function allows the owner to set the signer
         #[ink(message)]
         pub fn set_signer(&mut self, signer: AccountId) -> Result<(), StakingError> {
             let caller = self.env().caller();
@@ -114,6 +116,7 @@ mod staking {
             Ok(())
         }
 
+        /// function staking, after user call the API to get the signature for staking (BE API will sign the message), use will call this function to stake
         #[ink(message)]
         pub fn stake(&mut self, deadline: Timestamp, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
             let caller = self.env().caller();
@@ -148,6 +151,7 @@ mod staking {
             Ok(())
         }
 
+        /// function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake
         #[ink(message)]
         pub fn unstake(&mut self, deadline: Timestamp, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
             let caller = self.env().caller();
@@ -181,16 +185,19 @@ mod staking {
             Ok(())
         }
 
+        /// function to get staking token address
         #[ink(message)]
         pub fn get_stake_token(&self) -> AccountId {
             self.stake_token
         }
 
+        /// function to get the owner of the staking contract
         #[ink(message)]
         pub fn get_owner(&self) -> AccountId {
             self.owner
         }
 
+        /// function to set the owner of the staking contract
         #[ink(message)]
         pub fn set_owner(&mut self, new_owner: AccountId) -> Result<(), StakingError> {
             let caller = self.env().caller();
@@ -201,6 +208,7 @@ mod staking {
             Ok(())
         }
 
+        /// function to get staked amount of the input account
         #[ink(message)]
         pub fn staking_amount_of(&self, account: AccountId) -> u128 {
             match self.staking_amounts.get(&account) {
@@ -209,6 +217,7 @@ mod staking {
             }
         }
 
+        /// function to get tier of the input account
         #[ink(message)]
         pub fn tier_of(&self, account: AccountId) -> u128 {
             match self.account_tiers.get(&account) {
@@ -217,6 +226,7 @@ mod staking {
             }
         }
 
+        /// function to set list tiers of the staking contract
         #[ink(message)]
         pub fn set_tiers(&mut self, tiers: Vec<u128>) -> Result<(), StakingError> {
             let caller = self.env().caller();
@@ -228,11 +238,13 @@ mod staking {
             Ok(())
         }
 
+        /// function to get list tiers of the staking contract
         #[ink(message)]
-        pub fn get_tiers(&self, tiers: Vec<u128>) -> Result<Vec<u128>, StakingError> {
+        pub fn get_tiers(&self) -> Result<Vec<u128>, StakingError> {
             Ok(self.tier_configs.clone())
         }
 
+        /// function to update the contract code hash, use for proxy
         #[ink(message)]
         pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<(), StakingError> {
             let caller = self.env().caller();
