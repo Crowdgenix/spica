@@ -115,6 +115,7 @@ pub mod ido {
 
 
     impl traits::Ido for IdoContract {
+        /// this function is initialised function, will init the contract properties
         #[ink(message)]
         fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32) -> Result<(), IDOError> {
             ensure!(self.isInitialized == false, IDOError::Initialized);
@@ -128,11 +129,13 @@ pub mod ido {
             Ok(())
         }
 
+        /// get ido token
         #[ink(message)]
         fn get_ido_token(&self) -> AccountId {
             self.ido.ido_token
         }
 
+        /// function to buy ido token with native
         #[ink(message, payable)]
         fn buy_ido_with_native(&mut self, deadline: Timestamp, signature: [u8; 65]) -> Result<(), IDOError> {
             ensure!(
@@ -162,6 +165,7 @@ pub mod ido {
             Ok(())
         }
 
+        /// function to claim ido token
         #[ink(message)]
         fn claim_ido_token(&mut self, deadline: Timestamp, amount: Balance, signature: [u8; 65]) -> Result<(), IDOError> {
             ensure!(
@@ -197,6 +201,7 @@ pub mod ido {
             Ok(())
         }
 
+        /// function to set price of ido token, only admin can call this function
         #[ink(message)]
         #[modifiers(only_role(SUB_ADMIN))]
         fn admin_set_price(&mut self, new_price: u128) -> Result<(), IDOError> {
@@ -204,6 +209,7 @@ pub mod ido {
             Ok(())
         }
 
+        /// function to get price of ido token
         #[ink(message)]
         fn get_price(&self) -> u128 {
             self.ido.price
@@ -214,6 +220,7 @@ pub mod ido {
 
 
     impl IdoContract {
+        /// constructor of IDO contract
         #[ink(constructor)]
         pub fn new(owner: AccountId) -> Self {
             let mut instance = Self::default();
@@ -222,6 +229,7 @@ pub mod ido {
             instance
         }
 
+        // function to update code_hash (logic of IDO contract)
         #[ink(message)]
         #[modifiers(only_role(SUB_ADMIN))]
         pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<(), IDOError> {
