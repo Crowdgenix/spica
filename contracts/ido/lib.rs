@@ -151,7 +151,7 @@ pub mod ido {
             let is_ok = self._verify(message, self.ido.signer, signature);
 
             if !is_ok {
-                return Err(IDOError::CommonError);
+                return Err(IDOError::InvalidSignature);
             }
 
             // calculate IDO amount = received_value * price / 10^price_decimals
@@ -187,10 +187,13 @@ pub mod ido {
             let is_ok = self._verify(message, self.ido.signer, signature);
 
             if !is_ok {
-                return Err(IDOError::CommonError);
+                return Err(IDOError::InvalidSignature);
             }
 
-            let old_balances = self.ido.user_claim_amount.get(&self.env().caller()).unwrap();
+            let old_balances = match self.ido.user_claim_amount.get(&self.env().caller()) {
+                Some(balance) => balance,
+                None => 0 as u128,
+            };
             let new_balances = old_balances.checked_sub(amount).unwrap();
             self.ido.user_ido_balances.insert(self.env().caller(), &new_balances);
 

@@ -44,6 +44,7 @@ pub trait Internal {
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
 pub enum IDOError {
     Custom(String),
+    InvalidSignature,
     SafeTransferError,
     CommonError,
     Expired,
