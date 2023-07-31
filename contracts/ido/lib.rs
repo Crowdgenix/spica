@@ -156,7 +156,10 @@ pub mod ido {
 
             // calculate IDO amount = received_value * price / 10^price_decimals
             let ido_amount = received_value.checked_mul(self.ido.price).unwrap().checked_div((10 as u128).checked_pow(self.ido.price_decimals).unwrap()).unwrap();
-            let old_balances = self.ido.user_ido_balances.get(&self.env().caller()).unwrap();
+            let old_balances = match self.ido.user_ido_balances.get(&self.env().caller()) {
+                Some(balance) => balance,
+                None => 0 as u128,
+            };
             let new_balances = old_balances.checked_add(ido_amount).unwrap();
             self.ido.user_ido_balances.insert(self.env().caller(), &new_balances);
 

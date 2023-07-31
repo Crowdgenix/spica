@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x0608d4076daef9c1b69406384f1f51e268c0677767033cc9070153b9036b916c",
+    "hash": "0x71a1d789275f08b88b0f8e2d5178eaecac9b50aeddb87976b0d8063e5e5ca9fd",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -35,7 +35,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          "constructor of IDO contract"
+        ],
         "label": "new",
         "payable": false,
         "returnType": {
@@ -385,37 +387,11 @@
         "selector": "0x079d8598"
       },
       {
-        "args": [
-          {
-            "label": "new_price",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "AdminSetPriceInput1"
-              ],
-              "type": 3
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "Ido::admin_set_price",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 9
-        },
-        "selector": "0xdacc7376"
-      },
-      {
         "args": [],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function to get price of ido token"
+        ],
         "label": "Ido::get_price",
         "mutates": false,
         "payable": false,
@@ -427,95 +403,6 @@
           "type": 18
         },
         "selector": "0xcfff54c3"
-      },
-      {
-        "args": [
-          {
-            "label": "deadline",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "BuyIdoWithNativeInput1"
-              ],
-              "type": 13
-            }
-          },
-          {
-            "label": "signature",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "BuyIdoWithNativeInput2"
-              ],
-              "type": 16
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "Ido::buy_ido_with_native",
-        "mutates": true,
-        "payable": true,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 9
-        },
-        "selector": "0x29e3ab5b"
-      },
-      {
-        "args": [
-          {
-            "label": "deadline",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput1"
-              ],
-              "type": 13
-            }
-          },
-          {
-            "label": "amount",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput2"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "signature",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput3"
-              ],
-              "type": 16
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "Ido::claim_ido_token",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 9
-        },
-        "selector": "0xd38ba04d"
       },
       {
         "args": [
@@ -565,7 +452,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " this function is initialised function, will init the contract properties"
+        ],
         "label": "Ido::init_ido",
         "mutates": true,
         "payable": false,
@@ -579,9 +468,52 @@
         "selector": "0xea8c288e"
       },
       {
+        "args": [
+          {
+            "label": "deadline",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "BuyIdoWithNativeInput1"
+              ],
+              "type": 13
+            }
+          },
+          {
+            "label": "signature",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "BuyIdoWithNativeInput2"
+              ],
+              "type": 16
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to buy ido token with native"
+        ],
+        "label": "Ido::buy_ido_with_native",
+        "mutates": true,
+        "payable": true,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 9
+        },
+        "selector": "0x29e3ab5b"
+      },
+      {
         "args": [],
         "default": false,
-        "docs": [],
+        "docs": [
+          " get ido token"
+        ],
         "label": "Ido::get_ido_token",
         "mutates": false,
         "payable": false,
@@ -597,43 +529,44 @@
       {
         "args": [
           {
-            "label": "role",
+            "label": "deadline",
             "type": {
               "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "RenounceRoleInput1"
+                "traits",
+                "ido_external",
+                "ClaimIdoTokenInput1"
               ],
-              "type": 4
+              "type": 13
             }
           },
           {
-            "label": "account",
+            "label": "amount",
             "type": {
               "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "RenounceRoleInput2"
+                "traits",
+                "ido_external",
+                "ClaimIdoTokenInput2"
               ],
-              "type": 0
+              "type": 3
+            }
+          },
+          {
+            "label": "signature",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "ClaimIdoTokenInput3"
+              ],
+              "type": 16
             }
           }
         ],
         "default": false,
         "docs": [
-          " Revokes `role` from the calling account.",
-          " Roles are often managed via `grant_role` and `revoke_role`: this function's",
-          " purpose is to provide a mechanism for accounts to lose their privileges",
-          " if they are compromised (such as when a trusted device is misplaced).",
-          "",
-          " On success a `RoleRevoked` event is emitted.",
-          "",
-          " # Errors",
-          "",
-          " Returns with `InvalidCaller` error if caller is not `account`.",
-          " Returns with `MissingRole` error if `account` doesn't have `role`."
+          " function to claim ido token"
         ],
-        "label": "AccessControl::renounce_role",
+        "label": "Ido::claim_ido_token",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -641,46 +574,29 @@
             "ink",
             "MessageResult"
           ],
-          "type": 19
+          "type": 9
         },
-        "selector": "0xeaf1248a"
+        "selector": "0xd38ba04d"
       },
       {
         "args": [
           {
-            "label": "role",
+            "label": "new_price",
             "type": {
               "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "RevokeRoleInput1"
+                "traits",
+                "ido_external",
+                "AdminSetPriceInput1"
               ],
-              "type": 4
-            }
-          },
-          {
-            "label": "account",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "RevokeRoleInput2"
-              ],
-              "type": 0
+              "type": 3
             }
           }
         ],
         "default": false,
         "docs": [
-          " Revokes `role` from `account`.",
-          "",
-          " On success a `RoleRevoked` event is emitted.",
-          "",
-          " # Errors",
-          "",
-          " Returns with `MissingRole` error if caller can't grant the `role` or if `account` doesn't have `role`."
+          " function to set price of ido token, only admin can call this function"
         ],
-        "label": "AccessControl::revoke_role",
+        "label": "Ido::admin_set_price",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -688,9 +604,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 19
+          "type": 9
         },
-        "selector": "0x6e4f0991"
+        "selector": "0xdacc7376"
       },
       {
         "args": [
@@ -789,6 +705,53 @@
               "displayName": [
                 "access_control",
                 "accesscontrol_external",
+                "RevokeRoleInput1"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "RevokeRoleInput2"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Revokes `role` from `account`.",
+          "",
+          " On success a `RoleRevoked` event is emitted.",
+          "",
+          " # Errors",
+          "",
+          " Returns with `MissingRole` error if caller can't grant the `role` or if `account` doesn't have `role`."
+        ],
+        "label": "AccessControl::revoke_role",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 19
+        },
+        "selector": "0x6e4f0991"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
                 "GetRoleAdminInput1"
               ],
               "type": 4
@@ -810,6 +773,57 @@
           "type": 22
         },
         "selector": "0x83da3bb2"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "RenounceRoleInput1"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "RenounceRoleInput2"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Revokes `role` from the calling account.",
+          " Roles are often managed via `grant_role` and `revoke_role`: this function's",
+          " purpose is to provide a mechanism for accounts to lose their privileges",
+          " if they are compromised (such as when a trusted device is misplaced).",
+          "",
+          " On success a `RoleRevoked` event is emitted.",
+          "",
+          " # Errors",
+          "",
+          " Returns with `InvalidCaller` error if caller is not `account`.",
+          " Returns with `MissingRole` error if `account` doesn't have `role`."
+        ],
+        "label": "AccessControl::renounce_role",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 19
+        },
+        "selector": "0xeaf1248a"
       }
     ]
   },

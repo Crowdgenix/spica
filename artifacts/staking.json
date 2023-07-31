@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x9261fa3d0064960eb9795eb6ab6b6b4b5786b71cfbe669a1a0a3d141ad858079",
+    "hash": "0x1dcfb5911961fd031f42c8caabd5f8ffe29bb18ff317b0359bd2b0b354bfad90",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -53,7 +53,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          "constructor for staking, admin enter the signer, token for staking and list of tiers"
+        ],
         "label": "new",
         "payable": false,
         "returnType": {
@@ -224,7 +226,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " the function allows the owner to set the signer"
+        ],
         "label": "set_signer",
         "mutates": true,
         "payable": false,
@@ -266,7 +270,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function staking, after user call the API to get the signature for staking (BE API will sign the message), use will call this function to stake"
+        ],
         "label": "stake",
         "mutates": true,
         "payable": false,
@@ -308,7 +314,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake"
+        ],
         "label": "unstake",
         "mutates": true,
         "payable": false,
@@ -324,7 +332,9 @@
       {
         "args": [],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function to get staking token address"
+        ],
         "label": "get_stake_token",
         "mutates": false,
         "payable": false,
@@ -340,7 +350,9 @@
       {
         "args": [],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function to get the owner of the staking contract"
+        ],
         "label": "get_owner",
         "mutates": false,
         "payable": false,
@@ -366,7 +378,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function to set the owner of the staking contract"
+        ],
         "label": "set_owner",
         "mutates": true,
         "payable": false,
@@ -392,7 +406,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function to get staked amount of the input account"
+        ],
         "label": "staking_amount_of",
         "mutates": false,
         "payable": false,
@@ -418,7 +434,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function to get tier of the input account"
+        ],
         "label": "tier_of",
         "mutates": false,
         "payable": false,
@@ -444,7 +462,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function to set list tiers of the staking contract"
+        ],
         "label": "set_tiers",
         "mutates": true,
         "payable": false,
@@ -458,19 +478,11 @@
         "selector": "0xba0583d4"
       },
       {
-        "args": [
-          {
-            "label": "tiers",
-            "type": {
-              "displayName": [
-                "Vec"
-              ],
-              "type": 4
-            }
-          }
-        ],
+        "args": [],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function to get list tiers of the staking contract"
+        ],
         "label": "get_tiers",
         "mutates": false,
         "payable": false,
@@ -494,7 +506,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " function to update the contract code hash, use for proxy"
+        ],
         "label": "set_code",
         "mutates": true,
         "payable": false,
