@@ -5,22 +5,13 @@
 #[openbrush::contract]
 pub mod token_factory {
     use ink::{
-        codegen::{EmitEvent, Env},
+        codegen::{EmitEvent},
         prelude::string::String,
-        prelude::vec::Vec,
         reflect::ContractEventBase,
         ToAccountId,
+        storage::Mapping,
     };
     use openbrush::{
-        contracts::{
-            psp22::{
-                self,
-                extensions::{burnable, metadata, mintable},
-                psp22::Internal,
-                PSP22Error,
-            },
-        },
-        modifiers,
         traits::{Storage, DefaultEnv},
         utils::xxhash_rust::const_xxh32::xxh32,
     };
@@ -35,7 +26,8 @@ pub mod token_factory {
     #[derive(Default, Storage)]
     pub struct TokenFactory {
         pub token_contract_code_hash: Hash,
-        pub list_of_tokens: Vec<AccountId>,
+        pub tokens: Mapping<u128, AccountId>,
+        pub token_length: u128,
     }
 
     impl TokenFactory {
@@ -43,13 +35,14 @@ pub mod token_factory {
         pub fn new(token_contract_code_hash: Hash) -> Self {
             let mut instance = Self::default();
             instance.token_contract_code_hash = token_contract_code_hash;
-            instance.list_of_tokens = Vec::new();
+            instance.tokens = Mapping::default();
+            instance.token_length = 0;
             instance
         }
 
         #[ink(message)]
-        pub fn get_list_of_tokens(&self) -> Vec<AccountId> {
-            self.list_of_tokens.clone()
+        pub fn get_token(&self, index: u128) -> Option<AccountId> {
+            self.tokens.get(&index)
         }
 
         #[ink(message)]
@@ -58,17 +51,16 @@ pub mod token_factory {
             let hash = xxh32(&salt, 0).to_le_bytes();
 
             let pool_hash = self.token_contract_code_hash;
-            let pool = match TokenRef::new(owner, name, symbol, decimals, total_supply, is_require_whitelist, tax_fee, document)
+            let pool = TokenRef::new(owner, name, symbol, decimals, total_supply, is_require_whitelist, tax_fee, document)
                 .endowment(0)
                 .code_hash(pool_hash)
                 .salt_bytes(&hash[..4])
-                .try_instantiate()
-            {
-                Ok(Ok(res)) => Ok(res),
-                _ => Err(TokenFactoryError::CreateTokenFailed),
-            }?;
-            self.list_of_tokens.push(pool.to_account_id());
-            TokenFactory::emit_event(self.env(), Event::TokenCreatedEvent(TokenCreatedEvent { owner, address: pool.to_account_id() }));
+                .try_instantiate().map_err(|_| TokenFactoryError::CreateTokenFailed).unwrap().unwrap();
+
+            let index = self.token_length;
+            self.tokens.insert(index, &pool.to_account_id());
+            self.token_length = index + 1;
+            TokenFactory::emit_event(self.env(), Event::TokenCreatedEvent(TokenCreatedEvent { owner, address: pool.to_account_id(), length: index + 1 }));
             Ok(pool.to_account_id())
         }
 
@@ -86,6 +78,7 @@ pub mod token_factory {
         pub owner: AccountId,
         #[ink(topic)]
         pub address: AccountId,
+        pub length: u128,
     }
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
