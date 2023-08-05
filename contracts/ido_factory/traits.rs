@@ -1,12 +1,10 @@
 use openbrush::{
     traits::{
         AccountId,
-        Balance,
     },
 };
 use ink::prelude::string::String;
-use openbrush::traits::{Hash, Storage};
-use ido::traits::{IDOError};
+use openbrush::traits::{Hash};
 use openbrush::contracts::traits::access_control::AccessControlError;
 
 #[openbrush::wrapper]
@@ -15,10 +13,10 @@ pub type FactoryRef = dyn Factory;
 #[openbrush::trait_definition]
 pub trait Factory {
     #[ink(message)]
-    fn all_pools(&self, pid: u64) -> Option<AccountId>;
+    fn pools(&self, index: u128) -> Option<AccountId>;
 
     #[ink(message)]
-    fn all_pools_length(&self) -> u64;
+    fn pools_length(&self) -> u128;
 
     #[ink(message)]
     fn pool_contract_code_hash(&self) -> Hash;
@@ -31,9 +29,6 @@ pub trait Factory {
         price: u128,
         price_decimals: u32,
     ) -> Result<AccountId, FactoryError>;
-
-    #[ink(message)]
-    fn get_pool(&self, token: AccountId) -> Option<AccountId>;
 }
 
 #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]

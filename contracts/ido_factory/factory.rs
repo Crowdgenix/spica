@@ -1,5 +1,4 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-#![feature(min_specialization)]
 
 #[openbrush::contract]
 pub mod factory {
@@ -9,16 +8,14 @@ pub mod factory {
         },
         ToAccountId,
     };
-    use ink::env::hash::Blake2x256;
     use openbrush::modifiers;
     use openbrush::contracts::access_control::*;
     use openbrush::traits::{Storage};
     use openbrush::utils::xxhash_rust::const_xxh32::xxh32;
     use scale::Encode;
 
-    use crate::{ensure};
-    use crate::traits::{self, *};
-    use crate::types::{self, *};
+    use crate::traits::{*};
+    use crate::types::{*};
     use ido::traits::{IdoRef};
     use ido::ido::{IdoContractRef};
 
@@ -29,7 +26,7 @@ pub mod factory {
         #[ink(topic)]
         pub token: AccountId,
         pub pool: AccountId,
-        pub pool_len: u64,
+        pub pool_len: u128,
     }
 
     #[ink(storage)]
@@ -45,13 +42,8 @@ pub mod factory {
 
     impl Factory for FactoryContract {
         #[ink(message)]
-        fn all_pools(&self, pid: u64) -> Option<AccountId> {
-            self.factory.all_pools.get(pid as usize).cloned()
-        }
-
-        #[ink(message)]
-        fn all_pools_length(&self) -> u64 {
-            self.factory.all_pools.len() as u64
+        fn pools_length(&self) -> u128 {
+            self.factory.pool_length
         }
 
         #[ink(message)]
@@ -62,36 +54,27 @@ pub mod factory {
         #[ink(message)]
         #[modifiers(only_role(DEPLOYER))]
         fn create_pool(&mut self, ido_token: AccountId, signer: AccountId, price: u128, price_decimals: u32) -> Result<AccountId, FactoryError> {
-            ensure!(
-                self.factory.get_pool.get(&ido_token)
-                    .is_none(),
-                FactoryError::PoolExists
-            );
-
             let pool_contract = self._instantiate_pool()?;
+            IdoRef::init_ido(&pool_contract, ido_token, signer, price, price_decimals).map_err(|_| FactoryError::PoolInitFailed).unwrap();
 
-            let result = IdoRef::init_ido(&pool_contract, ido_token, signer, price, price_decimals);
-            if result.is_err() {
-                return Err(FactoryError::PoolInitFailed);
-            }
-
+            let index = self.factory.pool_length;
             self.factory
-                .get_pool
-                .insert(&ido_token, &pool_contract);
-            self.factory.all_pools.push(pool_contract);
+                .pools
+                .insert(&index, &pool_contract);
+            self.factory.pool_length = index + 1;
 
             self._emit_create_pool_event(
                 ido_token ,
                 pool_contract,
-                self.all_pools_length(),
+                index + 1,
             );
 
             Ok(pool_contract)
         }
 
         #[ink(message)]
-        fn get_pool(&self, token: AccountId) -> Option<AccountId> {
-            self.factory.get_pool.get(&token)
+        fn pools(&self, index: u128) -> Option<AccountId> {
+            self.factory.pools.get(&index)
         }
     }
 
@@ -109,15 +92,11 @@ pub mod factory {
             let hash = xxh32(&salt, 0).to_le_bytes();
 
             let pool_hash = self.factory.pool_contract_code_hash;
-            let pool = match IdoContractRef::new(self.env().caller())
+            let pool = IdoContractRef::new(self.env().caller())
                 .endowment(0)
                 .code_hash(pool_hash)
                 .salt_bytes(&hash[..4])
-                .try_instantiate()
-            {
-                Ok(Ok(res)) => Ok(res),
-                _ => Err(FactoryError::PoolInstantiationFailed),
-            }?;
+                .try_instantiate().map_err(|_| FactoryError::PoolInstantiationFailed).unwrap().unwrap();
             Ok(pool.to_account_id())
         }
 
@@ -125,7 +104,7 @@ pub mod factory {
             &self,
             token: AccountId,
             pool: AccountId,
-            pool_len: u64,
+            pool_len: u128,
         ) {
             EmitEvent::<FactoryContract>::emit_event(
                 self.env(),
