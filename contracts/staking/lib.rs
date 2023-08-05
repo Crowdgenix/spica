@@ -47,6 +47,7 @@ mod staking {
         pub staker: AccountId,
         pub amount: u128,
         pub new_tier: u128,
+        pub timestamp: Timestamp,
     }
 
     #[ink(event)]
@@ -54,6 +55,7 @@ mod staking {
         pub staker: AccountId,
         pub amount: u128,
         pub new_tier: u128,
+        pub timestamp: Timestamp,
     }
 
     #[ink(event)]
@@ -62,25 +64,27 @@ mod staking {
     }
 
     pub trait Internal {
-        fn _emit_staking_event(&self, account: AccountId, amount: u128, new_tier: u128);
-        fn _emit_unstaking_event(&self, account: AccountId, amount: u128, new_tier: u128);
+        fn _emit_staking_event(&self, account: AccountId, amount: u128, new_tier: u128, timestamp: Timestamp);
+        fn _emit_unstaking_event(&self, account: AccountId, amount: u128, new_tier: u128, timestamp: Timestamp);
         fn _emit_set_tiers_event(&self, tiers: Vec<u128>);
     }
 
     impl Internal for Staking {
-        fn _emit_staking_event(&self, account: AccountId, amount: u128, new_tier: u128) {
+        fn _emit_staking_event(&self, account: AccountId, amount: u128, new_tier: u128, timestamp: Timestamp) {
             self.env().emit_event(StakingEvent {
                 staker: account,
                 amount,
                 new_tier,
+                timestamp,
             })
         }
 
-        fn _emit_unstaking_event(&self, account: AccountId, amount: u128, new_tier: u128) {
+        fn _emit_unstaking_event(&self, account: AccountId, amount: u128, new_tier: u128, timestamp: Timestamp) {
             self.env().emit_event(UnstakingEvent {
                 staker: account,
                 amount,
                 new_tier,
+                timestamp,
             })
         }
 
@@ -157,7 +161,7 @@ mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
-            self._emit_staking_event(caller, new_amount, tier);
+            self._emit_staking_event(caller, new_amount, tier, self.env().block_timestamp());
 
             Ok(())
         }
@@ -192,7 +196,7 @@ mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
-            self._emit_unstaking_event(caller, new_amount, tier);
+            self._emit_unstaking_event(caller, new_amount, tier, self.env().block_timestamp());
             Ok(())
         }
 

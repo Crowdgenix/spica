@@ -20,16 +20,19 @@ pub trait Ido {
     fn get_ido_token(&self) -> AccountId;
 
     #[ink(message, payable)]
-    fn buy_ido_with_native(&mut self, deadline: Timestamp, signature: [u8; 65]) -> Result<(), IDOError>;
+    fn buy_ido_with_native(&mut self, deadline: Timestamp, nonce: u128, signature: [u8; 65]) -> Result<(), IDOError>;
 
     #[ink(message)]
-    fn claim_ido_token(&mut self, deadline: Timestamp, amount: Balance, signature: [u8; 65]) -> Result<(), IDOError>;
+    fn claim_ido_token(&mut self, deadline: Timestamp, nonce: u128, amount: Balance, signature: [u8; 65]) -> Result<(), IDOError>;
 
     #[ink(message)]
     fn admin_set_price(&mut self, new_price: u128) -> Result<(), IDOError>;
 
     #[ink(message)]
     fn get_price(&self) -> Balance;
+
+    #[ink(message)]
+    fn get_nonce(&self, account: AccountId) -> u128;
 }
 
 pub trait Internal {
@@ -44,6 +47,7 @@ pub trait Internal {
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
 pub enum IDOError {
     Custom(String),
+    InvalidNonce(String),
     InvalidSignature,
     SafeTransferError,
     CommonError,

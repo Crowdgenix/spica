@@ -135,17 +135,29 @@ pub mod ido {
             self.ido.ido_token
         }
 
+        #[ink(message)]
+        fn get_nonce(&self, account: AccountId) -> u128 {
+            self.ido.account_nonce.get(&account).unwrap_or(0)
+        }
+
         /// function to buy ido token with native
         #[ink(message, payable)]
-        fn buy_ido_with_native(&mut self, deadline: Timestamp, signature: [u8; 65]) -> Result<(), IDOError> {
+        fn buy_ido_with_native(&mut self, deadline: Timestamp, nonce: u128, signature: [u8; 65]) -> Result<(), IDOError> {
             ensure!(
                 deadline >= self.env().block_timestamp(),
                 IDOError::Expired
             );
+            ensure!(
+                nonce == self.ido.account_nonce.get(&self.env().caller()).unwrap_or(0),
+                IDOError::InvalidNonce(nonce.to_string())
+            );
+
+            self.ido.account_nonce.insert(&self.env().caller(), &(nonce + 1));
+
             let received_value = Self::env().transferred_value();
 
             // generate message = buy_ido + ido_token + buyer + amount
-            let message = self.gen_msg_for_buy_token(deadline, received_value);
+            let message = self.gen_msg_for_buy_token(deadline, nonce, received_value);
 
             // verify signature
             let is_ok = self._verify(message, self.ido.signer, signature);
@@ -170,18 +182,26 @@ pub mod ido {
 
         /// function to claim ido token
         #[ink(message)]
-        fn claim_ido_token(&mut self, deadline: Timestamp, amount: Balance, signature: [u8; 65]) -> Result<(), IDOError> {
+        fn claim_ido_token(&mut self, deadline: Timestamp, nonce: u128, amount: Balance, signature: [u8; 65]) -> Result<(), IDOError> {
             ensure!(
                 deadline >= self.env().block_timestamp(),
                 IDOError::Expired
             );
+
+            ensure!(
+                nonce == self.ido.account_nonce.get(&self.env().caller()).unwrap_or(0),
+                IDOError::InvalidNonce(nonce.to_string())
+            );
+
+            self.ido.account_nonce.insert(&self.env().caller(), &(nonce + 1));
+
             let caller = Self::env().caller();
             // ensure the user has enough collateral assets
             if PSP22Ref::balance_of(&self.ido.ido_token, self.env().account_id()) < amount {
                 return Err(IDOError::InsufficientBalance)
             }
             // generate message
-            let message = self.gen_msg_for_claim_token(deadline, amount);
+            let message = self.gen_msg_for_claim_token(deadline, nonce, amount);
 
             // verify signature
             let is_ok = self._verify(message, self.ido.signer, signature);
@@ -253,7 +273,7 @@ pub mod ido {
         }
 
         #[ink(message)]
-        pub fn gen_msg_for_buy_token(&self, deadline: Timestamp, received_value: Balance) -> String {
+        pub fn gen_msg_for_buy_token(&self, deadline: Timestamp, nonce: u128, received_value: Balance) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
             let mut message: String = String::from("");
             message.push_str("buy_ido_");
@@ -264,11 +284,14 @@ pub mod ido {
             message.push_str(&received_value.to_string().as_str());
             message.push_str("_");
             message.push_str(&deadline.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&nonce.to_string().as_str());
+
             message
         }
 
         #[ink(message)]
-        pub fn gen_msg_for_claim_token(&self, deadline: Timestamp, amount: Balance) -> String {
+        pub fn gen_msg_for_claim_token(&self, deadline: Timestamp, nonce: u128, amount: Balance) -> String {
             let mut message: String = String::from("");
             message.push_str("claim_ido_token_");
             message.push_str(encode(&self.ido.ido_token).as_str());
@@ -278,6 +301,8 @@ pub mod ido {
             message.push_str(&amount.to_string().as_str());
             message.push_str("_");
             message.push_str(&deadline.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&nonce.to_string().as_str());
 
             message
         }
