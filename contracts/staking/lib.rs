@@ -22,6 +22,8 @@ mod staking {
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
     pub enum StakingError {
+        InvalidNonce(String),
+        InvalidDeadline,
         TransferFailed,
         InsufficientAllowance,
         InsufficientBalance,
@@ -36,6 +38,7 @@ mod staking {
         staking_amounts: Mapping<AccountId, u128>,
         account_tiers: Mapping<AccountId, u128>,
         tier_configs: Vec<u128>,
+        account_nonce: Mapping<AccountId, u128>,
         signer: AccountId,
     }
 
@@ -100,6 +103,7 @@ mod staking {
                 staking_amounts,
                 account_tiers,
                 stake_token,
+                account_nonce: Mapping::default(),
                 tier_configs,
                 signer,
             }
@@ -118,10 +122,17 @@ mod staking {
 
         /// function staking, after user call the API to get the signature for staking (BE API will sign the message), use will call this function to stake
         #[ink(message)]
-        pub fn stake(&mut self, deadline: Timestamp, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
+        pub fn stake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
             let caller = self.env().caller();
+            if deadline < self.env().block_timestamp() {
+                return Err(StakingError::InvalidDeadline);
+            }
+            if nonce != self.account_nonce.get(&caller).unwrap_or(0) {
+                return Err(StakingError::InvalidNonce(nonce.to_string()));
+            }
+            self.account_nonce.insert(&caller, &(nonce + 1));
 
-            let message = self.gen_msg_for_stake_token(deadline, amount);
+            let message = self.gen_msg_for_stake_token(deadline, nonce, amount);
             // verify signature
             let is_ok = self._verify(message, self.signer, signature);
 
@@ -267,7 +278,7 @@ mod staking {
         }
 
         #[ink(message)]
-        pub fn gen_msg_for_stake_token(&self, deadline: Timestamp, stake_amount: u128) -> String {
+        pub fn gen_msg_for_stake_token(&self, deadline: Timestamp, nonce: u128, stake_amount: u128) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
             let mut message: String = String::from("");
             message.push_str("stake_token_");
@@ -278,6 +289,8 @@ mod staking {
             message.push_str(&stake_amount.to_string().as_str());
             message.push_str("_");
             message.push_str(&deadline.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&nonce.to_string().as_str());
             message
         }
 
