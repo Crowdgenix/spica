@@ -211,19 +211,13 @@ mod staking {
         /// function to get staked amount of the input account
         #[ink(message)]
         pub fn staking_amount_of(&self, account: AccountId) -> u128 {
-            match self.staking_amounts.get(&account) {
-                Some(value) => value,
-                None => 0,
-            }
+            self.staking_amounts.get(&account).unwrap_or(0)
         }
 
         /// function to get tier of the input account
         #[ink(message)]
         pub fn tier_of(&self, account: AccountId) -> u128 {
-            match self.account_tiers.get(&account) {
-                Some(value) => value,
-                None => 0,
-            }
+            self.account_tiers.get(&account).unwrap_or(0)
         }
 
         /// function to set list tiers of the staking contract
