@@ -2,6 +2,17 @@
 #![feature(min_specialization)]
 #![allow(clippy::let_unit_value)]
 
+use ink::primitives::AccountId;
+use openbrush::contracts::psp22::{Data, Internal, PSP22Error};
+use openbrush::traits::{Balance, Storage, String};
+
+use ink::{
+    codegen::{EmitEvent, Env},
+    prelude::vec::Vec,
+    reflect::ContractEventBase,
+    storage::Mapping,
+    env::transfer,
+};
 // pub use crate::token::selectors::*;
 pub use self::token::*;
 //
@@ -18,16 +29,188 @@ pub use self::token::*;
 //     body(instance)
 // }
 
+#[openbrush::wrapper]
+pub type PSP22Ref = dyn PSP22;
+
+#[openbrush::trait_definition]
+pub trait PSP22 {
+    /// Returns the total token supply.
+    #[ink(message)]
+    fn total_supply(&self) -> Balance;
+
+    /// Returns the account Balance for the specified `owner`.
+    ///
+    /// Returns `0` if the account is non-existent.
+    #[ink(message)]
+    fn balance_of(&self, owner: AccountId) -> Balance;
+
+    /// Returns the amount which `spender` is still allowed to withdraw from `owner`.
+    ///
+    /// Returns `0` if no allowance has been set `0`.
+    #[ink(message)]
+    fn allowance(&self, owner: AccountId, spender: AccountId) -> Balance;
+
+    /// Transfers `value` amount of tokens from the caller's account to account `to`
+    /// with additional `data` in unspecified format.
+    ///
+    /// On success a `Transfer` event is emitted.
+    ///
+    /// # Errors
+    ///
+    /// Returns `InsufficientBalance` error if there are not enough tokens on
+    /// the caller's account Balance.
+    ///
+    /// Returns `ZeroSenderAddress` error if sender's address is zero.
+    ///
+    /// Returns `ZeroRecipientAddress` error if recipient's address is zero.
+    #[ink(message)]
+    fn transfer(&mut self, to: AccountId, value: Balance, data: Vec<u8>) -> Result<()>;
+
+    /// Transfers `value` tokens on the behalf of `from` to the account `to`
+    /// with additional `data` in unspecified format.
+    ///
+    /// This can be used to allow a contract to transfer tokens on ones behalf and/or
+    /// to charge fees in sub-currencies, for example.
+    ///
+    /// On success a `Transfer` and `Approval` events are emitted.
+    ///
+    /// # Errors
+    ///
+    /// Returns `InsufficientAllowance` error if there are not enough tokens allowed
+    /// for the caller to withdraw from `from`.
+    ///
+    /// Returns `InsufficientBalance` error if there are not enough tokens on
+    /// the the account Balance of `from`.
+    ///
+    /// Returns `ZeroSenderAddress` error if sender's address is zero.
+    ///
+    /// Returns `ZeroRecipientAddress` error if recipient's address is zero.
+    #[ink(message)]
+    fn transfer_from(
+        &mut self,
+        from: AccountId,
+        to: AccountId,
+        value: Balance,
+        data: Vec<u8>,
+    ) -> Result<()>;
+
+    /// Allows `spender` to withdraw from the caller's account multiple times, up to
+    /// the `value` amount.
+    ///
+    /// If this function is called again it overwrites the current allowance with `value`.
+    ///
+    /// An `Approval` event is emitted.
+    ///
+    /// # Errors
+    ///
+    /// Returns `ZeroSenderAddress` error if sender's address is zero.
+    ///
+    /// Returns `ZeroRecipientAddress` error if recipient's address is zero.
+    #[ink(message)]
+    fn approve(&mut self, spender: AccountId, value: Balance) -> Result<()>;
+
+    /// Atomically increases the allowance granted to `spender` by the caller.
+    ///
+    /// An `Approval` event is emitted.
+    ///
+    /// # Errors
+    ///
+    /// Returns `ZeroSenderAddress` error if sender's address is zero.
+    ///
+    /// Returns `ZeroRecipientAddress` error if recipient's address is zero.
+    #[ink(message)]
+    fn increase_allowance(&mut self, spender: AccountId, delta_value: Balance) -> Result<()>;
+
+    /// Atomically decreases the allowance granted to `spender` by the caller.
+    ///
+    /// An `Approval` event is emitted.
+    ///
+    /// # Errors
+    ///
+    /// Returns `InsufficientAllowance` error if there are not enough tokens allowed
+    /// by owner for `spender`.
+    ///
+    /// Returns `ZeroSenderAddress` error if sender's address is zero.
+    ///
+    /// Returns `ZeroRecipientAddress` error if recipient's address is zero.
+    #[ink(message)]
+    fn decrease_allowance(&mut self, spender: AccountId, delta_value: Balance) -> Result<()>;
+}
+
+impl<T: Storage<Data>> PSP22 for T {
+    default fn total_supply(&self) -> Balance {
+        self._total_supply()
+    }
+
+    default fn balance_of(&self, owner: AccountId) -> Balance {
+        self._balance_of(&owner)
+    }
+
+    default fn allowance(&self, owner: AccountId, spender: AccountId) -> Balance {
+        self._allowance(&owner, &spender)
+    }
+
+    default fn transfer(&mut self, to: AccountId, value: Balance, data: Vec<u8>) -> Result<()> {
+        let from = Self::env().caller();
+        self._transfer_from_to(from, to, value, data)?;
+        Ok(())
+    }
+
+    default fn transfer_from(
+        &mut self,
+        from: AccountId,
+        to: AccountId,
+        value: Balance,
+        data: Vec<u8>,
+    ) -> Result<()> {
+        let caller = Self::env().caller();
+        let allowance = self._allowance(&from, &caller);
+
+        if allowance < value {
+            return Err(PSP22Error::InsufficientAllowance)
+        }
+
+        self._approve_from_to(from, caller, allowance - value)?;
+        self._transfer_from_to(from, to, value, data)?;
+        Ok(())
+    }
+
+    default fn approve(&mut self, spender: AccountId, value: Balance) -> Result<()> {
+        let owner = Self::env().caller();
+        self._approve_from_to(owner, spender, value)?;
+        Ok(())
+    }
+
+    default fn increase_allowance(&mut self, spender: AccountId, delta_value: Balance) -> Result<()> {
+        let owner = Self::env().caller();
+        self._approve_from_to(owner, spender, self._allowance(&owner, &spender) + delta_value)
+    }
+
+    default fn decrease_allowance(&mut self, spender: AccountId, delta_value: Balance) -> Result<()> {
+        let owner = Self::env().caller();
+        let allowance = self._allowance(&owner, &spender);
+
+        if allowance < delta_value {
+            return Err(PSP22Error::InsufficientAllowance)
+        }
+
+        self._approve_from_to(owner, spender, allowance - delta_value)
+    }
+}
+
 #[openbrush::contract]
 pub mod token {
+    use openbrush::contracts::psp22::{Data, Internal, PSP22Error};
+    use openbrush::traits::{Storage, String};
+
     use ink::{
         codegen::{EmitEvent, Env},
-        prelude::string::String,
         prelude::vec::Vec,
         reflect::ContractEventBase,
         storage::Mapping,
         env::transfer,
     };
+    use super::PSP22;
 
     use openbrush::{
         contracts::{
@@ -37,12 +220,9 @@ pub mod token {
                 self,
                 *,
                 extensions::{burnable, metadata, mintable},
-                psp22::Internal,
-                PSP22Error,
             },
         },
         modifiers,
-        traits::Storage,
     };
 
     /// Result type
@@ -81,6 +261,12 @@ pub mod token {
         document: String,
     }
 
+    // impl psp22::PSP22 for Token {
+    //     fn total_supply(&self) -> Balance {
+    //         self.psp22.total_supply()
+    //     }
+    // }
+
     impl psp22::Transfer for Token {
         #[modifiers(when_not_paused)]
         fn _before_token_transfer(
@@ -105,6 +291,9 @@ pub mod token {
             Ok(())
         }
     }
+
+
+    impl PSP22 for Token {}
 
     impl Token {
         #[ink(constructor)]
@@ -206,7 +395,7 @@ pub mod token {
     }
 
     // We have to implement the "main trait" for our contract to have the PSP22 methods available.
-    impl PSP22 for Token {}
+    // impl PSP22 for Token {}
 
     // And `PSP22Metadata` to get metadata-related methods.
     impl metadata::PSP22Metadata for Token {}
