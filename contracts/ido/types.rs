@@ -19,6 +19,8 @@ pub struct Data {
     pub signer: AccountId,
     pub account_nonce: Mapping<AccountId, u128>,
     pub user_ido_balances: Mapping<AccountId, Balance>,
+    pub max_issue_ido_amount: u128,
+    pub issued_ido_amount: u128,
 }
 
 impl Default for Data {
@@ -30,6 +32,8 @@ impl Default for Data {
             price_decimals: 5,
             account_nonce: Mapping::default(),
             user_ido_balances: Mapping::new(),
+            max_issue_ido_amount: 0,
+            issued_ido_amount: 0,
         }
     }
 }

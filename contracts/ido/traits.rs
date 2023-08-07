@@ -14,7 +14,7 @@ pub type IdoRef = dyn Ido;
 #[openbrush::trait_definition]
 pub trait Ido {
     #[ink(message)]
-    fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32) -> Result<(), IDOError>;
+    fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32, _max_issue_ido_amount: u128) -> Result<(), IDOError>;
 
     #[ink(message)]
     fn get_ido_token(&self) -> AccountId;
@@ -37,9 +37,9 @@ pub trait Ido {
 
 pub trait Internal {
     fn _verify(&self, data: String, signer: AccountId, signature: [u8; 65]) -> bool;
-    fn _emit_buy_with_native_event(&self, _buyer: AccountId, _native_amount: Balance, _ido_token_amount: Balance);
-    fn _emit_claim_token_event(&self, _buyer: AccountId, _ido_token_amount: Balance);
-    fn _emit_init_ido_contract_event(&self, _ido_token: AccountId, _price: Balance, _price_decimals: u32, _signer: AccountId);
+    fn _emit_buy_with_native_event(&self, _buyer: AccountId, _native_amount: Balance, _ido_token_amount: Balance, _nonce: u128);
+    fn _emit_claim_token_event(&self, _buyer: AccountId, _ido_token_amount: Balance, _nonce: u128);
+    fn _emit_init_ido_contract_event(&self, _ido_token: AccountId, _price: Balance, _price_decimals: u32, _signer: AccountId, _max_issue_ido_amount: u128);
 }
 
 
@@ -48,6 +48,7 @@ pub trait Internal {
 pub enum IDOError {
     Custom(String),
     InvalidNonce(String),
+    MaxIssueIdoAmount,
     InvalidSignature,
     SafeTransferError,
     CommonError,

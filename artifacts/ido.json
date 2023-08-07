@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x71a1d789275f08b88b0f8e2d5178eaecac9b50aeddb87976b0d8063e5e5ca9fd",
+    "hash": "0xf349c3ef5a134c15960618e4449cd621a6e94bf2dac0a94abdb29fc371331b62",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -87,7 +87,7 @@
         "displayName": [
           "Timestamp"
         ],
-        "type": 13
+        "type": 14
       }
     },
     "events": [
@@ -136,6 +136,17 @@
               ],
               "type": 0
             }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "max_issue_ido_amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
           }
         ],
         "docs": [],
@@ -175,6 +186,17 @@
               ],
               "type": 3
             }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
           }
         ],
         "docs": [],
@@ -203,6 +225,17 @@
               ],
               "type": 3
             }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
           }
         ],
         "docs": [],
@@ -217,6 +250,34 @@
       "type": 8
     },
     "messages": [
+      {
+        "args": [
+          {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to get balance of ido token"
+        ],
+        "label": "get_ido_token_balance",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 9
+        },
+        "selector": "0x782586f2"
+      },
       {
         "args": [
           {
@@ -237,7 +298,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 9
+          "type": 10
         },
         "selector": "0x694fb50f"
       },
@@ -249,7 +310,16 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 13
+              "type": 14
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
             }
           },
           {
@@ -272,7 +342,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 14
+          "type": 15
         },
         "selector": "0x19bab415"
       },
@@ -284,7 +354,16 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 13
+              "type": 14
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
             }
           },
           {
@@ -307,7 +386,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 14
+          "type": 15
         },
         "selector": "0x9b2671ad"
       },
@@ -323,7 +402,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 15
+          "type": 16
         },
         "selector": "0x73b017da"
       },
@@ -359,7 +438,7 @@
             "label": "signature",
             "type": {
               "displayName": [],
-              "type": 16
+              "type": 17
             }
           },
           {
@@ -368,7 +447,7 @@
               "displayName": [
                 "String"
               ],
-              "type": 12
+              "type": 13
             }
           }
         ],
@@ -382,17 +461,47 @@
             "ink",
             "MessageResult"
           ],
-          "type": 17
+          "type": 18
         },
         "selector": "0x079d8598"
+      },
+      {
+        "args": [
+          {
+            "label": "new_price",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "AdminSetPriceInput1"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to set price of ido token, only admin can call this function"
+        ],
+        "label": "Ido::admin_set_price",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0xdacc7376"
       },
       {
         "args": [],
         "default": false,
         "docs": [
-          " function to get price of ido token"
+          " get ido token"
         ],
-        "label": "Ido::get_price",
+        "label": "Ido::get_ido_token",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -400,9 +509,72 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 16
         },
-        "selector": "0xcfff54c3"
+        "selector": "0xe6db55e4"
+      },
+      {
+        "args": [
+          {
+            "label": "deadline",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "ClaimIdoTokenInput1"
+              ],
+              "type": 14
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "ClaimIdoTokenInput2"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "amount",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "ClaimIdoTokenInput3"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "signature",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "ClaimIdoTokenInput4"
+              ],
+              "type": 17
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to claim ido token"
+        ],
+        "label": "Ido::claim_ido_token",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0xd38ba04d"
       },
       {
         "args": [
@@ -449,6 +621,17 @@
               ],
               "type": 4
             }
+          },
+          {
+            "label": "_max_issue_ido_amount",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "InitIdoInput5"
+              ],
+              "type": 3
+            }
           }
         ],
         "default": false,
@@ -463,9 +646,55 @@
             "ink",
             "MessageResult"
           ],
-          "type": 9
+          "type": 10
         },
         "selector": "0xea8c288e"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          " function to get price of ido token"
+        ],
+        "label": "Ido::get_price",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 9
+        },
+        "selector": "0xcfff54c3"
+      },
+      {
+        "args": [
+          {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "GetNonceInput1"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "Ido::get_nonce",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 9
+        },
+        "selector": "0xc4ac011a"
       },
       {
         "args": [
@@ -477,7 +706,18 @@
                 "ido_external",
                 "BuyIdoWithNativeInput1"
               ],
-              "type": 13
+              "type": 14
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "BuyIdoWithNativeInput2"
+              ],
+              "type": 3
             }
           },
           {
@@ -486,9 +726,9 @@
               "displayName": [
                 "traits",
                 "ido_external",
-                "BuyIdoWithNativeInput2"
+                "BuyIdoWithNativeInput3"
               ],
-              "type": 16
+              "type": 17
             }
           }
         ],
@@ -504,109 +744,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 9
+          "type": 10
         },
         "selector": "0x29e3ab5b"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [
-          " get ido token"
-        ],
-        "label": "Ido::get_ido_token",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 15
-        },
-        "selector": "0xe6db55e4"
-      },
-      {
-        "args": [
-          {
-            "label": "deadline",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput1"
-              ],
-              "type": 13
-            }
-          },
-          {
-            "label": "amount",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput2"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "signature",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput3"
-              ],
-              "type": 16
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " function to claim ido token"
-        ],
-        "label": "Ido::claim_ido_token",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 9
-        },
-        "selector": "0xd38ba04d"
-      },
-      {
-        "args": [
-          {
-            "label": "new_price",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "AdminSetPriceInput1"
-              ],
-              "type": 3
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " function to set price of ido token, only admin can call this function"
-        ],
-        "label": "Ido::admin_set_price",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 9
-        },
-        "selector": "0xdacc7376"
       },
       {
         "args": [
@@ -616,28 +756,17 @@
               "displayName": [
                 "access_control",
                 "accesscontrol_external",
-                "HasRoleInput1"
+                "GetRoleAdminInput1"
               ],
               "type": 4
-            }
-          },
-          {
-            "label": "address",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "HasRoleInput2"
-              ],
-              "type": 0
             }
           }
         ],
         "default": false,
         "docs": [
-          " Returns `true` if `account` has been granted `role`."
+          " Returns the admin role that controls `role`. See `grant_role` and `revoke_role`."
         ],
-        "label": "AccessControl::has_role",
+        "label": "AccessControl::get_role_admin",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -645,9 +774,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 17
+          "type": 19
         },
-        "selector": "0xc1d9ac18"
+        "selector": "0x83da3bb2"
       },
       {
         "args": [
@@ -693,7 +822,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 19
+          "type": 20
         },
         "selector": "0x4ac062fd"
       },
@@ -740,7 +869,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 19
+          "type": 20
         },
         "selector": "0x6e4f0991"
       },
@@ -752,17 +881,28 @@
               "displayName": [
                 "access_control",
                 "accesscontrol_external",
-                "GetRoleAdminInput1"
+                "HasRoleInput1"
               ],
               "type": 4
+            }
+          },
+          {
+            "label": "address",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "HasRoleInput2"
+              ],
+              "type": 0
             }
           }
         ],
         "default": false,
         "docs": [
-          " Returns the admin role that controls `role`. See `grant_role` and `revoke_role`."
+          " Returns `true` if `account` has been granted `role`."
         ],
-        "label": "AccessControl::get_role_admin",
+        "label": "AccessControl::has_role",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -770,9 +910,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 18
         },
-        "selector": "0x83da3bb2"
+        "selector": "0xc1d9ac18"
       },
       {
         "args": [
@@ -821,7 +961,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 19
+          "type": 20
         },
         "selector": "0xeaf1248a"
       }
@@ -877,6 +1017,20 @@
                         "root": {
                           "layout": {
                             "leaf": {
+                              "key": "0x8517d658",
+                              "ty": 3
+                            }
+                          },
+                          "root_key": "0x8517d658"
+                        }
+                      },
+                      "name": "account_nonce"
+                    },
+                    {
+                      "layout": {
+                        "root": {
+                          "layout": {
+                            "leaf": {
                               "key": "0x4a9c3373",
                               "ty": 3
                             }
@@ -888,17 +1042,21 @@
                     },
                     {
                       "layout": {
-                        "root": {
-                          "layout": {
-                            "leaf": {
-                              "key": "0x38e8fdf3",
-                              "ty": 3
-                            }
-                          },
-                          "root_key": "0x38e8fdf3"
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 3
                         }
                       },
-                      "name": "user_claim_amount"
+                      "name": "max_issue_ido_amount"
+                    },
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 3
+                        }
+                      },
+                      "name": "issued_ido_amount"
                     }
                   ],
                   "name": "Data"
@@ -1019,7 +1177,7 @@
                   "ty": 6
                 }
               },
-              "name": "isInitialized"
+              "name": "is_initialized"
             }
           ],
           "name": "IdoContract"
@@ -1170,7 +1328,7 @@
               {
                 "fields": [
                   {
-                    "type": 10
+                    "type": 3
                   }
                 ],
                 "index": 0,
@@ -1191,7 +1349,7 @@
         "params": [
           {
             "name": "T",
-            "type": 10
+            "type": 3
           },
           {
             "name": "E",
@@ -1212,111 +1370,7 @@
               {
                 "fields": [
                   {
-                    "type": 5
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
                     "type": 11
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 5
-          },
-          {
-            "name": "E",
-            "type": 11
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 11,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 12,
-                    "typeName": "String"
-                  }
-                ],
-                "index": 0,
-                "name": "Custom"
-              },
-              {
-                "index": 1,
-                "name": "SafeTransferError"
-              },
-              {
-                "index": 2,
-                "name": "CommonError"
-              },
-              {
-                "index": 3,
-                "name": "Expired"
-              },
-              {
-                "index": 4,
-                "name": "InsufficientBalance"
-              },
-              {
-                "index": 5,
-                "name": "Initialized"
-              }
-            ]
-          }
-        },
-        "path": [
-          "ido",
-          "traits",
-          "IDOError"
-        ]
-      }
-    },
-    {
-      "id": 12,
-      "type": {
-        "def": {
-          "primitive": "str"
-        }
-      }
-    },
-    {
-      "id": 13,
-      "type": {
-        "def": {
-          "primitive": "u64"
-        }
-      }
-    },
-    {
-      "id": 14,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 12
                   }
                 ],
                 "index": 0,
@@ -1337,7 +1391,7 @@
         "params": [
           {
             "name": "T",
-            "type": 12
+            "type": 11
           },
           {
             "name": "E",
@@ -1350,7 +1404,171 @@
       }
     },
     {
+      "id": 11,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "String"
+                  }
+                ],
+                "index": 0,
+                "name": "Custom"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "String"
+                  }
+                ],
+                "index": 1,
+                "name": "InvalidNonce"
+              },
+              {
+                "index": 2,
+                "name": "MaxIssueIdoAmount"
+              },
+              {
+                "index": 3,
+                "name": "InvalidSignature"
+              },
+              {
+                "index": 4,
+                "name": "SafeTransferError"
+              },
+              {
+                "index": 5,
+                "name": "CommonError"
+              },
+              {
+                "index": 6,
+                "name": "Expired"
+              },
+              {
+                "index": 7,
+                "name": "InsufficientBalance"
+              },
+              {
+                "index": 8,
+                "name": "Initialized"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ido",
+          "traits",
+          "IDOError"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "primitive": "str"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "type": {
+        "def": {
+          "primitive": "u64"
+        }
+      }
+    },
+    {
       "id": 15,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 13
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 13
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 16,
       "type": {
         "def": {
           "variant": {
@@ -1392,7 +1610,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 17,
       "type": {
         "def": {
           "array": {
@@ -1403,7 +1621,7 @@
       }
     },
     {
-      "id": 17,
+      "id": 18,
       "type": {
         "def": {
           "variant": {
@@ -1445,163 +1663,7 @@
       }
     },
     {
-      "id": 18,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 3
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 8
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 3
-          },
-          {
-            "name": "E",
-            "type": 8
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
       "id": 19,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 20
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 8
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 20
-          },
-          {
-            "name": "E",
-            "type": 8
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 20,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 5
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 21
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 5
-          },
-          {
-            "name": "E",
-            "type": 21
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 21,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "InvalidCaller"
-              },
-              {
-                "index": 1,
-                "name": "MissingRole"
-              },
-              {
-                "index": 2,
-                "name": "RoleRedundant"
-              }
-            ]
-          }
-        },
-        "path": [
-          "openbrush_contracts",
-          "traits",
-          "errors",
-          "access_control",
-          "AccessControlError"
-        ]
-      }
-    },
-    {
-      "id": 22,
       "type": {
         "def": {
           "variant": {
@@ -1639,6 +1701,120 @@
         ],
         "path": [
           "Result"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 21
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 21
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 22
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          },
+          {
+            "name": "E",
+            "type": 22
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "InvalidCaller"
+              },
+              {
+                "index": 1,
+                "name": "MissingRole"
+              },
+              {
+                "index": 2,
+                "name": "RoleRedundant"
+              }
+            ]
+          }
+        },
+        "path": [
+          "openbrush_contracts",
+          "traits",
+          "errors",
+          "access_control",
+          "AccessControlError"
         ]
       }
     },

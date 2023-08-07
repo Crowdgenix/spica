@@ -38,6 +38,7 @@ pub mod ido {
         pub price: Balance,
         pub price_decimals: u32,
         pub signer: AccountId,
+        pub max_issue_ido_amount: u128,
     }
 
     #[ink(event)]
@@ -46,6 +47,7 @@ pub mod ido {
         pub buyer: AccountId,
         pub native_amount: Balance,
         pub new_ido_token_amount: Balance,
+        pub nonce: u128,
     }
 
     #[ink(event)]
@@ -53,6 +55,7 @@ pub mod ido {
         #[ink(topic)]
         pub buyer: AccountId,
         pub new_ido_token_amount: Balance,
+        pub nonce: u128,
     }
 
     #[ink(storage)]
@@ -88,27 +91,30 @@ pub mod ido {
             signer == AccountId::from(signature_account_id)
         }
 
-        fn _emit_buy_with_native_event(&self, _buyer: AccountId, _native_amount: Balance, _ido_token_amount: Balance) {
+        fn _emit_buy_with_native_event(&self, _buyer: AccountId, _native_amount: Balance, _ido_token_amount: Balance, _nonce: u128) {
             self.env().emit_event(BuyTokenWithNative {
                 buyer: _buyer,
                 native_amount: _native_amount,
                 new_ido_token_amount: _ido_token_amount,
+                nonce: _nonce,
             });
         }
 
-        fn _emit_claim_token_event(&self, _buyer: AccountId, _ido_token_amount: Balance) {
+        fn _emit_claim_token_event(&self, _buyer: AccountId, _ido_token_amount: Balance, _nonce: u128) {
             self.env().emit_event(ClaimToken {
                 buyer: _buyer,
                 new_ido_token_amount: _ido_token_amount,
+                nonce: _nonce,
             });
         }
 
-        fn _emit_init_ido_contract_event(&self, _ido_token: AccountId, _price: Balance, _price_decimals: u32, _signer: AccountId) {
+        fn _emit_init_ido_contract_event(&self, _ido_token: AccountId, _price: Balance, _price_decimals: u32, _signer: AccountId, _max_issue_ido_amount: u128) {
             self.env().emit_event(InitIdoContract {
                 ido_token: _ido_token,
                 price: _price,
                 price_decimals: _price_decimals,
                 signer: _signer,
+                max_issue_ido_amount: _max_issue_ido_amount,
             });
         }
     }
@@ -117,15 +123,16 @@ pub mod ido {
     impl traits::Ido for IdoContract {
         /// this function is initialised function, will init the contract properties
         #[ink(message)]
-        fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32) -> Result<(), IDOError> {
+        fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32, _max_issue_ido_amount: u128) -> Result<(), IDOError> {
             ensure!(self.is_initialized == false, IDOError::Initialized);
             self.ido.ido_token = _ido_token;
             self.ido.price = _price;
             self.ido.price_decimals = _price_decimals;
             self.ido.signer = _signer;
+            self.ido.max_issue_ido_amount = _max_issue_ido_amount;
             self.is_initialized = true;
 
-            self._emit_init_ido_contract_event(_ido_token, _price, _price_decimals, _signer);
+            self._emit_init_ido_contract_event(_ido_token, _price, _price_decimals, _signer, _max_issue_ido_amount);
             Ok(())
         }
 
@@ -152,9 +159,16 @@ pub mod ido {
                 IDOError::InvalidNonce(nonce.to_string())
             );
 
+
             self.ido.account_nonce.insert(&self.env().caller(), &(nonce + 1));
 
             let received_value = Self::env().transferred_value();
+
+            ensure!(
+                self.ido.issued_ido_amount.checked_add(received_value).unwrap() <= self.ido.max_issue_ido_amount,
+                IDOError::MaxIssueIdoAmount,
+            );
+            self.ido.max_issue_ido_amount = self.ido.issued_ido_amount.checked_add(received_value).unwrap();
 
             // generate message = buy_ido + ido_token + buyer + amount
             let message = self.gen_msg_for_buy_token(deadline, nonce, received_value);
@@ -176,7 +190,7 @@ pub mod ido {
             self.ido.user_ido_balances.insert(self.env().caller(), &new_balances);
 
             // emit event
-            self._emit_buy_with_native_event(self.env().caller(), received_value, new_balances);
+            self._emit_buy_with_native_event(self.env().caller(), received_value, new_balances, nonce);
             Ok(())
         }
 
@@ -220,7 +234,7 @@ pub mod ido {
                 return Err(IDOError::SafeTransferError);
             }
 
-            self._emit_claim_token_event(caller, new_balances);
+            self._emit_claim_token_event(caller, new_balances, nonce);
             Ok(())
         }
 

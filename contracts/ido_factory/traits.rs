@@ -28,6 +28,7 @@ pub trait Factory {
         signer: AccountId,
         price: u128,
         price_decimals: u32,
+        max_issue_ido_amount: u128,
     ) -> Result<AccountId, FactoryError>;
 }
 

@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xc714cbcf76b004a005b3fdc02b959fa34483cec97cc1d8d6d127aaba592418e2",
+    "hash": "0x6afd63777eaa25c2e735d5e17211b32346b0ad42fd070a4cc04737c33211409f",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -55,13 +55,13 @@
         "displayName": [
           "AccountId"
         ],
-        "type": 4
+        "type": 3
       },
       "balance": {
         "displayName": [
           "Balance"
         ],
-        "type": 10
+        "type": 4
       },
       "blockNumber": {
         "displayName": [
@@ -100,7 +100,7 @@
               "displayName": [
                 "AccountId"
               ],
-              "type": 4
+              "type": 3
             }
           },
           {
@@ -110,6 +110,17 @@
             "type": {
               "displayName": [
                 "AccountId"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "length",
+            "type": {
+              "displayName": [
+                "u128"
               ],
               "type": 4
             }
@@ -130,10 +141,20 @@
     },
     "messages": [
       {
-        "args": [],
+        "args": [
+          {
+            "label": "index",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 4
+            }
+          }
+        ],
         "default": false,
         "docs": [],
-        "label": "get_list_of_tokens",
+        "label": "get_token",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -143,7 +164,7 @@
           ],
           "type": 8
         },
-        "selector": "0x576be7c6"
+        "selector": "0x14d608f2"
       },
       {
         "args": [
@@ -153,7 +174,7 @@
               "displayName": [
                 "AccountId"
               ],
-              "type": 4
+              "type": 3
             }
           },
           {
@@ -162,7 +183,7 @@
               "displayName": [
                 "String"
               ],
-              "type": 9
+              "type": 10
             }
           },
           {
@@ -171,7 +192,7 @@
               "displayName": [
                 "String"
               ],
-              "type": 9
+              "type": 10
             }
           },
           {
@@ -189,7 +210,7 @@
               "displayName": [
                 "Balance"
               ],
-              "type": 10
+              "type": 4
             }
           },
           {
@@ -207,7 +228,7 @@
               "displayName": [
                 "Balance"
               ],
-              "type": 10
+              "type": 4
             }
           },
           {
@@ -216,7 +237,7 @@
               "displayName": [
                 "String"
               ],
-              "type": 9
+              "type": 10
             }
           }
         ],
@@ -252,12 +273,26 @@
             },
             {
               "layout": {
-                "leaf": {
-                  "key": "0x00000000",
-                  "ty": 3
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0x823d821c",
+                      "ty": 3
+                    }
+                  },
+                  "root_key": "0x823d821c"
                 }
               },
-              "name": "list_of_tokens"
+              "name": "tokens"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 4
+                }
+              },
+              "name": "token_length"
             }
           ],
           "name": "TokenFactory"
@@ -310,16 +345,6 @@
       "id": 3,
       "type": {
         "def": {
-          "sequence": {
-            "type": 4
-          }
-        }
-      }
-    },
-    {
-      "id": 4,
-      "type": {
-        "def": {
           "composite": {
             "fields": [
               {
@@ -334,6 +359,14 @@
           "types",
           "AccountId"
         ]
+      }
+    },
+    {
+      "id": 4,
+      "type": {
+        "def": {
+          "primitive": "u128"
+        }
       }
     },
     {
@@ -414,7 +447,7 @@
               {
                 "fields": [
                   {
-                    "type": 3
+                    "type": 9
                   }
                 ],
                 "index": 0,
@@ -435,7 +468,7 @@
         "params": [
           {
             "name": "T",
-            "type": 3
+            "type": 9
           },
           {
             "name": "E",
@@ -451,15 +484,40 @@
       "id": 9,
       "type": {
         "def": {
-          "primitive": "str"
-        }
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "None"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 3
+                  }
+                ],
+                "index": 1,
+                "name": "Some"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 3
+          }
+        ],
+        "path": [
+          "Option"
+        ]
       }
     },
     {
       "id": 10,
       "type": {
         "def": {
-          "primitive": "u128"
+          "primitive": "str"
         }
       }
     },
@@ -522,7 +580,7 @@
               {
                 "fields": [
                   {
-                    "type": 4
+                    "type": 3
                   }
                 ],
                 "index": 0,
@@ -543,7 +601,7 @@
         "params": [
           {
             "name": "T",
-            "type": 4
+            "type": 3
           },
           {
             "name": "E",

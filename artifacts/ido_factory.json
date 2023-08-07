@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x1290109aed822610565cdd430dc0d13f105302515740f1342bd9fd6f48d6ed68",
+    "hash": "0xd9b56daf1aa4037641862153642d6a37e83c33e522e8636990d304a0fcc1b2be",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -60,7 +60,7 @@
         "displayName": [
           "Balance"
         ],
-        "type": 19
+        "type": 3
       },
       "blockNumber": {
         "displayName": [
@@ -72,7 +72,7 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 25
+        "type": 24
       },
       "hash": {
         "displayName": [
@@ -85,7 +85,7 @@
         "displayName": [
           "Timestamp"
         ],
-        "type": 16
+        "type": 23
       }
     },
     "events": [
@@ -119,9 +119,9 @@
             "label": "pool_len",
             "type": {
               "displayName": [
-                "u64"
+                "u128"
               ],
-              "type": 16
+              "type": 3
             }
           }
         ],
@@ -145,17 +145,28 @@
               "displayName": [
                 "access_control",
                 "accesscontrol_external",
-                "GetRoleAdminInput1"
+                "HasRoleInput1"
               ],
               "type": 5
+            }
+          },
+          {
+            "label": "address",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "HasRoleInput2"
+              ],
+              "type": 0
             }
           }
         ],
         "default": false,
         "docs": [
-          " Returns the admin role that controls `role`. See `grant_role` and `revoke_role`."
+          " Returns `true` if `account` has been granted `role`."
         ],
-        "label": "AccessControl::get_role_admin",
+        "label": "AccessControl::has_role",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -165,7 +176,7 @@
           ],
           "type": 9
         },
-        "selector": "0x83da3bb2"
+        "selector": "0xc1d9ac18"
       },
       {
         "args": [
@@ -214,7 +225,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 10
+          "type": 11
         },
         "selector": "0xeaf1248a"
       },
@@ -262,7 +273,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 10
+          "type": 11
         },
         "selector": "0x4ac062fd"
       },
@@ -274,28 +285,17 @@
               "displayName": [
                 "access_control",
                 "accesscontrol_external",
-                "HasRoleInput1"
+                "GetRoleAdminInput1"
               ],
               "type": 5
-            }
-          },
-          {
-            "label": "address",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "HasRoleInput2"
-              ],
-              "type": 0
             }
           }
         ],
         "default": false,
         "docs": [
-          " Returns `true` if `account` has been granted `role`."
+          " Returns the admin role that controls `role`. See `grant_role` and `revoke_role`."
         ],
-        "label": "AccessControl::has_role",
+        "label": "AccessControl::get_role_admin",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -303,9 +303,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 13
+          "type": 14
         },
-        "selector": "0xc1d9ac18"
+        "selector": "0x83da3bb2"
       },
       {
         "args": [
@@ -350,15 +350,26 @@
             "ink",
             "MessageResult"
           ],
-          "type": 10
+          "type": 11
         },
         "selector": "0x6e4f0991"
       },
       {
-        "args": [],
+        "args": [
+          {
+            "label": "index",
+            "type": {
+              "displayName": [
+                "factory_external",
+                "PoolsInput1"
+              ],
+              "type": 3
+            }
+          }
+        ],
         "default": false,
         "docs": [],
-        "label": "Factory::all_pools_length",
+        "label": "Factory::pools",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -368,24 +379,13 @@
           ],
           "type": 15
         },
-        "selector": "0xb261846e"
+        "selector": "0x15de97a6"
       },
       {
-        "args": [
-          {
-            "label": "token",
-            "type": {
-              "displayName": [
-                "factory_external",
-                "GetPoolInput1"
-              ],
-              "type": 0
-            }
-          }
-        ],
+        "args": [],
         "default": false,
         "docs": [],
-        "label": "Factory::get_pool",
+        "label": "Factory::pool_contract_code_hash",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -395,24 +395,13 @@
           ],
           "type": 17
         },
-        "selector": "0x080b44cd"
+        "selector": "0x3a828d93"
       },
       {
-        "args": [
-          {
-            "label": "pid",
-            "type": {
-              "displayName": [
-                "factory_external",
-                "AllPoolsInput1"
-              ],
-              "type": 16
-            }
-          }
-        ],
+        "args": [],
         "default": false,
         "docs": [],
-        "label": "Factory::all_pools",
+        "label": "Factory::pools_length",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -420,9 +409,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 17
+          "type": 18
         },
-        "selector": "0xc61cf18e"
+        "selector": "0xf027de7d"
       },
       {
         "args": [
@@ -453,7 +442,7 @@
                 "factory_external",
                 "CreatePoolInput3"
               ],
-              "type": 19
+              "type": 3
             }
           },
           {
@@ -464,6 +453,16 @@
                 "CreatePoolInput4"
               ],
               "type": 5
+            }
+          },
+          {
+            "label": "max_issue_ido_amount",
+            "type": {
+              "displayName": [
+                "factory_external",
+                "CreatePoolInput5"
+              ],
+              "type": 3
             }
           }
         ],
@@ -477,25 +476,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 20
+          "type": 19
         },
         "selector": "0x2c25a4d1"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [],
-        "label": "Factory::pool_contract_code_hash",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 24
-        },
-        "selector": "0x3a828d93"
       }
     ]
   },
@@ -513,14 +496,14 @@
                         "root": {
                           "layout": {
                             "leaf": {
-                              "key": "0x22faa2f8",
+                              "key": "0x55756e7b",
                               "ty": 0
                             }
                           },
-                          "root_key": "0x22faa2f8"
+                          "root_key": "0x55756e7b"
                         }
                       },
-                      "name": "get_pool"
+                      "name": "pools"
                     },
                     {
                       "layout": {
@@ -529,7 +512,7 @@
                           "ty": 3
                         }
                       },
-                      "name": "all_pools"
+                      "name": "pool_length"
                     },
                     {
                       "layout": {
@@ -703,9 +686,7 @@
       "id": 3,
       "type": {
         "def": {
-          "sequence": {
-            "type": 0
-          }
+          "primitive": "u128"
         }
       }
     },
@@ -815,6 +796,170 @@
               {
                 "fields": [
                   {
+                    "type": 10
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 10
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "type": {
+        "def": {
+          "primitive": "bool"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 12
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 6
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 6
+          },
+          {
+            "name": "E",
+            "type": 13
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "InvalidCaller"
+              },
+              {
+                "index": 1,
+                "name": "MissingRole"
+              },
+              {
+                "index": 2,
+                "name": "RoleRedundant"
+              }
+            ]
+          }
+        },
+        "path": [
+          "openbrush_contracts",
+          "traits",
+          "errors",
+          "access_control",
+          "AccessControlError"
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
                     "type": 5
                   }
                 ],
@@ -846,170 +991,6 @@
         "path": [
           "Result"
         ]
-      }
-    },
-    {
-      "id": 10,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 11
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 8
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 11
-          },
-          {
-            "name": "E",
-            "type": 8
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 11,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 6
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 12
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 6
-          },
-          {
-            "name": "E",
-            "type": 12
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 12,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "InvalidCaller"
-              },
-              {
-                "index": 1,
-                "name": "MissingRole"
-              },
-              {
-                "index": 2,
-                "name": "RoleRedundant"
-              }
-            ]
-          }
-        },
-        "path": [
-          "openbrush_contracts",
-          "traits",
-          "errors",
-          "access_control",
-          "AccessControlError"
-        ]
-      }
-    },
-    {
-      "id": 13,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 14
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 8
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 14
-          },
-          {
-            "name": "E",
-            "type": 8
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 14,
-      "type": {
-        "def": {
-          "primitive": "bool"
-        }
       }
     },
     {
@@ -1058,56 +1039,6 @@
       "id": 16,
       "type": {
         "def": {
-          "primitive": "u64"
-        }
-      }
-    },
-    {
-      "id": 17,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 18
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 8
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 18
-          },
-          {
-            "name": "E",
-            "type": 8
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 18,
-      "type": {
-        "def": {
           "variant": {
             "variants": [
               {
@@ -1138,157 +1069,7 @@
       }
     },
     {
-      "id": 19,
-      "type": {
-        "def": {
-          "primitive": "u128"
-        }
-      }
-    },
-    {
-      "id": 20,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 21
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 8
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 21
-          },
-          {
-            "name": "E",
-            "type": 8
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 21,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 0
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 22
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 0
-          },
-          {
-            "name": "E",
-            "type": 22
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 22,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 23,
-                    "typeName": "String"
-                  }
-                ],
-                "index": 0,
-                "name": "Custom"
-              },
-              {
-                "index": 1,
-                "name": "CallerIsNotFeeSetter"
-              },
-              {
-                "index": 2,
-                "name": "ZeroAddress"
-              },
-              {
-                "index": 3,
-                "name": "IdenticalAddresses"
-              },
-              {
-                "index": 4,
-                "name": "PoolExists"
-              },
-              {
-                "index": 5,
-                "name": "PoolInstantiationFailed"
-              },
-              {
-                "index": 6,
-                "name": "PoolInitFailed"
-              }
-            ]
-          }
-        },
-        "path": [
-          "ido_factory",
-          "traits",
-          "FactoryError"
-        ]
-      }
-    },
-    {
-      "id": 23,
-      "type": {
-        "def": {
-          "primitive": "str"
-        }
-      }
-    },
-    {
-      "id": 24,
+      "id": 17,
       "type": {
         "def": {
           "variant": {
@@ -1330,7 +1111,199 @@
       }
     },
     {
-      "id": 25,
+      "id": 18,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 3
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 3
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 20
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 20
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 21
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          },
+          {
+            "name": "E",
+            "type": 21
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 22,
+                    "typeName": "String"
+                  }
+                ],
+                "index": 0,
+                "name": "Custom"
+              },
+              {
+                "index": 1,
+                "name": "CallerIsNotFeeSetter"
+              },
+              {
+                "index": 2,
+                "name": "ZeroAddress"
+              },
+              {
+                "index": 3,
+                "name": "IdenticalAddresses"
+              },
+              {
+                "index": 4,
+                "name": "PoolExists"
+              },
+              {
+                "index": 5,
+                "name": "PoolInstantiationFailed"
+              },
+              {
+                "index": 6,
+                "name": "PoolInitFailed"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ido_factory",
+          "traits",
+          "FactoryError"
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "type": {
+        "def": {
+          "primitive": "str"
+        }
+      }
+    },
+    {
+      "id": 23,
+      "type": {
+        "def": {
+          "primitive": "u64"
+        }
+      }
+    },
+    {
+      "id": 24,
       "type": {
         "def": {
           "variant": {}
