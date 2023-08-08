@@ -46,6 +46,11 @@ pub mod token_factory {
         }
 
         #[ink(message)]
+        pub fn get_token_length(&self) -> u128 {
+            self.token_length
+        }
+
+        #[ink(message)]
         pub fn create_token(&mut self, owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance, is_require_whitelist: bool, tax_fee: Balance, document: String) -> Result<AccountId, TokenFactoryError> {
             let salt = (<Self as DefaultEnv>::env().block_timestamp(), b"token_contract").encode();
             let hash = xxh32(&salt, 0).to_le_bytes();
