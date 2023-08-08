@@ -48,6 +48,7 @@ mod staking {
         pub amount: u128,
         pub new_tier: u128,
         pub timestamp: Timestamp,
+        pub nonce: u128,
     }
 
     #[ink(event)]
@@ -56,6 +57,7 @@ mod staking {
         pub amount: u128,
         pub new_tier: u128,
         pub timestamp: Timestamp,
+        pub nonce: u128,
     }
 
     #[ink(event)]
@@ -64,27 +66,29 @@ mod staking {
     }
 
     pub trait Internal {
-        fn _emit_staking_event(&self, account: AccountId, amount: u128, new_tier: u128, timestamp: Timestamp);
-        fn _emit_unstaking_event(&self, account: AccountId, amount: u128, new_tier: u128, timestamp: Timestamp);
+        fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp);
+        fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp);
         fn _emit_set_tiers_event(&self, tiers: Vec<u128>);
     }
 
     impl Internal for Staking {
-        fn _emit_staking_event(&self, account: AccountId, amount: u128, new_tier: u128, timestamp: Timestamp) {
+        fn _emit_staking_event(&self, account: AccountId, amount: u128, nonce: u128, new_tier: u128, timestamp: Timestamp) {
             self.env().emit_event(StakingEvent {
                 staker: account,
                 amount,
                 new_tier,
                 timestamp,
+                nonce,
             })
         }
 
-        fn _emit_unstaking_event(&self, account: AccountId, amount: u128, new_tier: u128, timestamp: Timestamp) {
+        fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp) {
             self.env().emit_event(UnstakingEvent {
                 staker: account,
                 amount,
                 new_tier,
                 timestamp,
+                nonce,
             })
         }
 
@@ -161,16 +165,24 @@ mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
-            self._emit_staking_event(caller, new_amount, tier, self.env().block_timestamp());
+            self._emit_staking_event(caller, nonce, new_amount, tier, self.env().block_timestamp());
 
             Ok(())
         }
 
         /// function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake
         #[ink(message)]
-        pub fn unstake(&mut self, deadline: Timestamp, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
+        pub fn unstake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
             let caller = self.env().caller();
-            let message = self.gen_msg_for_unstake_token(deadline, amount);
+            if deadline < self.env().block_timestamp() {
+                return Err(StakingError::InvalidDeadline);
+            }
+            if nonce != self.account_nonce.get(&caller).unwrap_or(0) {
+                return Err(StakingError::InvalidNonce(nonce.to_string()));
+            }
+
+            self.account_nonce.insert(&caller, &(nonce + 1));
+            let message = self.gen_msg_for_unstake_token(deadline, nonce, amount);
             // verify signature
             let is_ok = self._verify(message, self.signer, signature);
 
@@ -196,7 +208,7 @@ mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
-            self._emit_unstaking_event(caller, new_amount, tier, self.env().block_timestamp());
+            self._emit_unstaking_event(caller, nonce, new_amount, tier, self.env().block_timestamp());
             Ok(())
         }
 
@@ -204,6 +216,12 @@ mod staking {
         #[ink(message)]
         pub fn get_stake_token(&self) -> AccountId {
             self.stake_token
+        }
+
+        #[ink(message)]
+        pub fn get_nonce(&self) -> u128 {
+            let caller = self.env().caller();
+            self.account_nonce.get(&caller).unwrap_or(0)
         }
 
         /// function to get the owner of the staking contract
@@ -299,7 +317,7 @@ mod staking {
         }
 
         #[ink(message)]
-        pub fn gen_msg_for_unstake_token(&self, deadline: Timestamp, unstake_amount: u128) -> String {
+        pub fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
             let mut message: String = String::from("");
             message.push_str("unstake_token_");
@@ -310,6 +328,8 @@ mod staking {
             message.push_str(&unstake_amount.to_string().as_str());
             message.push_str("_");
             message.push_str(&deadline.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&nonce.to_string().as_str());
             message
         }
 
