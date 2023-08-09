@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x6afd63777eaa25c2e735d5e17211b32346b0ad42fd070a4cc04737c33211409f",
+    "hash": "0xdda8cfe24044fd94e39a34dd3878c9a903d4999a226826cf10cbbbbe213830c5",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -67,13 +67,13 @@
         "displayName": [
           "BlockNumber"
         ],
-        "type": 16
+        "type": 17
       },
       "chainExtension": {
         "displayName": [
           "ChainExtension"
         ],
-        "type": 17
+        "type": 18
       },
       "hash": {
         "displayName": [
@@ -86,7 +86,7 @@
         "displayName": [
           "Timestamp"
         ],
-        "type": 15
+        "type": 16
       }
     },
     "events": [
@@ -167,6 +167,22 @@
         "selector": "0x14d608f2"
       },
       {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "get_token_length",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x903c262f"
+      },
+      {
         "args": [
           {
             "label": "owner",
@@ -183,7 +199,7 @@
               "displayName": [
                 "String"
               ],
-              "type": 10
+              "type": 11
             }
           },
           {
@@ -192,7 +208,7 @@
               "displayName": [
                 "String"
               ],
-              "type": 10
+              "type": 11
             }
           },
           {
@@ -219,7 +235,7 @@
               "displayName": [
                 "bool"
               ],
-              "type": 11
+              "type": 12
             }
           },
           {
@@ -237,7 +253,7 @@
               "displayName": [
                 "String"
               ],
-              "type": 10
+              "type": 11
             }
           }
         ],
@@ -251,7 +267,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 12
+          "type": 13
         },
         "selector": "0x4e621c27"
       }
@@ -517,28 +533,12 @@
       "id": 10,
       "type": {
         "def": {
-          "primitive": "str"
-        }
-      }
-    },
-    {
-      "id": 11,
-      "type": {
-        "def": {
-          "primitive": "bool"
-        }
-      }
-    },
-    {
-      "id": 12,
-      "type": {
-        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 13
+                    "type": 4
                   }
                 ],
                 "index": 0,
@@ -559,7 +559,7 @@
         "params": [
           {
             "name": "T",
-            "type": 13
+            "type": 4
           },
           {
             "name": "E",
@@ -572,7 +572,65 @@
       }
     },
     {
+      "id": 11,
+      "type": {
+        "def": {
+          "primitive": "str"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "primitive": "bool"
+        }
+      }
+    },
+    {
       "id": 13,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 14
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 7
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 14
+          },
+          {
+            "name": "E",
+            "type": 7
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 14,
       "type": {
         "def": {
           "variant": {
@@ -589,7 +647,7 @@
               {
                 "fields": [
                   {
-                    "type": 14
+                    "type": 15
                   }
                 ],
                 "index": 1,
@@ -605,7 +663,7 @@
           },
           {
             "name": "E",
-            "type": 14
+            "type": 15
           }
         ],
         "path": [
@@ -614,7 +672,7 @@
       }
     },
     {
-      "id": 14,
+      "id": 15,
       "type": {
         "def": {
           "variant": {
@@ -634,7 +692,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 16,
       "type": {
         "def": {
           "primitive": "u64"
@@ -642,7 +700,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 17,
       "type": {
         "def": {
           "primitive": "u32"
@@ -650,7 +708,7 @@
       }
     },
     {
-      "id": 17,
+      "id": 18,
       "type": {
         "def": {
           "variant": {}

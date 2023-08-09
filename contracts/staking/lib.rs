@@ -72,7 +72,7 @@ mod staking {
     }
 
     impl Internal for Staking {
-        fn _emit_staking_event(&self, account: AccountId, amount: u128, nonce: u128, new_tier: u128, timestamp: Timestamp) {
+        fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp) {
             self.env().emit_event(StakingEvent {
                 staker: account,
                 amount,

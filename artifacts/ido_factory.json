@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xd9b56daf1aa4037641862153642d6a37e83c33e522e8636990d304a0fcc1b2be",
+    "hash": "0x215f93edbb3726d1a8181e96db2f30d4bdd86db18dc72d6ff00c40a02f643449",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -186,6 +186,54 @@
               "displayName": [
                 "access_control",
                 "accesscontrol_external",
+                "GrantRoleInput1"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "GrantRoleInput2"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Grants `role` to `account`.",
+          "",
+          " On success a `RoleGranted` event is emitted.",
+          "",
+          " # Errors",
+          "",
+          " Returns with `MissingRole` error if caller can't grant the role.",
+          " Returns with `RoleRedundant` error `account` has `role`."
+        ],
+        "label": "AccessControl::grant_role",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0x4ac062fd"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
                 "RenounceRoleInput1"
               ],
               "type": 5
@@ -237,84 +285,6 @@
               "displayName": [
                 "access_control",
                 "accesscontrol_external",
-                "GrantRoleInput1"
-              ],
-              "type": 5
-            }
-          },
-          {
-            "label": "account",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "GrantRoleInput2"
-              ],
-              "type": 0
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " Grants `role` to `account`.",
-          "",
-          " On success a `RoleGranted` event is emitted.",
-          "",
-          " # Errors",
-          "",
-          " Returns with `MissingRole` error if caller can't grant the role.",
-          " Returns with `RoleRedundant` error `account` has `role`."
-        ],
-        "label": "AccessControl::grant_role",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 11
-        },
-        "selector": "0x4ac062fd"
-      },
-      {
-        "args": [
-          {
-            "label": "role",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "GetRoleAdminInput1"
-              ],
-              "type": 5
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " Returns the admin role that controls `role`. See `grant_role` and `revoke_role`."
-        ],
-        "label": "AccessControl::get_role_admin",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 14
-        },
-        "selector": "0x83da3bb2"
-      },
-      {
-        "args": [
-          {
-            "label": "role",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
                 "RevokeRoleInput1"
               ],
               "type": 5
@@ -353,6 +323,36 @@
           "type": 11
         },
         "selector": "0x6e4f0991"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "GetRoleAdminInput1"
+              ],
+              "type": 5
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Returns the admin role that controls `role`. See `grant_role` and `revoke_role`."
+        ],
+        "label": "AccessControl::get_role_admin",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 14
+        },
+        "selector": "0x83da3bb2"
       },
       {
         "args": [

@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x9d99a0f3da12df7361d8265e55215da2570bc2c78cdb0e7d2cfe0b397b528850",
+    "hash": "0x0d946014457406f81f3f54a3d4940335a3651a8e4215331740cb57cfe99cb80b",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -154,6 +154,17 @@
               ],
               "type": 12
             }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
           }
         ],
         "docs": [],
@@ -203,6 +214,17 @@
                 "Timestamp"
               ],
               "type": 12
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
             }
           }
         ],
@@ -328,6 +350,15 @@
             }
           },
           {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
             "label": "amount",
             "type": {
               "displayName": [
@@ -377,6 +408,22 @@
           "type": 14
         },
         "selector": "0x6499b57b"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "get_nonce",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 15
+        },
+        "selector": "0xd9a8c128"
       },
       {
         "args": [],
@@ -605,6 +652,15 @@
                 "Timestamp"
               ],
               "type": 12
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
             }
           },
           {
