@@ -165,7 +165,7 @@ mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
-            self._emit_staking_event(caller, nonce, new_amount, tier, self.env().block_timestamp());
+            self._emit_staking_event(caller, nonce, new_amount, tier, deadline);
 
             Ok(())
         }
@@ -208,7 +208,7 @@ mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
-            self._emit_unstaking_event(caller, nonce, new_amount, tier, self.env().block_timestamp());
+            self._emit_unstaking_event(caller, nonce, new_amount, tier, deadline);
             Ok(())
         }
 
