@@ -168,7 +168,6 @@ pub mod ido {
                 self.ido.issued_ido_amount.checked_add(received_value).unwrap() <= self.ido.max_issue_ido_amount,
                 IDOError::MaxIssueIdoAmount,
             );
-            self.ido.max_issue_ido_amount = self.ido.issued_ido_amount.checked_add(received_value).unwrap();
 
             // generate message = buy_ido + ido_token + buyer + amount
             let message = self.gen_msg_for_buy_token(deadline, nonce, received_value);
@@ -182,6 +181,8 @@ pub mod ido {
 
             // calculate IDO amount = received_value * price / 10^price_decimals
             let ido_amount = received_value.checked_mul(self.ido.price).unwrap().checked_div((10 as u128).checked_pow(self.ido.price_decimals).unwrap()).unwrap();
+            self.ido.issued_ido_amount = self.ido.issued_ido_amount.checked_add(ido_amount).unwrap();
+
             let old_balances = match self.ido.user_ido_balances.get(&self.env().caller()) {
                 Some(balance) => balance,
                 None => 0 as u128,
