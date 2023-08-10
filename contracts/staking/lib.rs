@@ -3,7 +3,8 @@
 #[openbrush::contract]
 mod staking {
     use hex::*;
-    use ink::storage::Mapping;
+    use logics::types::staking::*;
+    use logics::traits::staking::*;
     use ink::{
         env::{
             hash,
@@ -14,32 +15,21 @@ mod staking {
         },
         prelude::vec::Vec,
         prelude::string::{String, ToString},
+        storage::Mapping,
     };
     use openbrush::{
+        traits::{Storage, DefaultEnv},
         contracts::traits::psp22::{PSP22Ref},
+        contracts::ownable::{self},
     };
 
-    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
-    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
-    pub enum StakingError {
-        InvalidNonce(String),
-        InvalidDeadline,
-        TransferFailed,
-        InsufficientAllowance,
-        InsufficientBalance,
-        InvalidSignature,
-        OnlyOwner,
-    }
-
     #[ink(storage)]
-    pub struct Staking {
-        owner: AccountId,
-        stake_token: AccountId,
-        staking_amounts: Mapping<AccountId, u128>,
-        account_tiers: Mapping<AccountId, u128>,
-        tier_configs: Vec<u128>,
-        account_nonce: Mapping<AccountId, u128>,
-        signer: AccountId,
+    #[derive(Default, Storage)]
+    pub struct StakingContract {
+        #[storage_field]
+        staking: StakingData,
+        // #[storage_field]
+        // ownable: ownable::Data,
     }
 
     #[ink(event)]
@@ -65,13 +55,188 @@ mod staking {
         pub tiers: Vec<u128>,
     }
 
-    pub trait Internal {
-        fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp);
-        fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp);
-        fn _emit_set_tiers_event(&self, tiers: Vec<u128>);
+    // impl ownable::Ownable for StakingContract {}
+
+    impl Staking for StakingContract {
+        /// the function allows the owner to set the signer
+        #[ink(message)]
+        fn set_signer(&mut self, signer: AccountId) -> Result<(), StakingError> {
+            self.staking.signer = signer;
+            Ok(())
+        }
+
+        /// function staking, after user call the API to get the signature for staking (BE API will sign the message), use will call this function to stake
+        #[ink(message)]
+        fn stake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
+            let caller = self.env().caller();
+            let me = self.env().account_id();
+            // if deadline < self.env().block_timestamp() {
+            //     return Err(StakingError::InvalidDeadline);
+            // }
+            // if nonce != self.staking.account_nonce.get(&caller).unwrap_or(0) {
+            //     return Err(StakingError::InvalidNonce(nonce.to_string()));
+            // }
+            // self.staking.account_nonce.insert(&caller, &(nonce + 1));
+            //
+            // let message = self.gen_msg_for_stake_token(deadline, nonce, amount);
+            // // verify signature
+            // let is_ok = self._verify(message, self.staking.signer, signature);
+            //
+            // if !is_ok {
+            //     return Err(StakingError::InvalidSignature);
+            // }
+            //
+            // if PSP22Ref::allowance(&self.staking.stake_token, caller, me) < amount {
+            //     return Err(StakingError::InsufficientAllowance)
+            // }
+            // // ensure the user has enough collateral assets
+            // if PSP22Ref::balance_of(&self.staking.stake_token, caller) < amount {
+            //     return Err(StakingError::InsufficientBalance)
+            // }
+
+            // transfer from caller to self
+            PSP22Ref::transfer_from_builder(&mut self.staking.stake_token, caller, me, 0, Vec::<u8>::new()).call_flags(ink::env::CallFlags::default().set_allow_reentry(true)).try_invoke().map_err(|_| StakingError::TransferFailed).unwrap();
+            //
+            // let new_amount = self.staking.staking_amounts.get(&caller).unwrap_or(0) + amount;
+            // self.staking.staking_amounts.insert(&caller, &new_amount);
+            //
+            // let tier = self.get_tier_from_amount(new_amount);
+            // self.staking.account_tiers.insert(&caller, &tier);
+            //
+            // self._emit_staking_event(caller, nonce, new_amount, tier, deadline);
+
+            Ok(())
+        }
+
+        /// function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake
+        #[ink(message)]
+        fn unstake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
+            let caller = self.env().caller();
+            let me = self.env().account_id();
+            if deadline < self.env().block_timestamp() {
+                return Err(StakingError::InvalidDeadline);
+            }
+            if nonce != self.staking.account_nonce.get(&caller).unwrap_or(0) {
+                return Err(StakingError::InvalidNonce(nonce.to_string()));
+            }
+
+            self.staking.account_nonce.insert(&caller, &(nonce + 1));
+            let message = self.gen_msg_for_unstake_token(deadline, nonce, amount);
+            // verify signature
+            let is_ok = self._verify(message, self.staking.signer, signature);
+
+            if !is_ok {
+                return Err(StakingError::InvalidSignature);
+            }
+
+            let stake_amount = self.staking.staking_amounts.get(&caller).unwrap_or(0);
+            if stake_amount < amount {
+                return Err(StakingError::InsufficientBalance)
+            }
+            // ensure the user has enough collateral assets
+            if PSP22Ref::balance_of(&self.staking.stake_token, me) < amount {
+                return Err(StakingError::InsufficientBalance)
+            }
+
+            let new_amount = self.staking.staking_amounts.get(&caller).unwrap_or(0) - amount;
+            self.staking.staking_amounts.insert(&caller, &new_amount);
+
+            // transfer from self to caller
+            PSP22Ref::transfer_from_builder(&(self.staking.stake_token.clone()), caller, me, amount, Vec::<u8>::new()).call_flags(ink::env::CallFlags::default().set_allow_reentry(true)).try_invoke().map_err(|_| StakingError::TransferFailed).unwrap();
+
+            let tier = self.get_tier_from_amount(new_amount);
+            self.staking.account_tiers.insert(&caller, &tier);
+
+            self._emit_unstaking_event(caller, nonce, new_amount, tier, deadline);
+            Ok(())
+        }
+
+        /// function to get staking token address
+        #[ink(message)]
+        fn get_stake_token(&self) -> AccountId {
+            self.staking.stake_token
+        }
+
+        #[ink(message)]
+        fn get_nonce(&self) -> u128 {
+            let caller = self.env().caller();
+            self.staking.account_nonce.get(&caller).unwrap_or(0)
+        }
+
+        /// function to get staked amount of the input account
+        #[ink(message)]
+        fn staking_amount_of(&self, account: AccountId) -> u128 {
+            self.staking.staking_amounts.get(&account).unwrap_or(0)
+        }
+
+        /// function to get tier of the input account
+        #[ink(message)]
+        fn tier_of(&self, account: AccountId) -> u128 {
+            self.staking.account_tiers.get(&account).unwrap_or(0)
+        }
+
+        /// function to set list tiers of the staking contract
+        #[ink(message)]
+        fn set_tiers(&mut self, tiers: Vec<u128>) -> Result<(), StakingError> {
+            self.staking.tier_configs = tiers.clone();
+            self._emit_set_tiers_event(tiers.clone());
+            Ok(())
+        }
+
+        /// function to get list tiers of the staking contract
+        #[ink(message)]
+        fn get_tiers(&self) -> Result<Vec<u128>, StakingError> {
+            Ok(self.staking.tier_configs.clone())
+        }
+
+        #[ink(message)]
+        fn get_tier_from_amount(&self, amount: u128) -> u128 {
+            let mut tier: u128 = 0;
+            for i in 0..self.staking.tier_configs.len() {
+                if amount >= self.staking.tier_configs[i] {
+                    tier = i as u128;
+                }
+            }
+
+            return tier;
+        }
+
+        #[ink(message)]
+        fn gen_msg_for_stake_token(&self, deadline: Timestamp, nonce: u128, stake_amount: u128) -> String {
+            // generate message = buy_ido + ido_token + buyer + amount
+            let mut message: String = String::from("");
+            message.push_str("stake_token_");
+            message.push_str(encode(&self.env().account_id()).as_str());
+            message.push_str("_");
+            message.push_str(encode(&self.env().caller()).as_str());
+            message.push_str("_");
+            message.push_str(&stake_amount.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&deadline.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&nonce.to_string().as_str());
+            message
+        }
+
+        #[ink(message)]
+        fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128) -> String {
+            // generate message = buy_ido + ido_token + buyer + amount
+            let mut message: String = String::from("");
+            message.push_str("unstake_token_");
+            message.push_str(encode(&self.env().account_id()).as_str());
+            message.push_str("_");
+            message.push_str(encode(&self.env().caller()).as_str());
+            message.push_str("_");
+            message.push_str(&unstake_amount.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&deadline.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&nonce.to_string().as_str());
+            message
+        }
     }
 
-    impl Internal for Staking {
+    impl Internal for StakingContract {
         fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp) {
             self.env().emit_event(StakingEvent {
                 staker: account,
@@ -97,241 +262,6 @@ mod staking {
                 tiers,
             })
         }
-    }
-
-    impl Staking {
-        /// constructor for staking, admin enter the signer, token for staking and list of tiers
-        #[ink(constructor)]
-        pub fn new(signer: AccountId, stake_token: AccountId, tier_configs: Vec<u128>) -> Self {
-            let staking_amounts = Mapping::default();
-            let account_tiers = Mapping::default();
-            let owner = Self::env().caller();
-            Self {
-                owner,
-                staking_amounts,
-                account_tiers,
-                stake_token,
-                account_nonce: Mapping::default(),
-                tier_configs,
-                signer,
-            }
-        }
-
-        /// the function allows the owner to set the signer
-        #[ink(message)]
-        pub fn set_signer(&mut self, signer: AccountId) -> Result<(), StakingError> {
-            let caller = self.env().caller();
-            if caller != self.owner {
-                return Err(StakingError::OnlyOwner.into());
-            }
-            self.signer = signer;
-            Ok(())
-        }
-
-        /// function staking, after user call the API to get the signature for staking (BE API will sign the message), use will call this function to stake
-        #[ink(message)]
-        pub fn stake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
-            let caller = self.env().caller();
-            if deadline < self.env().block_timestamp() {
-                return Err(StakingError::InvalidDeadline);
-            }
-            if nonce != self.account_nonce.get(&caller).unwrap_or(0) {
-                return Err(StakingError::InvalidNonce(nonce.to_string()));
-            }
-            self.account_nonce.insert(&caller, &(nonce + 1));
-
-            let message = self.gen_msg_for_stake_token(deadline, nonce, amount);
-            // verify signature
-            let is_ok = self._verify(message, self.signer, signature);
-
-            if !is_ok {
-                return Err(StakingError::InvalidSignature);
-            }
-
-            if PSP22Ref::allowance(&self.stake_token, caller, self.env().account_id()) < amount {
-                return Err(StakingError::InsufficientAllowance)
-            }
-            // ensure the user has enough collateral assets
-            if PSP22Ref::balance_of(&self.stake_token, caller) < amount {
-                return Err(StakingError::InsufficientBalance)
-            }
-
-            // transfer from caller to self
-            PSP22Ref::transfer_from_builder(&mut self.stake_token, caller, Self::env().account_id(), amount, Vec::<u8>::new()).call_flags(ink::env::CallFlags::default().set_allow_reentry(true)).try_invoke().map_err(|_| StakingError::TransferFailed).unwrap();
-
-            let new_amount = self.staking_amounts.get(&caller).unwrap_or(0) + amount;
-            self.staking_amounts.insert(&caller, &new_amount);
-
-            let tier = self.get_tier_from_amount(new_amount);
-            self.account_tiers.insert(&caller, &tier);
-
-            self._emit_staking_event(caller, nonce, new_amount, tier, deadline);
-
-            Ok(())
-        }
-
-        /// function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake
-        #[ink(message)]
-        pub fn unstake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
-            let caller = self.env().caller();
-            if deadline < self.env().block_timestamp() {
-                return Err(StakingError::InvalidDeadline);
-            }
-            if nonce != self.account_nonce.get(&caller).unwrap_or(0) {
-                return Err(StakingError::InvalidNonce(nonce.to_string()));
-            }
-
-            self.account_nonce.insert(&caller, &(nonce + 1));
-            let message = self.gen_msg_for_unstake_token(deadline, nonce, amount);
-            // verify signature
-            let is_ok = self._verify(message, self.signer, signature);
-
-            if !is_ok {
-                return Err(StakingError::InvalidSignature);
-            }
-
-            let stake_amount = self.staking_amounts.get(&caller).unwrap_or(0);
-            if stake_amount < amount {
-                return Err(StakingError::InsufficientBalance)
-            }
-            // ensure the user has enough collateral assets
-            if PSP22Ref::balance_of(&self.stake_token, self.env().account_id()) < amount {
-                return Err(StakingError::InsufficientBalance)
-            }
-
-            let new_amount = self.staking_amounts.get(&caller).unwrap_or(0) - amount;
-            self.staking_amounts.insert(&caller, &new_amount);
-
-            // transfer from self to caller
-            PSP22Ref::transfer_from_builder(&mut self.stake_token, caller, Self::env().account_id(), amount, Vec::<u8>::new()).call_flags(ink::env::CallFlags::default().set_allow_reentry(true)).try_invoke().map_err(|_| StakingError::TransferFailed).unwrap();
-
-            let tier = self.get_tier_from_amount(new_amount);
-            self.account_tiers.insert(&caller, &tier);
-
-            self._emit_unstaking_event(caller, nonce, new_amount, tier, deadline);
-            Ok(())
-        }
-
-        /// function to get staking token address
-        #[ink(message)]
-        pub fn get_stake_token(&self) -> AccountId {
-            self.stake_token
-        }
-
-        #[ink(message)]
-        pub fn get_nonce(&self) -> u128 {
-            let caller = self.env().caller();
-            self.account_nonce.get(&caller).unwrap_or(0)
-        }
-
-        /// function to get the owner of the staking contract
-        #[ink(message)]
-        pub fn get_owner(&self) -> AccountId {
-            self.owner
-        }
-
-        /// function to set the owner of the staking contract
-        #[ink(message)]
-        pub fn set_owner(&mut self, new_owner: AccountId) -> Result<(), StakingError> {
-            let caller = self.env().caller();
-            if caller != self.owner {
-                return Err(StakingError::OnlyOwner.into());
-            }
-            self.owner = new_owner;
-            Ok(())
-        }
-
-        /// function to get staked amount of the input account
-        #[ink(message)]
-        pub fn staking_amount_of(&self, account: AccountId) -> u128 {
-            self.staking_amounts.get(&account).unwrap_or(0)
-        }
-
-        /// function to get tier of the input account
-        #[ink(message)]
-        pub fn tier_of(&self, account: AccountId) -> u128 {
-            self.account_tiers.get(&account).unwrap_or(0)
-        }
-
-        /// function to set list tiers of the staking contract
-        #[ink(message)]
-        pub fn set_tiers(&mut self, tiers: Vec<u128>) -> Result<(), StakingError> {
-            let caller = self.env().caller();
-            if caller != self.owner {
-                return Err(StakingError::OnlyOwner.into());
-            }
-            self.tier_configs = tiers.clone();
-            self._emit_set_tiers_event(tiers.clone());
-            Ok(())
-        }
-
-        /// function to get list tiers of the staking contract
-        #[ink(message)]
-        pub fn get_tiers(&self) -> Result<Vec<u128>, StakingError> {
-            Ok(self.tier_configs.clone())
-        }
-
-        /// function to update the contract code hash, use for proxy
-        #[ink(message)]
-        pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<(), StakingError> {
-            let caller = self.env().caller();
-            if caller != self.owner {
-                return Err(StakingError::OnlyOwner.into());
-            }
-            ink::env::set_code_hash(&code_hash).unwrap_or_else(|err| {
-                panic!(
-                    "Failed to `set_code_hash` to {:?} due to {:?}",
-                    code_hash, err
-                )
-            });
-            ink::env::debug_println!("Switched code hash to {:?}.", code_hash);
-            Ok(())
-        }
-
-        fn get_tier_from_amount(&self, amount: u128) -> u128 {
-            let mut tier: u128 = 0;
-            for i in 0..self.tier_configs.len() {
-                if amount >= self.tier_configs[i] {
-                    tier = i as u128;
-                }
-            }
-
-            return tier;
-        }
-
-        #[ink(message)]
-        pub fn gen_msg_for_stake_token(&self, deadline: Timestamp, nonce: u128, stake_amount: u128) -> String {
-            // generate message = buy_ido + ido_token + buyer + amount
-            let mut message: String = String::from("");
-            message.push_str("stake_token_");
-            message.push_str(encode(&self.env().account_id()).as_str());
-            message.push_str("_");
-            message.push_str(encode(&self.env().caller()).as_str());
-            message.push_str("_");
-            message.push_str(&stake_amount.to_string().as_str());
-            message.push_str("_");
-            message.push_str(&deadline.to_string().as_str());
-            message.push_str("_");
-            message.push_str(&nonce.to_string().as_str());
-            message
-        }
-
-        #[ink(message)]
-        pub fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128) -> String {
-            // generate message = buy_ido + ido_token + buyer + amount
-            let mut message: String = String::from("");
-            message.push_str("unstake_token_");
-            message.push_str(encode(&self.env().account_id()).as_str());
-            message.push_str("_");
-            message.push_str(encode(&self.env().caller()).as_str());
-            message.push_str("_");
-            message.push_str(&unstake_amount.to_string().as_str());
-            message.push_str("_");
-            message.push_str(&deadline.to_string().as_str());
-            message.push_str("_");
-            message.push_str(&nonce.to_string().as_str());
-            message
-        }
 
         fn _verify(&self, data: String, signer: AccountId, signature: [u8; 65]) -> bool {
             ink::env::debug_println!("data {:?}", data);
@@ -354,21 +284,34 @@ mod staking {
 
             signer == AccountId::from(signature_account_id)
         }
-
     }
 
-    #[cfg(test)]
-    mod tests {
-        use super::*;
-        use ink::env::{test, debug_println, DefaultEnvironment};
-        use ink::{ToAccountId};
+    impl StakingContract {
+        /// constructor for staking, admin enter the signer, token for staking and list of tiers
+        #[ink(constructor)]
+        pub fn new(signer: AccountId, stake_token: AccountId, tier_configs: Vec<u128>) -> Self {
+            let mut instance = Self::default();
+            let caller = instance.env().caller();
+            // instance._init_with_owner(caller);
+            instance.staking.stake_token = stake_token;
+            instance.staking.tier_configs = tier_configs;
+            instance.staking.signer = signer;
 
-        #[ink::test]
-        fn set_tiers_works() {
-            let accounts = test::default_accounts::<DefaultEnvironment>();
-            let mut staking = Staking::new(accounts.alice, accounts.alice, Vec::new());
-            staking.set_tiers(vec![100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]);
-            // assert_eq!(staking.get_tiers(c).unwrap(), vec![100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]);
+            instance
+        }
+
+        /// function to update the contract code hash, use for proxy
+        #[ink(message)]
+        pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<(), StakingError> {
+            ink::env::set_code_hash(&code_hash).unwrap_or_else(|err| {
+                panic!(
+                    "Failed to `set_code_hash` to {:?} due to {:?}",
+                    code_hash, err
+                )
+            });
+            ink::env::debug_println!("Switched code hash to {:?}.", code_hash);
+            Ok(())
         }
     }
+
 }

@@ -12,6 +12,7 @@ hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 
 scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
 scale-info = { version = "2.6", default-features = false, features = ["derive"], optional = true }
+logics = { path = "../logics", default-features = false }
 
 [lib]
 name = "staking"
@@ -24,6 +25,7 @@ std = [
     "scale/std",
     "scale-info/std",
     "token/std",
+    "logics/std",
 ]
 ink-as-dependency = []
 

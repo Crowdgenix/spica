@@ -10,6 +10,7 @@ openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts/", tag 
 
 scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
 scale-info = { version = "2.6", default-features = false, features = ["derive"], optional = true }
+hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 
 [lib]
 path = "lib.rs"
