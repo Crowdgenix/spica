@@ -198,36 +198,36 @@ pub mod ido {
         /// function to claim ido token
         #[ink(message)]
         fn claim_ido_token(&mut self, deadline: Timestamp, nonce: u128, amount: Balance, signature: [u8; 65]) -> Result<(), IDOError> {
-            ensure!(
-                deadline >= self.env().block_timestamp(),
-                IDOError::Expired
-            );
-
-            ensure!(
-                nonce == self.ido.account_nonce.get(&self.env().caller()).unwrap_or(0),
-                IDOError::InvalidNonce(nonce.to_string())
-            );
-
-            self.ido.account_nonce.insert(&self.env().caller(), &(nonce + 1));
-
-            let caller = Self::env().caller();
-            // ensure the user has enough collateral assets
-            if PSP22Ref::balance_of(&self.ido.ido_token, self.env().account_id()) < amount {
-                return Err(IDOError::InsufficientBalance)
-            }
-            // generate message
-            let message = self.gen_msg_for_claim_token(deadline, nonce, amount);
-
-            // verify signature
-            let is_ok = self._verify(message, self.ido.signer, signature);
-
-            if !is_ok {
-                return Err(IDOError::InvalidSignature);
-            }
-
-            let old_balances = self.ido.user_ido_balances.get(&self.env().caller()).unwrap_or(0);
-            let new_balances = old_balances.checked_sub(amount).unwrap_or(0);
-            self.ido.user_ido_balances.insert(self.env().caller(), &new_balances);
+            // ensure!(
+            //     deadline >= self.env().block_timestamp(),
+            //     IDOError::Expired
+            // );
+            //
+            // ensure!(
+            //     nonce == self.ido.account_nonce.get(&self.env().caller()).unwrap_or(0),
+            //     IDOError::InvalidNonce(nonce.to_string())
+            // );
+            //
+            // self.ido.account_nonce.insert(&self.env().caller(), &(nonce + 1));
+            //
+            let caller = self.env().caller();
+            // // ensure the user has enough collateral assets
+            // if PSP22Ref::balance_of(&self.ido.ido_token, self.env().account_id()) < amount {
+            //     return Err(IDOError::InsufficientBalance)
+            // }
+            // // generate message
+            // let message = self.gen_msg_for_claim_token(deadline, nonce, amount);
+            //
+            // // verify signature
+            // let is_ok = self._verify(message, self.ido.signer, signature);
+            //
+            // if !is_ok {
+            //     return Err(IDOError::InvalidSignature);
+            // }
+            //
+            // let old_balances = self.ido.user_ido_balances.get(&self.env().caller()).unwrap_or(0);
+            // let new_balances = old_balances.checked_sub(amount).unwrap_or(0);
+            // self.ido.user_ido_balances.insert(self.env().caller(), &new_balances);
 
             let result = helpers::safe_transfer(self.ido.ido_token, caller, amount);
             // check result
@@ -235,7 +235,7 @@ pub mod ido {
                 return Err(IDOError::SafeTransferError);
             }
 
-            self._emit_claim_token_event(caller, new_balances, nonce);
+            // self._emit_claim_token_event(caller, new_balances, nonce);
             Ok(())
         }
 
@@ -335,6 +335,21 @@ pub mod ido {
         #[ink(message)]
         pub fn verify_signature(&self, signature: [u8; 65], msg: String) -> bool {
             self._verify(msg, self.ido.signer, signature)
+        }
+
+        /// function staking, after user call the API to get the signature for staking (BE API will sign the message), use will call this function to stake
+        #[ink(message)]
+        pub fn stake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), IDOError> {
+            let caller = self.env().caller();
+
+            // transfer from caller to self
+            let result = helpers::safe_transfer(self.ido.ido_token, caller, 0);
+            // check result
+            if result.is_err() {
+                return Err(IDOError::SafeTransferError);
+            }
+
+            Ok(())
         }
     }
 

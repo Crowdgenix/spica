@@ -6,7 +6,6 @@ edition = "2021"
 
 [dependencies]
 ink = { version = "=4.2.1", default-features = false}
-token = { path = "../token", default-features = false, features = ["ink-as-dependency"] }
 openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts/", tag = "3.1.1", default-features = false, features = ["psp22", "ownable"] }
 hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 
@@ -24,8 +23,14 @@ std = [
     "ink/std",
     "scale/std",
     "scale-info/std",
-    "token/std",
     "logics/std",
 ]
 ink-as-dependency = []
 
+
+[profile.dev]
+overflow-checks = false
+
+[profile.release]
+overflow-checks = false     # Disable integer overflow checks.
+lto = false
