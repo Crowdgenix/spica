@@ -46,7 +46,7 @@ pub mod ido {
         #[ink(topic)]
         pub buyer: AccountId,
         pub native_amount: Balance,
-        pub new_ido_token_amount: Balance,
+        pub ido_token_amount: Balance,
         pub nonce: u128,
     }
 
@@ -54,7 +54,7 @@ pub mod ido {
     pub struct ClaimToken {
         #[ink(topic)]
         pub buyer: AccountId,
-        pub new_ido_token_amount: Balance,
+        pub ido_token_amount: Balance,
         pub nonce: u128,
     }
 
@@ -95,7 +95,7 @@ pub mod ido {
             self.env().emit_event(BuyTokenWithNative {
                 buyer: _buyer,
                 native_amount: _native_amount,
-                new_ido_token_amount: _ido_token_amount,
+                ido_token_amount: _ido_token_amount,
                 nonce: _nonce,
             });
         }
@@ -103,7 +103,7 @@ pub mod ido {
         fn _emit_claim_token_event(&self, _buyer: AccountId, _ido_token_amount: Balance, _nonce: u128) {
             self.env().emit_event(ClaimToken {
                 buyer: _buyer,
-                new_ido_token_amount: _ido_token_amount,
+                ido_token_amount: _ido_token_amount,
                 nonce: _nonce,
             });
         }
@@ -191,43 +191,43 @@ pub mod ido {
             self.ido.user_ido_balances.insert(self.env().caller(), &new_balances);
 
             // emit event
-            self._emit_buy_with_native_event(self.env().caller(), received_value, new_balances, nonce);
+            self._emit_buy_with_native_event(self.env().caller(), received_value, ido_amount, nonce);
             Ok(())
         }
 
         /// function to claim ido token
         #[ink(message)]
         fn claim_ido_token(&mut self, deadline: Timestamp, nonce: u128, amount: Balance, signature: [u8; 65]) -> Result<(), IDOError> {
-            // ensure!(
-            //     deadline >= self.env().block_timestamp(),
-            //     IDOError::Expired
-            // );
-            //
-            // ensure!(
-            //     nonce == self.ido.account_nonce.get(&self.env().caller()).unwrap_or(0),
-            //     IDOError::InvalidNonce(nonce.to_string())
-            // );
-            //
-            // self.ido.account_nonce.insert(&self.env().caller(), &(nonce + 1));
-            //
+            ensure!(
+                deadline >= self.env().block_timestamp(),
+                IDOError::Expired
+            );
+
+            ensure!(
+                nonce == self.ido.account_nonce.get(&self.env().caller()).unwrap_or(0),
+                IDOError::InvalidNonce(nonce.to_string())
+            );
+
+            self.ido.account_nonce.insert(&self.env().caller(), &(nonce + 1));
+
             let caller = self.env().caller();
-            // // ensure the user has enough collateral assets
-            // if PSP22Ref::balance_of(&self.ido.ido_token, self.env().account_id()) < amount {
-            //     return Err(IDOError::InsufficientBalance)
-            // }
-            // // generate message
-            // let message = self.gen_msg_for_claim_token(deadline, nonce, amount);
-            //
-            // // verify signature
-            // let is_ok = self._verify(message, self.ido.signer, signature);
-            //
-            // if !is_ok {
-            //     return Err(IDOError::InvalidSignature);
-            // }
-            //
-            // let old_balances = self.ido.user_ido_balances.get(&self.env().caller()).unwrap_or(0);
-            // let new_balances = old_balances.checked_sub(amount).unwrap_or(0);
-            // self.ido.user_ido_balances.insert(self.env().caller(), &new_balances);
+            // ensure the user has enough collateral assets
+            if PSP22Ref::balance_of(&self.ido.ido_token, self.env().account_id()) < amount {
+                return Err(IDOError::InsufficientBalance)
+            }
+            // generate message
+            let message = self.gen_msg_for_claim_token(deadline, nonce, amount);
+
+            // verify signature
+            let is_ok = self._verify(message, self.ido.signer, signature);
+
+            if !is_ok {
+                return Err(IDOError::InvalidSignature);
+            }
+
+            let old_balances = self.ido.user_ido_balances.get(&self.env().caller()).unwrap_or(0);
+            let new_balances = old_balances.checked_sub(amount).unwrap_or(0);
+            self.ido.user_ido_balances.insert(self.env().caller(), &new_balances);
 
             let result = helpers::safe_transfer(self.ido.ido_token, caller, amount);
             // check result
@@ -235,7 +235,7 @@ pub mod ido {
                 return Err(IDOError::SafeTransferError);
             }
 
-            // self._emit_claim_token_event(caller, new_balances, nonce);
+            self._emit_claim_token_event(caller, amount, nonce);
             Ok(())
         }
 
@@ -328,8 +328,10 @@ pub mod ido {
         }
 
         #[ink(message)]
-        pub fn set_signer(&mut self, _new_signer: AccountId) {
-            self.ido.signer = _new_signer
+        #[modifiers(only_role(SUB_ADMIN))]
+        pub fn set_signer(&mut self, _new_signer: AccountId) -> Result<(), IDOError> {
+            self.ido.signer = _new_signer;
+            Ok(())
         }
 
         #[ink(message)]

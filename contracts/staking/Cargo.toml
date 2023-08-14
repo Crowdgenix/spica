@@ -1,17 +1,20 @@
 [package]
 name = "staking"
 version = "0.1.0"
-authors = ["Cuong <[your_email]>"]
+authors = ["Cuong Sotatek"]
 edition = "2021"
+license = "Apache 2.0"
 
 [dependencies]
-ink = { version = "=4.2.1", default-features = false}
-openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts/", tag = "3.1.1", default-features = false, features = ["psp22", "ownable"] }
+ink = { version = "4.2.0", default-features = false }
+openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts/", tag = "3.1.1", default-features = false, features = ["psp22", "ownable", "pausable"] }
 hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
-
-scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
-scale-info = { version = "2.6", default-features = false, features = ["derive"], optional = true }
+scale = { package = "parity-scale-codec", version = "3.5.0", default-features = false, features = ["derive"] }
+scale-info = { version = "2.7", default-features = false, features = ["derive"], optional = true }
 logics = { path = "../logics", default-features = false }
+
+[dev-dependencies]
+ink_e2e = { version = "4.2.0" }
 
 [lib]
 name = "staking"
@@ -23,14 +26,8 @@ std = [
     "ink/std",
     "scale/std",
     "scale-info/std",
+    "openbrush/std",
     "logics/std",
 ]
 ink-as-dependency = []
-
-
-[profile.dev]
-overflow-checks = false
-
-[profile.release]
-overflow-checks = false     # Disable integer overflow checks.
-lto = false
+e2e-tests = []

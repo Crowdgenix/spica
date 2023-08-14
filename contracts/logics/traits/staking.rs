@@ -17,7 +17,7 @@ use openbrush::{
 #[openbrush::wrapper]
 pub type StakingRef = dyn Staking;
 
-pub trait Internal {
+pub trait StakingInternal {
     fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp);
     fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp);
     fn _emit_set_tiers_event(&self, tiers: Vec<u128>);
@@ -34,41 +34,41 @@ pub trait Staking {
     #[ink(message)]
     fn stake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError>;
 
-    // /// function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake
-    // #[ink(message)]
-    // fn unstake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError>;
-    //
-    // /// function to get staking token address
-    // #[ink(message)]
-    // fn get_stake_token(&self) -> AccountId;
-    //
-    // #[ink(message)]
-    // fn get_nonce(&self) -> u128;
-    //
-    // /// function to get staked amount of the input account
-    // #[ink(message)]
-    // fn staking_amount_of(&self, account: AccountId) -> u128;
-    //
-    // /// function to get tier of the input account
-    // #[ink(message)]
-    // fn tier_of(&self, account: AccountId) -> u128;
-    //
-    // /// function to set list tiers of the staking contract
-    // #[ink(message)]
-    // fn set_tiers(&mut self, tiers: Vec<u128>) -> Result<(), StakingError>;
-    //
-    // /// function to get list tiers of the staking contract
-    // #[ink(message)]
-    // fn get_tiers(&self) -> Result<Vec<u128>, StakingError>;
-    //
-    // #[ink(message)]
-    // fn get_tier_from_amount(&self, amount: u128) -> u128;
-    //
-    // #[ink(message)]
-    // fn gen_msg_for_stake_token(&self, deadline: Timestamp, nonce: u128, stake_amount: u128) -> String;
-    //
-    // #[ink(message)]
-    // fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128) -> String;
+    /// function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake
+    #[ink(message)]
+    fn unstake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError>;
+
+    /// function to get staking token address
+    #[ink(message)]
+    fn get_stake_token(&self) -> AccountId;
+
+    #[ink(message)]
+    fn get_nonce(&self) -> u128;
+
+    /// function to get staked amount of the input account
+    #[ink(message)]
+    fn staking_amount_of(&self, account: AccountId) -> u128;
+
+    /// function to get tier of the input account
+    #[ink(message)]
+    fn tier_of(&self, account: AccountId) -> u128;
+
+    /// function to set list tiers of the staking contract
+    #[ink(message)]
+    fn set_tiers(&mut self, tiers: Vec<u128>) -> Result<(), StakingError>;
+
+    /// function to get list tiers of the staking contract
+    #[ink(message)]
+    fn get_tiers(&self) -> Result<Vec<u128>, StakingError>;
+
+    #[ink(message)]
+    fn get_tier_from_amount(&self, amount: u128) -> u128;
+
+    #[ink(message)]
+    fn gen_msg_for_stake_token(&self, deadline: Timestamp, nonce: u128, stake_amount: u128) -> String;
+
+    #[ink(message)]
+    fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128) -> String;
 }
 
 #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
