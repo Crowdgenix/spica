@@ -338,21 +338,6 @@ pub mod ido {
         pub fn verify_signature(&self, signature: [u8; 65], msg: String) -> bool {
             self._verify(msg, self.ido.signer, signature)
         }
-
-        /// function staking, after user call the API to get the signature for staking (BE API will sign the message), use will call this function to stake
-        #[ink(message)]
-        pub fn stake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), IDOError> {
-            let caller = self.env().caller();
-
-            // transfer from caller to self
-            let result = helpers::safe_transfer(self.ido.ido_token, caller, 0);
-            // check result
-            if result.is_err() {
-                return Err(IDOError::SafeTransferError);
-            }
-
-            Ok(())
-        }
     }
 
 
