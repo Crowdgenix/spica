@@ -18,7 +18,7 @@ use openbrush::{
 pub type StakingRef = dyn Staking;
 
 pub trait StakingInternal {
-    fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp);
+    fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp, stake_duration: Timestamp);
     fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp);
     fn _emit_set_tiers_event(&self, tiers: Vec<u128>);
     fn _verify(&self, data: String, signer: AccountId, signature: [u8; 65]) -> bool;
@@ -32,7 +32,7 @@ pub trait Staking {
 
     /// function staking, after user call the API to get the signature for staking (BE API will sign the message), use will call this function to stake
     #[ink(message)]
-    fn stake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError>;
+    fn stake(&mut self, deadline: Timestamp, stake_duration: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError>;
 
     /// function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake
     #[ink(message)]
@@ -65,7 +65,7 @@ pub trait Staking {
     fn get_tier_from_amount(&self, amount: u128) -> u128;
 
     #[ink(message)]
-    fn gen_msg_for_stake_token(&self, deadline: Timestamp, nonce: u128, stake_amount: u128) -> String;
+    fn gen_msg_for_stake_token(&self, deadline: Timestamp, stake_duration: Timestamp, nonce: u128, stake_amount: u128) -> String;
 
     #[ink(message)]
     fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128) -> String;

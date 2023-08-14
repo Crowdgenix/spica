@@ -65,7 +65,7 @@ pub mod staking {
 
         /// function staking, after user call the API to get the signature for staking (BE API will sign the message), use will call this function to stake
         #[ink(message)]
-        fn stake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
+        fn stake(&mut self, deadline: Timestamp, stake_duration: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
             let caller = self.env().caller();
             let me = self.env().account_id();
             if deadline < self.env().block_timestamp() {
@@ -76,7 +76,7 @@ pub mod staking {
             }
             self.staking.account_nonce.insert(&caller, &(nonce + 1));
 
-            let message = self.gen_msg_for_stake_token(deadline, nonce, amount);
+            let message = self.gen_msg_for_stake_token(deadline, stake_duration, nonce, amount);
             // verify signature
             let is_ok = self._verify(message, self.staking.signer, signature);
 
@@ -105,7 +105,7 @@ pub mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.staking.account_tiers.insert(&caller, &tier);
 
-            self._emit_staking_event(caller, nonce, new_amount, tier, deadline);
+            self._emit_staking_event(caller, nonce, new_amount, tier, deadline, stake_duration);
 
             Ok(())
         }
@@ -205,7 +205,7 @@ pub mod staking {
         }
 
         #[ink(message)]
-        fn gen_msg_for_stake_token(&self, deadline: Timestamp, nonce: u128, stake_amount: u128) -> String {
+        fn gen_msg_for_stake_token(&self, deadline: Timestamp, stake_duration: Timestamp, nonce: u128, stake_amount: u128) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
             let mut message: String = String::from("");
             message.push_str("stake_token_");
@@ -216,6 +216,8 @@ pub mod staking {
             message.push_str(&stake_amount.to_string().as_str());
             message.push_str("_");
             message.push_str(&deadline.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&stake_duration.to_string().as_str());
             message.push_str("_");
             message.push_str(&nonce.to_string().as_str());
             message
@@ -240,13 +242,14 @@ pub mod staking {
     }
 
     impl traits::staking::StakingInternal for StakingContract {
-        fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp) {
+        fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp, stake_duration: Timestamp) {
             Self::emit_event(Self::env(), Event::StakingEvent(StakingEvent {
                 staker: account,
                 amount,
                 new_tier,
                 timestamp,
                 nonce,
+                stake_duration,
             }))
         }
 
@@ -373,6 +376,7 @@ pub mod staking {
         pub amount: u128,
         pub new_tier: u128,
         pub timestamp: Timestamp,
+        pub stake_duration: Timestamp,
         pub nonce: u128,
     }
 
