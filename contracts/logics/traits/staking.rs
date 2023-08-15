@@ -18,8 +18,8 @@ use openbrush::{
 pub type StakingRef = dyn Staking;
 
 pub trait StakingInternal {
-    fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp, stake_duration: Timestamp);
-    fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp);
+    fn _emit_staking_event(&self, account: AccountId, nonce: u128, total_amount: u128, amount: u128, new_tier: u128, timestamp: Timestamp, stake_duration: Timestamp);
+    fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, total_amount: u128, amount: u128, new_tier: u128, timestamp: Timestamp, fee: u128);
     fn _emit_set_tiers_event(&self, tiers: Vec<u128>);
     fn _verify(&self, data: String, signer: AccountId, signature: [u8; 65]) -> bool;
 }
@@ -36,7 +36,7 @@ pub trait Staking {
 
     /// function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake
     #[ink(message)]
-    fn unstake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError>;
+    fn unstake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, fee: u128, signature: [u8; 65]) -> Result<(), StakingError>;
 
     /// function to get staking token address
     #[ink(message)]

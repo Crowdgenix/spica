@@ -105,14 +105,14 @@ pub mod staking {
             let tier = self.get_tier_from_amount(new_amount);
             self.staking.account_tiers.insert(&caller, &tier);
 
-            self._emit_staking_event(caller, nonce, new_amount, tier, deadline, stake_duration);
+            self._emit_staking_event(caller, nonce, new_amount, amount, tier,deadline, stake_duration);
 
             Ok(())
         }
 
         /// function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake
         #[ink(message)]
-        fn unstake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
+        fn unstake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, fee: u128, signature: [u8; 65]) -> Result<(), StakingError> {
             let caller = self.env().caller();
             let me = self.env().account_id();
             if deadline < self.env().block_timestamp() {
@@ -144,12 +144,12 @@ pub mod staking {
             self.staking.staking_amounts.insert(&caller, &new_amount);
 
             // transfer from self to caller
-            PSP22Ref::transfer_from_builder(&(self.staking.stake_token.clone()), caller, me, amount, Vec::<u8>::new()).call_flags(ink::env::CallFlags::default().set_allow_reentry(true)).try_invoke().map_err(|_| StakingError::TransferFailed).unwrap();
+            PSP22Ref::transfer_from_builder(&(self.staking.stake_token.clone()), caller, me, amount.checked_sub(fee).unwrap_or(0), Vec::<u8>::new()).call_flags(ink::env::CallFlags::default().set_allow_reentry(true)).try_invoke().map_err(|_| StakingError::TransferFailed).unwrap();
 
             let tier = self.get_tier_from_amount(new_amount);
             self.staking.account_tiers.insert(&caller, &tier);
 
-            self._emit_unstaking_event(caller, nonce, new_amount, tier, deadline);
+            self._emit_unstaking_event(caller, nonce, new_amount, amount, tier, deadline, fee);
             Ok(())
         }
 
@@ -241,10 +241,11 @@ pub mod staking {
         }
     }
 
-    impl traits::staking::StakingInternal for StakingContract {
-        fn _emit_staking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp, stake_duration: Timestamp) {
+    impl StakingInternal for StakingContract {
+        fn _emit_staking_event(&self, account: AccountId, nonce: u128, total_amount: u128, amount: u128, new_tier: u128, timestamp: Timestamp, stake_duration: Timestamp) {
             Self::emit_event(Self::env(), Event::StakingEvent(StakingEvent {
                 staker: account,
+                total_amount,
                 amount,
                 new_tier,
                 timestamp,
@@ -253,13 +254,15 @@ pub mod staking {
             }))
         }
 
-        fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, amount: u128, new_tier: u128, timestamp: Timestamp) {
+        fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, total_amount: u128, amount: u128, new_tier: u128, timestamp: Timestamp, fee: u128) {
             Self::emit_event(Self::env(), Event::UnstakingEvent(UnstakingEvent {
                 staker: account,
+                total_amount,
                 amount,
                 new_tier,
                 timestamp,
                 nonce,
+                fee,
             }))
         }
 
@@ -373,6 +376,7 @@ pub mod staking {
     #[derive(Debug)]
     pub struct StakingEvent {
         pub staker: AccountId,
+        pub total_amount: u128,
         pub amount: u128,
         pub new_tier: u128,
         pub timestamp: Timestamp,
@@ -384,10 +388,12 @@ pub mod staking {
     #[derive(Debug)]
     pub struct UnstakingEvent {
         pub staker: AccountId,
+        pub total_amount: u128,
         pub amount: u128,
         pub new_tier: u128,
         pub timestamp: Timestamp,
         pub nonce: u128,
+        pub fee: u128,
     }
 
     #[ink(event)]
