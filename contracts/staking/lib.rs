@@ -123,7 +123,7 @@ pub mod staking {
             }
 
             self.staking.account_nonce.insert(&caller, &(nonce + 1));
-            let message = self.gen_msg_for_unstake_token(deadline, nonce, amount);
+            let message = self.gen_msg_for_unstake_token(deadline, nonce, amount, fee);
             // verify signature
             let is_ok = self._verify(message, self.staking.signer, signature);
 
@@ -224,7 +224,7 @@ pub mod staking {
         }
 
         #[ink(message)]
-        fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128) -> String {
+        fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128, fee: u128) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
             let mut message: String = String::from("");
             message.push_str("unstake_token_");
@@ -237,6 +237,8 @@ pub mod staking {
             message.push_str(&deadline.to_string().as_str());
             message.push_str("_");
             message.push_str(&nonce.to_string().as_str());
+            message.push_str("_");
+            message.push_str(&fee.to_string().as_str());
             message
         }
     }

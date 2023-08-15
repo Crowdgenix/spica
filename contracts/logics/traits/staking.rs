@@ -68,7 +68,7 @@ pub trait Staking {
     fn gen_msg_for_stake_token(&self, deadline: Timestamp, stake_duration: Timestamp, nonce: u128, stake_amount: u128) -> String;
 
     #[ink(message)]
-    fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128) -> String;
+    fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128, fee: u128) -> String;
 }
 
 #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
