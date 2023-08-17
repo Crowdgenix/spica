@@ -24,6 +24,7 @@ pub trait Factory {
     #[ink(message)]
     fn create_pool(
         &mut self,
+        id: u128,
         ido_token: AccountId,
         signer: AccountId,
         price: u128,

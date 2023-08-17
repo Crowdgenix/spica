@@ -25,6 +25,8 @@ pub mod factory {
     pub struct PoolCreated {
         #[ink(topic)]
         pub token: AccountId,
+        #[ink(topic)]
+        pub id: u128,
         pub pool: AccountId,
         pub pool_len: u128,
     }
@@ -53,7 +55,7 @@ pub mod factory {
 
         #[ink(message)]
         #[modifiers(only_role(DEPLOYER))]
-        fn create_pool(&mut self, ido_token: AccountId, signer: AccountId, price: u128, price_decimals: u32, max_issue_ido_amount: u128) -> Result<AccountId, FactoryError> {
+        fn create_pool(&mut self, id: u128, ido_token: AccountId, signer: AccountId, price: u128, price_decimals: u32, max_issue_ido_amount: u128) -> Result<AccountId, FactoryError> {
             let pool_contract = self._instantiate_pool()?;
             IdoRef::init_ido(&pool_contract, ido_token, signer, price, price_decimals, max_issue_ido_amount).map_err(|_| FactoryError::PoolInitFailed).unwrap();
 
@@ -64,6 +66,7 @@ pub mod factory {
             self.factory.pool_length = index + 1;
 
             self._emit_create_pool_event(
+                id,
                 ido_token ,
                 pool_contract,
                 index + 1,
@@ -102,6 +105,7 @@ pub mod factory {
 
         fn _emit_create_pool_event(
             &self,
+            id: u128,
             token: AccountId,
             pool: AccountId,
             pool_len: u128,
@@ -109,6 +113,7 @@ pub mod factory {
             EmitEvent::<FactoryContract>::emit_event(
                 self.env(),
                 PoolCreated {
+                    id,
                     token,
                     pool,
                     pool_len,
@@ -132,7 +137,7 @@ pub mod factory {
             ink::env::debug_println!("data {:?}", DEPLOYER);
             let accounts = default_accounts::<ink::env::DefaultEnvironment>();
             let mut factory = FactoryContract::new(Hash::default());
-            let pool_address = factory.create_pool(accounts.alice, accounts.alice, 100, 10, 100000).unwrap();
+            let pool_address = factory.create_pool(1, accounts.alice, accounts.alice, 100, 10, 100000).unwrap();
         }
     }
 }
