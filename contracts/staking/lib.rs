@@ -144,7 +144,7 @@ pub mod staking {
             self.staking.staking_amounts.insert(&caller, &new_amount);
 
             // transfer from self to caller
-            PSP22Ref::transfer_from_builder(&(self.staking.stake_token.clone()), caller, me, amount.checked_sub(fee).unwrap_or(0), Vec::<u8>::new()).call_flags(ink::env::CallFlags::default().set_allow_reentry(true)).try_invoke().map_err(|_| StakingError::TransferFailed).unwrap();
+            PSP22Ref::transfer_builder(&(self.staking.stake_token.clone()), caller, amount.checked_sub(fee).unwrap_or(0), Vec::<u8>::new()).call_flags(ink::env::CallFlags::default().set_allow_reentry(true)).try_invoke().map_err(|_| StakingError::TransferFailed).unwrap();
 
             let tier = self.get_tier_from_amount(new_amount);
             self.staking.account_tiers.insert(&caller, &tier);

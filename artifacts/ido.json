@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xadf31e00fc1f081ed99d572b306be0ceb5f5c34474119c8cd2150420882b8b3d",
+    "hash": "0x9f6f0127495b26b7df9e8f5776973f50a33d17343b9f827d70561f4b78f447f1",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -110,7 +110,7 @@
             "label": "price",
             "type": {
               "displayName": [
-                "Balance"
+                "u128"
               ],
               "type": 3
             }
@@ -171,7 +171,7 @@
             "label": "native_amount",
             "type": {
               "displayName": [
-                "Balance"
+                "u128"
               ],
               "type": 3
             }
@@ -182,7 +182,7 @@
             "label": "ido_token_amount",
             "type": {
               "displayName": [
-                "Balance"
+                "u128"
               ],
               "type": 3
             }
@@ -221,7 +221,7 @@
             "label": "ido_token_amount",
             "type": {
               "displayName": [
-                "Balance"
+                "u128"
               ],
               "type": 3
             }
@@ -466,99 +466,6 @@
         "selector": "0x079d8598"
       },
       {
-        "args": [
-          {
-            "label": "deadline",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput1"
-              ],
-              "type": 14
-            }
-          },
-          {
-            "label": "nonce",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput2"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "amount",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput3"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "signature",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput4"
-              ],
-              "type": 17
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " function to claim ido token"
-        ],
-        "label": "Ido::claim_ido_token",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 10
-        },
-        "selector": "0xd38ba04d"
-      },
-      {
-        "args": [
-          {
-            "label": "new_price",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "AdminSetPriceInput1"
-              ],
-              "type": 3
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " function to set price of ido token, only admin can call this function"
-        ],
-        "label": "Ido::admin_set_price",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 10
-        },
-        "selector": "0xdacc7376"
-      },
-      {
         "args": [],
         "default": false,
         "docs": [
@@ -603,6 +510,58 @@
           "type": 9
         },
         "selector": "0xc4ac011a"
+      },
+      {
+        "args": [
+          {
+            "label": "deadline",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "BuyIdoWithNativeInput1"
+              ],
+              "type": 14
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "BuyIdoWithNativeInput2"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "signature",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "BuyIdoWithNativeInput3"
+              ],
+              "type": 17
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to buy ido token with native"
+        ],
+        "label": "Ido::buy_ido_with_native",
+        "mutates": true,
+        "payable": true,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x29e3ab5b"
       },
       {
         "args": [
@@ -704,7 +663,7 @@
               "displayName": [
                 "traits",
                 "ido_external",
-                "BuyIdoWithNativeInput1"
+                "ClaimIdoTokenInput1"
               ],
               "type": 14
             }
@@ -715,7 +674,18 @@
               "displayName": [
                 "traits",
                 "ido_external",
-                "BuyIdoWithNativeInput2"
+                "ClaimIdoTokenInput2"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "amount",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "ClaimIdoTokenInput3"
               ],
               "type": 3
             }
@@ -726,7 +696,7 @@
               "displayName": [
                 "traits",
                 "ido_external",
-                "BuyIdoWithNativeInput3"
+                "ClaimIdoTokenInput4"
               ],
               "type": 17
             }
@@ -734,11 +704,11 @@
         ],
         "default": false,
         "docs": [
-          " function to buy ido token with native"
+          " function to claim ido token"
         ],
-        "label": "Ido::buy_ido_with_native",
+        "label": "Ido::claim_ido_token",
         "mutates": true,
-        "payable": true,
+        "payable": false,
         "returnType": {
           "displayName": [
             "ink",
@@ -746,7 +716,37 @@
           ],
           "type": 10
         },
-        "selector": "0x29e3ab5b"
+        "selector": "0xd38ba04d"
+      },
+      {
+        "args": [
+          {
+            "label": "new_price",
+            "type": {
+              "displayName": [
+                "traits",
+                "ido_external",
+                "AdminSetPriceInput1"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to set price of ido token, only admin can call this function"
+        ],
+        "label": "Ido::admin_set_price",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0xdacc7376"
       },
       {
         "args": [
@@ -855,47 +855,6 @@
               "displayName": [
                 "access_control",
                 "accesscontrol_external",
-                "HasRoleInput1"
-              ],
-              "type": 4
-            }
-          },
-          {
-            "label": "address",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "HasRoleInput2"
-              ],
-              "type": 0
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " Returns `true` if `account` has been granted `role`."
-        ],
-        "label": "AccessControl::has_role",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 18
-        },
-        "selector": "0xc1d9ac18"
-      },
-      {
-        "args": [
-          {
-            "label": "role",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
                 "GetRoleAdminInput1"
               ],
               "type": 4
@@ -964,6 +923,47 @@
           "type": 19
         },
         "selector": "0x6e4f0991"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "HasRoleInput1"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "address",
+            "type": {
+              "displayName": [
+                "access_control",
+                "accesscontrol_external",
+                "HasRoleInput2"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Returns `true` if `account` has been granted `role`."
+        ],
+        "label": "AccessControl::has_role",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 18
+        },
+        "selector": "0xc1d9ac18"
       }
     ]
   },

@@ -18,6 +18,7 @@ pub mod ido {
             Env,
         },
         prelude::string::{String, ToString},
+        reflect::ContractEventBase,
     };
     use openbrush::{
         modifiers,
@@ -29,13 +30,16 @@ pub mod ido {
     use crate::{ensure, traits, helpers, types};
     use crate::traits::{IDOError, Internal};
 
+    type Event = <IdoContract as ContractEventBase>::Type;
+
+
     pub const SUB_ADMIN: RoleType = ink::selector_id!("SUB_ADMIN");
 
     #[ink(event)]
     pub struct InitIdoContract {
         #[ink(topic)]
         pub ido_token: AccountId,
-        pub price: Balance,
+        pub price: u128,
         pub price_decimals: u32,
         pub signer: AccountId,
         pub max_issue_ido_amount: u128,
@@ -45,8 +49,8 @@ pub mod ido {
     pub struct BuyTokenWithNative {
         #[ink(topic)]
         pub buyer: AccountId,
-        pub native_amount: Balance,
-        pub ido_token_amount: Balance,
+        pub native_amount: u128,
+        pub ido_token_amount: u128,
         pub nonce: u128,
     }
 
@@ -54,7 +58,7 @@ pub mod ido {
     pub struct ClaimToken {
         #[ink(topic)]
         pub buyer: AccountId,
-        pub ido_token_amount: Balance,
+        pub ido_token_amount: u128,
         pub nonce: u128,
     }
 
@@ -92,30 +96,30 @@ pub mod ido {
         }
 
         fn _emit_buy_with_native_event(&self, _buyer: AccountId, _native_amount: Balance, _ido_token_amount: Balance, _nonce: u128) {
-            self.env().emit_event(BuyTokenWithNative {
+            Self::emit_event(Self::env(), Event::BuyTokenWithNative(BuyTokenWithNative {
                 buyer: _buyer,
                 native_amount: _native_amount,
                 ido_token_amount: _ido_token_amount,
                 nonce: _nonce,
-            });
+            }));
         }
 
         fn _emit_claim_token_event(&self, _buyer: AccountId, _ido_token_amount: Balance, _nonce: u128) {
-            self.env().emit_event(ClaimToken {
+            Self::emit_event(Self::env(), Event::ClaimToken(ClaimToken {
                 buyer: _buyer,
                 ido_token_amount: _ido_token_amount,
                 nonce: _nonce,
-            });
+            }));
         }
 
         fn _emit_init_ido_contract_event(&self, _ido_token: AccountId, _price: Balance, _price_decimals: u32, _signer: AccountId, _max_issue_ido_amount: u128) {
-            self.env().emit_event(InitIdoContract {
+            Self::emit_event(Self::env(), Event::InitIdoContract(InitIdoContract {
                 ido_token: _ido_token,
                 price: _price,
                 price_decimals: _price_decimals,
                 signer: _signer,
                 max_issue_ido_amount: _max_issue_ido_amount,
-            });
+            }));
         }
     }
 
@@ -336,6 +340,13 @@ pub mod ido {
         #[ink(message)]
         pub fn verify_signature(&self, signature: [u8; 65], msg: String) -> bool {
             self._verify(msg, self.ido.signer, signature)
+        }
+
+        fn emit_event<EE>(emitter: EE, event: Event)
+            where
+                EE: EmitEvent<IdoContract>,
+        {
+            emitter.emit_event(event);
         }
     }
 
