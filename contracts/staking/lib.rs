@@ -333,47 +333,6 @@ pub mod staking {
     }
 
 
-    /// dont listen this event because it used to ignore the redundant events emitted by cross contract call
-    #[ink(event)]
-    #[derive(Debug)]
-    pub struct IgnoredEvent01 {
-        pub ido_token: AccountId,
-        pub price: Balance,
-        pub price_decimals: u32,
-        pub signer: AccountId,
-        pub max_issue_ido_amount1: u128,
-        pub max_issue_ido_amount2: u128,
-        pub max_issue_ido_amount3: u128,
-        pub max_issue_ido_amount4: u128,
-        pub max_issue_ido_amount5: u128,
-        pub max_issue_ido_amount6: u128,
-        pub max_issue_ido_amount7: u128,
-        pub max_issue_ido_amount8: u128,
-        pub max_issue_ido_amount9: u128,
-        pub max_issue_ido_amount10: u128,
-    }
-
-
-    /// dont listen this event because it used to ignore the redundant events emitted by cross contract call
-    #[ink(event)]
-    #[derive(Debug)]
-    pub struct IgnoredEvent02 {
-        pub ido_token: AccountId,
-        pub price: Balance,
-        pub price_decimals: u32,
-        pub signer: AccountId,
-        pub max_issue_ido_amount1: u128,
-        pub max_issue_ido_amount2: u128,
-        pub max_issue_ido_amount3: u128,
-        pub max_issue_ido_amount4: u128,
-        pub max_issue_ido_amount5: u128,
-        pub max_issue_ido_amount6: u128,
-        pub max_issue_ido_amount7: u128,
-        pub max_issue_ido_amount8: u128,
-        pub max_issue_ido_amount9: u128,
-        pub max_issue_ido_amount10: u128,
-    }
-
     #[ink(event)]
     #[derive(Debug)]
     pub struct StakingEvent {

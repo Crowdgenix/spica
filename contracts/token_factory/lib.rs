@@ -7,6 +7,7 @@ pub mod token_factory {
     use ink::{
         codegen::{EmitEvent},
         prelude::string::String,
+        prelude::borrow::ToOwned,
         reflect::ContractEventBase,
         ToAccountId,
         storage::Mapping,
@@ -56,7 +57,7 @@ pub mod token_factory {
             let hash = xxh32(&salt, 0).to_le_bytes();
 
             let pool_hash = self.token_contract_code_hash;
-            let pool = TokenRef::new(owner, name, symbol, decimals, total_supply, is_require_whitelist, tax_fee, document)
+            let pool = TokenRef::new(owner, name.clone(), symbol.clone(), decimals, total_supply, is_require_whitelist, tax_fee, document.clone())
                 .endowment(0)
                 .code_hash(pool_hash)
                 .salt_bytes(&hash[..4])
@@ -65,7 +66,7 @@ pub mod token_factory {
             let index = self.token_length;
             self.tokens.insert(index, &pool.to_account_id());
             self.token_length = index + 1;
-            TokenFactory::emit_event(self.env(), Event::TokenCreatedEvent(TokenCreatedEvent { owner, address: pool.to_account_id(), length: index + 1 }));
+            TokenFactory::emit_event(self.env(), Event::TokenCreatedEvent(TokenCreatedEvent { owner, address: pool.to_account_id(), name, symbol, decimals, total_supply, is_require_whitelist, tax_fee, document, length: index + 1 }));
             Ok(pool.to_account_id())
         }
 
@@ -83,6 +84,13 @@ pub mod token_factory {
         pub owner: AccountId,
         #[ink(topic)]
         pub address: AccountId,
+        pub name: String,
+        pub symbol: String,
+        pub decimals: u8,
+        pub total_supply: u128,
+        pub is_require_whitelist: bool,
+        pub tax_fee: u128,
+        pub document: String,
         pub length: u128,
     }
 
