@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xdda8cfe24044fd94e39a34dd3878c9a903d4999a226826cf10cbbbbe213830c5",
+    "hash": "0x2f33c383caa0923c4897f6840142e7823ff52cdc6b08e544b70e0df3d8af4df9",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -112,6 +112,171 @@
                 "AccountId"
               ],
               "type": 3
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "name",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 11
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "symbol",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 11
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "decimals",
+            "type": {
+              "displayName": [
+                "u8"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "total_supply",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "is_require_whitelist",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "is_require_blacklist",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "is_burnable",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "is_mintable",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "is_require_max_alloc_per_address",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "max_alloc_per_user",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "is_force_transfer_enable",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "is_pausable",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "tax_fee",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "tax_fee_receiver",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "document",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 11
             }
           },
           {
@@ -236,6 +401,78 @@
                 "bool"
               ],
               "type": 12
+            }
+          },
+          {
+            "label": "is_require_blacklist",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "label": "is_burnable",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "label": "is_mintable",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "label": "is_force_transfer_enable",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "label": "is_pausable",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "label": "is_require_max_alloc_per_address",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "label": "max_alloc_per_user",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "tax_fee_receiver",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 3
             }
           },
           {

@@ -52,12 +52,14 @@ pub mod token_factory {
         }
 
         #[ink(message)]
-        pub fn create_token(&mut self, owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance, is_require_whitelist: bool, tax_fee: Balance, document: String) -> Result<AccountId, TokenFactoryError> {
+        pub fn create_token(&mut self, owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance, is_require_whitelist: bool,
+                            is_require_blacklist: bool, is_burnable: bool, is_mintable: bool, is_force_transfer_enable: bool,
+                            is_pausable: bool, is_require_max_alloc_per_address: bool, max_alloc_per_user: u128, tax_fee_receiver: AccountId, tax_fee: Balance, document: String) -> Result<AccountId, TokenFactoryError> {
             let salt = (<Self as DefaultEnv>::env().block_timestamp(), b"token_contract").encode();
             let hash = xxh32(&salt, 0).to_le_bytes();
 
             let pool_hash = self.token_contract_code_hash;
-            let pool = TokenRef::new(owner, name.clone(), symbol.clone(), decimals, total_supply, is_require_whitelist, tax_fee, document.clone())
+            let pool = TokenRef::new(owner, name.clone(), symbol.clone(), decimals, total_supply, is_require_whitelist, is_require_blacklist, is_burnable, is_mintable, is_force_transfer_enable, is_pausable, is_require_max_alloc_per_address, max_alloc_per_user, tax_fee_receiver, tax_fee, document.clone())
                 .endowment(0)
                 .code_hash(pool_hash)
                 .salt_bytes(&hash[..4])
@@ -66,7 +68,7 @@ pub mod token_factory {
             let index = self.token_length;
             self.tokens.insert(index, &pool.to_account_id());
             self.token_length = index + 1;
-            TokenFactory::emit_event(self.env(), Event::TokenCreatedEvent(TokenCreatedEvent { owner, address: pool.to_account_id(), name, symbol, decimals, total_supply, is_require_whitelist, tax_fee, document, length: index + 1 }));
+            TokenFactory::emit_event(self.env(), Event::TokenCreatedEvent(TokenCreatedEvent { owner, address: pool.to_account_id(), name, symbol, decimals, total_supply, is_require_whitelist, is_require_blacklist, is_burnable, is_mintable, is_force_transfer_enable, is_pausable, is_require_max_alloc_per_address, max_alloc_per_user, tax_fee_receiver, tax_fee, document, length: index + 1 }));
             Ok(pool.to_account_id())
         }
 
@@ -89,7 +91,15 @@ pub mod token_factory {
         pub decimals: u8,
         pub total_supply: u128,
         pub is_require_whitelist: bool,
+        pub is_require_blacklist: bool,
+        pub is_burnable: bool,
+        pub is_mintable: bool,
+        pub is_require_max_alloc_per_address: bool,
+        pub max_alloc_per_user: u128,
+        pub is_force_transfer_enable: bool,
+        pub is_pausable: bool,
         pub tax_fee: u128,
+        pub tax_fee_receiver: AccountId,
         pub document: String,
         pub length: u128,
     }
