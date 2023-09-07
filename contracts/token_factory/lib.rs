@@ -52,9 +52,9 @@ pub mod token_factory {
         }
 
         #[ink(message)]
-        pub fn create_token(&mut self, owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance, is_require_whitelist: bool,
+        pub fn create_token(&mut self, owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: u128, is_require_whitelist: bool,
                             is_require_blacklist: bool, is_burnable: bool, is_mintable: bool, is_force_transfer_enable: bool,
-                            is_pausable: bool, is_require_max_alloc_per_address: bool, max_alloc_per_user: u128, tax_fee_receiver: AccountId, tax_fee: Balance, document: String) -> Result<AccountId, TokenFactoryError> {
+                            is_pausable: bool, is_require_max_alloc_per_address: bool, max_alloc_per_user: u128, tax_fee_receiver: AccountId, tax_fee: u128, document: String) -> Result<AccountId, TokenFactoryError> {
             let salt = (<Self as DefaultEnv>::env().block_timestamp(), b"token_contract").encode();
             let hash = xxh32(&salt, 0).to_le_bytes();
 

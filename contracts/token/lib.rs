@@ -88,33 +88,41 @@ pub mod token {
         ) -> Result<()> {
             // if enabled whitelist and caller is not whitelisted or recipient is not whitelisted
             if self.is_required_whiteList == true {
-                if self.whitelist.get(_from.unwrap()).unwrap_or(false) == false {
-                    return Err(PSP22Error::Custom(String::from("Caller is not whitelisted")));
+                if !_from.is_none() && self.whitelist.get(_from.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == false {
+                    return Err(PSP22Error::Custom(String::from("From address is not whitelisted")));
                 }
-                if self.whitelist.get(_to.unwrap()).unwrap_or(false) == false {
-                    return Err(PSP22Error::Custom(String::from("Recipient is not whitelisted")));
+                if !_to.is_none() && self.whitelist.get(_to.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == false {
+                    return Err(PSP22Error::Custom(String::from("To address is not whitelisted")));
                 }
             }
 
             if self.is_required_blackList == true {
-                if self.blacklist.get(_from.unwrap()).unwrap_or(false) == true {
+                if !_from.is_none() && self.blacklist.get(_from.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == true {
                     return Err(PSP22Error::Custom(String::from("Caller is blacklisted")));
                 }
-                if self.blacklist.get(_to.unwrap()).unwrap_or(false) == true {
+                if !_to.is_none() && self.blacklist.get(_to.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == true {
                     return Err(PSP22Error::Custom(String::from("Recipient is blacklisted")));
-                }
-            }
-
-            let to_addr = _to.unwrap();
-            if self.is_require_max_alloc_per_address {
-                if (self.ownable.owner != *to_addr || _to.is_none()) && self.balance_of(*to_addr) >= self.max_alloc_per_user {
-
                 }
             }
 
             let received_value = self.env().transferred_value();
             if received_value < self.tax_fee {
+                if self.env().caller() == self.ownable.owner() {
+                    return Ok(());
+                }
                 return Err(PSP22Error::Custom(String::from("NotExactTaxFee")));
+            }
+            Ok(())
+        }
+
+        fn _after_token_transfer(&mut self, _from: Option<&AccountId>, _to: Option<&AccountId>, _amount: &Balance) -> Result<()> {
+            if self.is_require_max_alloc_per_address {
+                if _to.is_none() || self.ownable.owner == *_to.unwrap() {
+                    return Ok(());
+                }
+                if self.balance_of(*_to.unwrap()) >= self.max_alloc_per_user {
+                    return Err(PSP22Error::Custom(String::from("Exceeded max allocation per address")));
+                }
             }
             Ok(())
         }
@@ -125,7 +133,7 @@ pub mod token {
 
     impl Token {
         #[ink(constructor)]
-        pub fn new(owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: Balance, is_require_whitelist: bool,
+        pub fn new(owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: u128, is_require_whitelist: bool,
                    is_require_blacklist: bool, is_burnable: bool, is_mintable: bool, is_force_transfer_enable: bool,
                    is_pausable: bool, is_require_max_alloc_per_address: bool, max_alloc_per_user: u128, tax_fee_receiver: AccountId, tax_fee: u128, document: String) -> Self {
             let mut instance = Self::default();
@@ -167,7 +175,7 @@ pub mod token {
         }
 
         #[ink(message)]
-        pub fn tax_fee(&self) -> Balance {
+        pub fn tax_fee(&self) -> u128 {
             self.tax_fee
         }
 
@@ -224,7 +232,7 @@ pub mod token {
         #[ink(message)]
         #[modifiers(only_owner)]
         /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
-        pub fn force_transfer(&mut self, from_account: AccountId, to_account: AccountId, amount: Balance) -> Result<()> {
+        pub fn force_transfer(&mut self, from_account: AccountId, to_account: AccountId, amount: u128) -> Result<()> {
             if !self.is_force_transfer_enable {
                 return Err(PSP22Error::Custom(String::from("not allow force transfer")));
             }
@@ -234,7 +242,7 @@ pub mod token {
 
         #[ink(message)]
         /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
-        pub fn claim_tax_fee(&mut self, to: AccountId, amount: Balance) -> Result<()> {
+        pub fn claim_tax_fee(&mut self, to: AccountId, amount: u128) -> Result<()> {
             if self.env().caller() != self.tax_fee_receiver.unwrap() {
                 return Err(PSP22Error::Custom(String::from("caller is not tax_fee_receiver")));
             }
@@ -247,7 +255,7 @@ pub mod token {
 
         #[ink(message)]
         /// Burns the `amount` of underlying tokens from the balance of `account` recipient.
-        pub fn burn(&mut self, amount: Balance) -> Result<()> {
+        pub fn burn(&mut self, amount: u128) -> Result<()> {
             if !self.is_burnable {
                 return Err(PSP22Error::Custom(String::from("not burnable")));
             }
@@ -283,7 +291,7 @@ pub mod token {
         #[ink(message)]
         #[modifiers(only_owner)]
         /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
-        fn mint(&mut self, account: AccountId, amount: Balance) -> Result<()> {
+        fn mint(&mut self, account: AccountId, amount: u128) -> Result<()> {
             if !self.is_mintable {
                 return Err(PSP22Error::Custom(String::from("not mintable")));
             }
@@ -339,7 +347,7 @@ pub mod token {
         pub from: Option<AccountId>,
         #[ink(topic)]
         pub to: Option<AccountId>,
-        pub value: Balance,
+        pub value: u128,
     }
 
     /// Event emitted when an approval occurs that `spender` is allowed to withdraw
@@ -351,6 +359,6 @@ pub mod token {
         owner: AccountId,
         #[ink(topic)]
         spender: AccountId,
-        value: Balance,
+        value: u128,
     }
 }
