@@ -389,7 +389,7 @@
             "label": "total_supply",
             "type": {
               "displayName": [
-                "Balance"
+                "u128"
               ],
               "type": 4
             }
@@ -479,7 +479,7 @@
             "label": "tax_fee",
             "type": {
               "displayName": [
-                "Balance"
+                "u128"
               ],
               "type": 4
             }
