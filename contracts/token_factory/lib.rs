@@ -68,7 +68,7 @@ pub mod token_factory {
             let index = self.token_length;
             self.tokens.insert(index, &pool.to_account_id());
             self.token_length = index + 1;
-            TokenFactory::emit_event(self.env(), Event::TokenCreatedEvent(TokenCreatedEvent { owner, address: pool.to_account_id(), name, symbol, decimals, total_supply, is_require_whitelist, is_require_blacklist, is_burnable, is_mintable, is_force_transfer_enable, is_pausable, is_require_max_alloc_per_address, max_alloc_per_user, tax_fee_receiver, tax_fee, document, length: index + 1 }));
+            TokenFactory::emit_event(self.env(), Event::TokenCreatedEvent(TokenCreatedEvent { owner, caller: self.env().caller(), address: pool.to_account_id(), name, symbol, decimals, total_supply, is_require_whitelist, is_require_blacklist, is_burnable, is_mintable, is_force_transfer_enable, is_pausable, is_require_max_alloc_per_address, max_alloc_per_user, tax_fee_receiver, tax_fee, document, length: index + 1 }));
             Ok(pool.to_account_id())
         }
 
@@ -84,6 +84,8 @@ pub mod token_factory {
     pub struct TokenCreatedEvent {
         #[ink(topic)]
         pub owner: AccountId,
+        #[ink(topic)]
+        pub caller: AccountId,
         #[ink(topic)]
         pub address: AccountId,
         pub name: String,
