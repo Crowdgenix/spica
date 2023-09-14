@@ -24,12 +24,3 @@ pub fn safe_transfer_from(
 pub enum TransferHelperError {
     TransferFailed,
 }
-
-#[macro_export]
-macro_rules! ensure {
-    ( $x:expr, $y:expr $(,)? ) => {{
-        if !$x {
-            return Err($y.into())
-        }
-    }};
-}
