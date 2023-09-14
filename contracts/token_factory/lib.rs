@@ -2,7 +2,7 @@
 #![feature(min_specialization)]
 #![allow(clippy::let_unit_value)]
 
-#[openbrush::contract]
+#[ink::contract]
 pub mod token_factory {
     use ink::{
         codegen::{EmitEvent},
@@ -13,18 +13,15 @@ pub mod token_factory {
         storage::Mapping,
     };
     use openbrush::{
-        traits::{Storage, DefaultEnv},
         utils::xxhash_rust::const_xxh32::xxh32,
     };
     use scale::Encode;
     use token::token::TokenRef;
 
-
     pub type Event = <TokenFactory as ContractEventBase>::Type;
 
-
     #[ink(storage)]
-    #[derive(Default, Storage)]
+    #[derive(Default)]
     pub struct TokenFactory {
         pub token_contract_code_hash: Hash,
         pub tokens: Mapping<u128, AccountId>,
@@ -55,7 +52,7 @@ pub mod token_factory {
         pub fn create_token(&mut self, owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: u128, is_require_whitelist: bool,
                             is_require_blacklist: bool, is_burnable: bool, is_mintable: bool, is_force_transfer_enable: bool,
                             is_pausable: bool, is_require_max_alloc_per_address: bool, max_alloc_per_user: u128, tax_fee_receiver: AccountId, tax_fee: u128, document: String) -> Result<AccountId, TokenFactoryError> {
-            let salt = (<Self as DefaultEnv>::env().block_timestamp(), b"token_contract").encode();
+            let salt = (Self::env().block_timestamp(), b"token_contract").encode();
             let hash = xxh32(&salt, 0).to_le_bytes();
 
             let pool_hash = self.token_contract_code_hash;
