@@ -7,18 +7,19 @@ pub mod factory {
             EmitEvent,
         },
         ToAccountId,
+        prelude::string::{String},
+        storage::{
+            Mapping,
+        }
     };
-    use openbrush::modifiers;
-    use openbrush::contracts::access_control::*;
-    use openbrush::traits::{Storage};
     use openbrush::utils::xxhash_rust::const_xxh32::xxh32;
     use scale::Encode;
 
     use crate::traits::{*};
-    use crate::types::{*};
-    use ido::traits::{IdoRef};
+    use crate::{ensure};
     use ido::ido::{IdoContractRef};
 
+    type RoleType = u32;
     pub const DEPLOYER: RoleType = ink::selector_id!("DEPLOYER");
 
     #[ink(event)]
@@ -32,38 +33,56 @@ pub mod factory {
     }
 
     #[ink(storage)]
-    #[derive(Default, Storage)]
     pub struct FactoryContract {
-        #[storage_field]
-        factory: FactoryData,
-        #[storage_field]
-        access_control: access_control::Data,
+        pools: Mapping<u128, AccountId>,
+        pool_length: u128,
+        pool_contract_code_hash: Hash,
+        roles: Mapping<(AccountId, RoleType), bool>,
+        owner: AccountId,
     }
 
-    impl access_control::AccessControl for FactoryContract {}
 
-    impl Factory for FactoryContract {
-        #[ink(message)]
-        fn pools_length(&self) -> u128 {
-            self.factory.pool_length
+    impl FactoryContract {
+        #[ink(constructor)]
+        pub fn new(pool_code_hash: Hash) -> Self {
+            Self {
+                pools: Mapping::default(),
+                pool_length: 0,
+                pool_contract_code_hash: pool_code_hash,
+                roles: Mapping::default(),
+                owner: Self::env().caller(),
+            }
         }
 
         #[ink(message)]
-        fn pool_contract_code_hash(&self) -> Hash {
-            self.factory.pool_contract_code_hash
+        pub fn pools_length(&self) -> u128 {
+            self.pool_length
         }
 
         #[ink(message)]
-        #[modifiers(only_role(DEPLOYER))]
-        fn create_pool(&mut self, id: u128, ido_token: AccountId, signer: AccountId, price: u128, price_decimals: u32, max_issue_ido_amount: u128) -> Result<AccountId, FactoryError> {
+        pub fn pool_contract_code_hash(&self) -> Hash {
+            self.pool_contract_code_hash
+        }
+
+        #[ink(message)]
+        pub fn set_pool_contract_code_hash(&mut self, new_hash: Hash) -> Result<(), FactoryError> {
+            self.pool_contract_code_hash = new_hash;
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn create_pool(&mut self, id: u128, ido_token: AccountId, signer: AccountId, price: u128, price_decimals: u32, max_issue_ido_amount: u128) -> Result<AccountId, FactoryError> {
+            let is_deployer: bool = self.roles.get(&(self.env().caller(), DEPLOYER)).unwrap_or(false);
+            ensure!(is_deployer, FactoryError::NotDeployer);
+
             let pool_contract = self._instantiate_pool()?;
-            IdoRef::init_ido(&pool_contract, ido_token, signer, price, price_decimals, max_issue_ido_amount).map_err(|_| FactoryError::PoolInitFailed).unwrap();
+            let mut callee: IdoContractRef = ink::env::call::FromAccountId::from_account_id(pool_contract);
+            callee.init_ido(ido_token, signer, price, price_decimals, max_issue_ido_amount).map_err(|_| FactoryError::PoolInitFailed).unwrap();
 
-            let index = self.factory.pool_length;
-            self.factory
-                .pools
+            let index = self.pool_length;
+            self.pools
                 .insert(&index, &pool_contract);
-            self.factory.pool_length = index + 1;
+            self.pool_length = index + 1;
 
             self._emit_create_pool_event(
                 id,
@@ -76,25 +95,42 @@ pub mod factory {
         }
 
         #[ink(message)]
-        fn pools(&self, index: u128) -> Option<AccountId> {
-            self.factory.pools.get(&index)
+        pub fn pools(&self, index: u128) -> Option<AccountId> {
+            self.pools.get(&index)
         }
-    }
 
-    impl FactoryContract {
-        #[ink(constructor)]
-        pub fn new(pool_code_hash: Hash) -> Self {
-            let mut instance = Self::default();
-            instance.factory.pool_contract_code_hash = pool_code_hash;
-            instance._init_with_admin(Self::env().caller());
-            instance
+        #[ink(message)]
+        pub fn transfer_ownership(&mut self, new_owner: AccountId) -> Result<(), FactoryError> {
+            ensure!(self.env().caller() == self.owner, FactoryError::NotOwner);
+            self.owner = new_owner;
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn grant_role(&mut self, role: RoleType, user: AccountId) -> Result<(), FactoryError> {
+            ensure!(self.env().caller() == self.owner, FactoryError::NotOwner);
+            self.roles.insert(&(user, role), &true);
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn revoke_role(&mut self, role: RoleType, user: AccountId) -> Result<(), FactoryError> {
+            ensure!(self.env().caller() == self.owner, FactoryError::NotOwner);
+            self.roles.insert(&(user, role), &false);
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn is_role_granted(&self, role: RoleType, user: AccountId) -> Result<bool, FactoryError> {
+            let ok = self.roles.get(&(user, role)).unwrap_or(false);
+            Ok(ok)
         }
 
         fn _instantiate_pool(&mut self) -> Result<AccountId, FactoryError> {
             let salt = (self.env().block_timestamp(), b"ido_factory").encode();
             let hash = xxh32(&salt, 0).to_le_bytes();
 
-            let pool_hash = self.factory.pool_contract_code_hash;
+            let pool_hash = self.pool_contract_code_hash;
             let pool = IdoContractRef::new(self.env().caller())
                 .endowment(0)
                 .code_hash(pool_hash)

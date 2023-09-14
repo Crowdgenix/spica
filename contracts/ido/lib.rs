@@ -3,21 +3,6 @@
 
 pub mod traits;
 pub use traits::{*};
-use openbrush::contracts::{
-    psp22::{
-        PSP22Error,
-    },
-};
-use ink::prelude::vec::Vec;
-
-#[ink::trait_definition]
-pub trait TokenRef {
-    #[ink(message, payable)]
-    fn transfer(&mut self, to: AccountId, value: u128, data: Vec<u8>) -> Result<(), PSP22Error>;
-
-    #[ink(message)]
-    fn balance_of(&self, owner: AccountId) -> u128;
-}
 
 #[ink::contract]
 pub mod ido {
@@ -41,7 +26,10 @@ pub mod ido {
         //     AccountId,
         // }
     };
-    use crate::{ensure, traits, TokenRef};
+    use openbrush::{
+        contracts::psp22::{PSP22Error, PSP22Ref},
+    };
+    use crate::{ensure, traits};
     use crate::traits::{IDOError};
 
     type Event = <IdoContract as ContractEventBase>::Type;
@@ -157,11 +145,6 @@ pub mod ido {
             Ok(ok)
         }
 
-        fn ensure_admin(&self) {
-            let is_admin: bool = self.roles.get(&(self.env().caller(), SUB_ADMIN)).unwrap_or(false);
-            ensure!(is_admin, IDOError::NotAdmin);
-        }
-
         #[ink(message)]
         pub fn gen_msg_for_buy_token(&self, deadline: Timestamp, nonce: u128, received_value: u128) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
@@ -204,7 +187,8 @@ pub mod ido {
 
         #[ink(message)]
         pub fn set_signer(&mut self, _new_signer: AccountId) -> Result<(), IDOError> {
-            self.ensure_admin();
+            let is_admin: bool = self.roles.get(&(self.env().caller(), SUB_ADMIN)).unwrap_or(false);
+            ensure!(is_admin, IDOError::NotAdmin);
             self.signer = Some(_new_signer);
             Ok(())
         }
@@ -304,7 +288,7 @@ pub mod ido {
 
             let caller = self.env().caller();
             // ensure the user has enough collateral assets
-            if TokenRef::balance_of(&self.ido_token.unwrap(), self.env().account_id()) < amount {
+            if PSP22Ref::balance_of(&self.ido_token.unwrap(), self.env().account_id()) < amount {
                 return Err(IDOError::InsufficientBalance);
             }
             // generate message
@@ -321,7 +305,7 @@ pub mod ido {
             let new_balances = old_balances.checked_sub(amount).unwrap_or(0);
             self.user_ido_balances.insert(self.env().caller(), &new_balances);
 
-            let result = TokenRef::transfer(&mut self.ido_token.unwrap(), caller, amount, Vec::new());
+            let result = PSP22Ref::transfer(&mut self.ido_token.unwrap(), caller, amount, Vec::new());
             // check result
             if result.is_err() {
                 return Err(IDOError::SafeTransferError);
@@ -334,7 +318,8 @@ pub mod ido {
         /// function to set price of ido token, only admin can call this function
         #[ink(message)]
         pub fn admin_set_price(&mut self, new_price: u128) -> Result<(), IDOError> {
-            self.ensure_admin();
+            let is_admin: bool = self.roles.get(&(self.env().caller(), SUB_ADMIN)).unwrap_or(false);
+            ensure!(is_admin, IDOError::NotAdmin);
             self.price = new_price;
             Ok(())
         }
