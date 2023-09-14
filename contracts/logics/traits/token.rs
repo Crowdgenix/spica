@@ -1,49 +1,45 @@
-use ink::prelude::string::{
-    String,
-    ToString,
-};
+use ink::primitives::AccountId;
 use ink::prelude::vec::Vec;
+use ink::prelude::string::String;
 
-use openbrush::{
-    modifiers,
-    traits::{
-        AccountId,
-        Balance,
-        Storage,
-    },
-};
+/// The PSP22 error type. Contract will throw one of this errors.
+#[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+#[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
+pub enum PSP22Error {
+    /// Custom error type for cases if writer of traits added own restrictions
+    Custom(String),
+    /// Returned if not enough balance to fulfill a request is available.
+    InsufficientBalance,
+    /// Returned if not enough allowance to fulfill a request is available.
+    InsufficientAllowance,
+    /// Returned if recipient's address is zero.
+    ZeroRecipientAddress,
+    /// Returned if sender's address is zero.
+    ZeroSenderAddress,
+    /// Returned if safe transfer check fails
+    SafeTransferCheckFailed(String),
+}
 
+pub type Result<T> = core::result::Result<T, PSP22Error>;
 
-use openbrush::contracts::{
-    ownable,
-    ownable::only_owner,
-    psp22,
-    psp22::{
-        Data,
-        Internal,
-        PSP22Error,
-    },
-};
-
-#[openbrush::trait_definition]
-pub trait PSP22:
-Storage<Data>
+#[ink::trait_definition]
+pub trait PSP22
 {
     /// Returns the total token supply.
     #[ink(message)]
-    fn total_supply(&self) -> Balance;
+    fn total_supply(&self) -> u128;
 
     /// Returns the account Balance for the specified `owner`.
     ///
     /// Returns `0` if the account is non-existent.
     #[ink(message)]
-    fn balance_of(&self, owner: AccountId) -> Balance;
+    fn balance_of(&self, owner: AccountId) -> u128;
 
     /// Returns the amount which `spender` is still allowed to withdraw from `owner`.
     ///
     /// Returns `0` if no allowance has been set `0`.
     #[ink(message)]
-    fn allowance(&self, owner: AccountId, spender: AccountId) -> Balance;
+    fn allowance(&self, owner: AccountId, spender: AccountId) -> u128;
 
     /// Transfers `value` amount of tokens from the caller's account to account `to`
     /// with additional `data` in unspecified format.
@@ -59,7 +55,7 @@ Storage<Data>
     ///
     /// Returns `ZeroRecipientAddress` error if recipient's address is zero.
     #[ink(message, payable)]
-    fn transfer(&mut self, to: AccountId, value: Balance, data: Vec<u8>) -> Result<(), PSP22Error>;
+    fn transfer(&mut self, to: AccountId, value: u128, data: Vec<u8>) -> Result<()>;
 
     /// Transfers `value` tokens on the behalf of `from` to the account `to`
     /// with additional `data` in unspecified format.
@@ -85,9 +81,9 @@ Storage<Data>
         &mut self,
         from: AccountId,
         to: AccountId,
-        value: Balance,
+        value: u128,
         data: Vec<u8>,
-    ) -> Result<(), PSP22Error>;
+    ) -> Result<()>;
 
     /// Allows `spender` to withdraw from the caller's account multiple times, up to
     /// the `value` amount.
@@ -102,7 +98,7 @@ Storage<Data>
     ///
     /// Returns `ZeroRecipientAddress` error if recipient's address is zero.
     #[ink(message)]
-    fn approve(&mut self, spender: AccountId, value: Balance) -> Result<(), PSP22Error>;
+    fn approve(&mut self, spender: AccountId, value: u128) -> Result<()>;
 
     /// Atomically increases the allowance granted to `spender` by the caller.
     ///
@@ -114,7 +110,7 @@ Storage<Data>
     ///
     /// Returns `ZeroRecipientAddress` error if recipient's address is zero.
     #[ink(message)]
-    fn increase_allowance(&mut self, spender: AccountId, delta_value: Balance) -> Result<(), PSP22Error>;
+    fn increase_allowance(&mut self, spender: AccountId, delta_value: u128) -> Result<()>;
 
     /// Atomically decreases the allowance granted to `spender` by the caller.
     ///
@@ -129,71 +125,26 @@ Storage<Data>
     ///
     /// Returns `ZeroRecipientAddress` error if recipient's address is zero.
     #[ink(message)]
-    fn decrease_allowance(&mut self, spender: AccountId, delta_value: Balance) -> Result<(), PSP22Error>;
+    fn decrease_allowance(&mut self, spender: AccountId, delta_value: u128) -> Result<()>;
 }
 
+#[ink::trait_definition]
+pub trait PSP22Metadata {
+    #[ink(message)]
+    fn token_name(&self) -> Option<String>;
 
-impl<T> PSP22 for T
-    where
-        T: Internal,
-        T: Storage<Data>,
-{
-    fn total_supply(&self) -> Balance {
-        self._total_supply()
-    }
+    #[ink(message)]
+    fn token_symbol(&self) -> Option<String>;
 
-    fn balance_of(&self, owner: AccountId) -> Balance {
-        self._balance_of(&owner)
-    }
+    #[ink(message)]
+    fn token_decimals(&self) -> u8;
+}
 
-    fn allowance(&self, owner: AccountId, spender: AccountId) -> Balance {
-        self._allowance(&owner, &spender)
-    }
+#[ink::trait_definition]
+pub trait PSP22Pausable {
+    #[ink(message)]
+    fn paused(&self) -> bool;
 
-    fn transfer(&mut self, to: AccountId, value: Balance, data: Vec<u8>) -> Result<(), PSP22Error> {
-        let from = Self::env().caller();
-        self._transfer_from_to(from, to, value, data)?;
-        Ok(())
-    }
-
-    fn transfer_from(
-        &mut self,
-        from: AccountId,
-        to: AccountId,
-        value: Balance,
-        data: Vec<u8>,
-    ) -> Result<(), PSP22Error> {
-        let caller = Self::env().caller();
-        let allowance = self._allowance(&from, &caller);
-
-        if allowance < value {
-            return Err(PSP22Error::InsufficientAllowance)
-        }
-
-        self._approve_from_to(from, caller, allowance - value)?;
-        self._transfer_from_to(from, to, value, data)?;
-        Ok(())
-    }
-
-    fn approve(&mut self, spender: AccountId, value: Balance) -> Result<(), PSP22Error> {
-        let owner = Self::env().caller();
-        self._approve_from_to(owner, spender, value)?;
-        Ok(())
-    }
-
-    fn increase_allowance(&mut self, spender: AccountId, delta_value: Balance) -> Result<(), PSP22Error> {
-        let owner = Self::env().caller();
-        self._approve_from_to(owner, spender, self._allowance(&owner, &spender) + delta_value)
-    }
-
-    fn decrease_allowance(&mut self, spender: AccountId, delta_value: Balance) -> Result<(), PSP22Error> {
-        let owner = Self::env().caller();
-        let allowance = self._allowance(&owner, &spender);
-
-        if allowance < delta_value {
-            return Err(PSP22Error::InsufficientAllowance)
-        }
-
-        self._approve_from_to(owner, spender, allowance - delta_value)
-    }
+    #[ink(message)]
+    fn change_pause_state(&mut self) -> Result<()>;
 }
