@@ -2,6 +2,7 @@
 #![feature(min_specialization)]
 #![allow(clippy::let_unit_value)]
 
+pub use crate::token::*;
 
 #[ink::contract]
 pub mod token {
@@ -198,9 +199,9 @@ pub mod token {
             instance.document = document;
 
             // Mint initial supply to the caller.
-            instance
-                ._mint_to(owner, total_supply)
-                .unwrap();
+            instance.balances.insert(&owner, &total_supply);
+            instance.supply = total_supply;
+            instance._emit_transfer_event(None, Some(owner), total_supply);
 
             instance
         }
@@ -218,6 +219,12 @@ pub mod token {
         #[ink(message)]
         pub fn tax_fee(&self) -> u128 {
             self.tax_fee
+        }
+
+        #[ink(message)]
+        pub fn transfer_ownership(&mut self, new_owner: AccountId) -> Result<()> {
+            self.owner = Some(new_owner);
+            Ok(())
         }
 
         #[ink(message)]
@@ -433,7 +440,7 @@ pub mod token {
                 if !_from.is_none() && self.whitelist.get(_from.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == false {
                     return Err(PSP22Error::Custom(String::from("From address is not whitelisted")));
                 }
-                if !_to.is_none() && self.whitelist.get(_to.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == false {
+                if !_to.is_none() && *_to.unwrap() != self.owner.unwrap_or(ZERO_ADDRESS.into()) && self.whitelist.get(_to.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == false {
                     return Err(PSP22Error::Custom(String::from("To address is not whitelisted")));
                 }
             }

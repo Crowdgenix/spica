@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x2f33c383caa0923c4897f6840142e7823ff52cdc6b08e544b70e0df3d8af4df9",
+    "hash": "0x3b7a5388bd405479ec069b5a580a4f8c250eb650fe8719170d39f2aae97aa2c6",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -96,6 +96,17 @@
             "docs": [],
             "indexed": true,
             "label": "owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "docs": [],
+            "indexed": true,
+            "label": "caller",
             "type": {
               "displayName": [
                 "AccountId"

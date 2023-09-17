@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x4e76718ba48ba707a718819230acf642530018a2d7c1d98941840d0ab896900a",
+    "hash": "0x5f6ac69d70abb6aa14ac7673aef0d73a3d0d44a72c1bf14e78bc747b9c80ebec",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -64,7 +64,7 @@
             "ink_primitives",
             "ConstructorResult"
           ],
-          "type": 6
+          "type": 5
         },
         "selector": "0x9bae9d5e"
       }
@@ -87,26 +87,26 @@
         "displayName": [
           "BlockNumber"
         ],
-        "type": 23
+        "type": 20
       },
       "chainExtension": {
         "displayName": [
           "ChainExtension"
         ],
-        "type": 24
+        "type": 21
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 22
+        "type": 19
       },
       "maxEventTopics": 4,
       "timestamp": {
         "displayName": [
           "Timestamp"
         ],
-        "type": 19
+        "type": 12
       }
     },
     "events": [
@@ -164,7 +164,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 19
+              "type": 12
             }
           },
           {
@@ -175,7 +175,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 19
+              "type": 12
             }
           },
           {
@@ -247,7 +247,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 19
+              "type": 12
             }
           },
           {
@@ -305,6 +305,32 @@
       {
         "args": [
           {
+            "label": "new_owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "transfer_ownership",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 8
+        },
+        "selector": "0x107e33ea"
+      },
+      {
+        "args": [
+          {
             "label": "code_hash",
             "type": {
               "displayName": [],
@@ -329,244 +355,12 @@
         "selector": "0x694fb50f"
       },
       {
-        "args": [],
-        "default": false,
-        "docs": [
-          " Leaves the contract without owner. It will not be possible to call",
-          " owner's functions anymore. Can only be called by the current owner.",
-          "",
-          " NOTE: Renouncing ownership will leave the contract without an owner,",
-          " thereby removing any functionality that is only available to the owner.",
-          "",
-          " On success a `OwnershipTransferred` event is emitted.",
-          "",
-          " # Errors",
-          "",
-          " Panics with `CallerIsNotOwner` error if caller is not owner"
-        ],
-        "label": "Ownable::renounce_ownership",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 13
-        },
-        "selector": "0x5e228753"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [
-          " Returns the address of the current owner."
-        ],
-        "label": "Ownable::owner",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 15
-        },
-        "selector": "0x4fa43c8c"
-      },
-      {
-        "args": [
-          {
-            "label": "new_owner",
-            "type": {
-              "displayName": [
-                "ownable_external",
-                "TransferOwnershipInput1"
-              ],
-              "type": 0
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " Transfers ownership of the contract to a `new_owner`.",
-          " Can only be called by the current owner.",
-          "",
-          " On success a `OwnershipTransferred` event is emitted.",
-          "",
-          " # Errors",
-          "",
-          " Panics with `CallerIsNotOwner` error if caller is not owner.",
-          "",
-          " Panics with `NewOwnerIsZero` error if new owner's address is zero."
-        ],
-        "label": "Ownable::transfer_ownership",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 13
-        },
-        "selector": "0x11f43efd"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [
-          " function to get list tiers of the staking contract"
-        ],
-        "label": "Staking::get_tiers",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 16
-        },
-        "selector": "0x83d6e1f0"
-      },
-      {
-        "args": [
-          {
-            "label": "tiers",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "SetTiersInput1"
-              ],
-              "type": 4
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " function to set list tiers of the staking contract"
-        ],
-        "label": "Staking::set_tiers",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 8
-        },
-        "selector": "0x3d271061"
-      },
-      {
-        "args": [
-          {
-            "label": "amount",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "GetTierFromAmountInput1"
-              ],
-              "type": 3
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "Staking::get_tier_from_amount",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 18
-        },
-        "selector": "0xeb6ee123"
-      },
-      {
-        "args": [
-          {
-            "label": "deadline",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "GenMsgForStakeTokenInput1"
-              ],
-              "type": 19
-            }
-          },
-          {
-            "label": "stake_duration",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "GenMsgForStakeTokenInput2"
-              ],
-              "type": 19
-            }
-          },
-          {
-            "label": "nonce",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "GenMsgForStakeTokenInput3"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "stake_amount",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "GenMsgForStakeTokenInput4"
-              ],
-              "type": 3
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "Staking::gen_msg_for_stake_token",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 20
-        },
-        "selector": "0xb431a097"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [],
-        "label": "Staking::get_nonce",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 18
-        },
-        "selector": "0x5e56e0f2"
-      },
-      {
         "args": [
           {
             "label": "signer",
             "type": {
               "displayName": [
-                "staking_external",
-                "SetSignerInput1"
+                "AccountId"
               ],
               "type": 0
             }
@@ -589,206 +383,30 @@
         "selector": "0xfdf57d4d"
       },
       {
-        "args": [],
-        "default": false,
-        "docs": [
-          " function to get staking token address"
-        ],
-        "label": "Staking::get_stake_token",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 15
-        },
-        "selector": "0xe7ca2170"
-      },
-      {
         "args": [
           {
             "label": "deadline",
             "type": {
               "displayName": [
-                "staking_external",
-                "GenMsgForUnstakeTokenInput1"
+                "Timestamp"
               ],
-              "type": 19
-            }
-          },
-          {
-            "label": "nonce",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "GenMsgForUnstakeTokenInput2"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "unstake_amount",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "GenMsgForUnstakeTokenInput3"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "fee",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "GenMsgForUnstakeTokenInput4"
-              ],
-              "type": 3
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "Staking::gen_msg_for_unstake_token",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 20
-        },
-        "selector": "0x9eae6e19"
-      },
-      {
-        "args": [
-          {
-            "label": "deadline",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "UnstakeInput1"
-              ],
-              "type": 19
-            }
-          },
-          {
-            "label": "nonce",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "UnstakeInput2"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "amount",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "UnstakeInput3"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "fee",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "UnstakeInput4"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "signature",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "UnstakeInput5"
-              ],
-              "type": 21
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake"
-        ],
-        "label": "Staking::unstake",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 8
-        },
-        "selector": "0x3902ec4e"
-      },
-      {
-        "args": [
-          {
-            "label": "account",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "TierOfInput1"
-              ],
-              "type": 0
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " function to get tier of the input account"
-        ],
-        "label": "Staking::tier_of",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 18
-        },
-        "selector": "0x59b57936"
-      },
-      {
-        "args": [
-          {
-            "label": "deadline",
-            "type": {
-              "displayName": [
-                "staking_external",
-                "StakeInput1"
-              ],
-              "type": 19
+              "type": 12
             }
           },
           {
             "label": "stake_duration",
             "type": {
               "displayName": [
-                "staking_external",
-                "StakeInput2"
+                "Timestamp"
               ],
-              "type": 19
+              "type": 12
             }
           },
           {
             "label": "nonce",
             "type": {
               "displayName": [
-                "staking_external",
-                "StakeInput3"
+                "u128"
               ],
               "type": 3
             }
@@ -797,8 +415,7 @@
             "label": "amount",
             "type": {
               "displayName": [
-                "staking_external",
-                "StakeInput4"
+                "u128"
               ],
               "type": 3
             }
@@ -806,11 +423,8 @@
           {
             "label": "signature",
             "type": {
-              "displayName": [
-                "staking_external",
-                "StakeInput5"
-              ],
-              "type": 21
+              "displayName": [],
+              "type": 13
             }
           }
         ],
@@ -833,11 +447,106 @@
       {
         "args": [
           {
+            "label": "deadline",
+            "type": {
+              "displayName": [
+                "Timestamp"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "fee",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "signature",
+            "type": {
+              "displayName": [],
+              "type": 13
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function unstaking, after user call the API to get the signature for unstaking (BE API will sign the message), use will call this function to unstake"
+        ],
+        "label": "Staking::unstake",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 8
+        },
+        "selector": "0x3902ec4e"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          " function to get staking token address"
+        ],
+        "label": "Staking::get_stake_token",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 14
+        },
+        "selector": "0xe7ca2170"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "Staking::get_nonce",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 15
+        },
+        "selector": "0x5e56e0f2"
+      },
+      {
+        "args": [
+          {
             "label": "account",
             "type": {
               "displayName": [
-                "staking_external",
-                "StakingAmountOfInput1"
+                "AccountId"
               ],
               "type": 0
             }
@@ -855,9 +564,215 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 15
         },
         "selector": "0x71a1751c"
+      },
+      {
+        "args": [
+          {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to get tier of the input account"
+        ],
+        "label": "Staking::tier_of",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 15
+        },
+        "selector": "0x59b57936"
+      },
+      {
+        "args": [
+          {
+            "label": "tiers",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 4
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to set list tiers of the staking contract"
+        ],
+        "label": "Staking::set_tiers",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 8
+        },
+        "selector": "0x3d271061"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          " function to get list tiers of the staking contract"
+        ],
+        "label": "Staking::get_tiers",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 16
+        },
+        "selector": "0x83d6e1f0"
+      },
+      {
+        "args": [
+          {
+            "label": "amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "Staking::get_tier_from_amount",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 15
+        },
+        "selector": "0xeb6ee123"
+      },
+      {
+        "args": [
+          {
+            "label": "deadline",
+            "type": {
+              "displayName": [
+                "Timestamp"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "label": "stake_duration",
+            "type": {
+              "displayName": [
+                "Timestamp"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "stake_amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "Staking::gen_msg_for_stake_token",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 18
+        },
+        "selector": "0xb431a097"
+      },
+      {
+        "args": [
+          {
+            "label": "deadline",
+            "type": {
+              "displayName": [
+                "Timestamp"
+              ],
+              "type": 12
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "unstake_amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "fee",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "Staking::gen_msg_for_unstake_token",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 18
+        },
+        "selector": "0x9eae6e19"
       }
     ]
   },
@@ -868,130 +783,81 @@
           "fields": [
             {
               "layout": {
-                "struct": {
-                  "fields": [
-                    {
-                      "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 0
-                        }
-                      },
-                      "name": "stake_token"
-                    },
-                    {
-                      "layout": {
-                        "root": {
-                          "layout": {
-                            "leaf": {
-                              "key": "0xba0c7191",
-                              "ty": 3
-                            }
-                          },
-                          "root_key": "0xba0c7191"
-                        }
-                      },
-                      "name": "staking_amounts"
-                    },
-                    {
-                      "layout": {
-                        "root": {
-                          "layout": {
-                            "leaf": {
-                              "key": "0xdcbf6038",
-                              "ty": 3
-                            }
-                          },
-                          "root_key": "0xdcbf6038"
-                        }
-                      },
-                      "name": "account_tiers"
-                    },
-                    {
-                      "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 4
-                        }
-                      },
-                      "name": "tier_configs"
-                    },
-                    {
-                      "layout": {
-                        "root": {
-                          "layout": {
-                            "leaf": {
-                              "key": "0xa95321ed",
-                              "ty": 3
-                            }
-                          },
-                          "root_key": "0xa95321ed"
-                        }
-                      },
-                      "name": "account_nonce"
-                    },
-                    {
-                      "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 0
-                        }
-                      },
-                      "name": "signer"
-                    }
-                  ],
-                  "name": "StakingData"
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 0
                 }
               },
-              "name": "staking"
+              "name": "stake_token"
             },
             {
               "layout": {
-                "struct": {
-                  "fields": [
-                    {
-                      "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 0
-                        }
-                      },
-                      "name": "owner"
-                    },
-                    {
-                      "layout": {
-                        "enum": {
-                          "dispatchKey": "0x00000000",
-                          "name": "Option",
-                          "variants": {
-                            "0": {
-                              "fields": [],
-                              "name": "None"
-                            },
-                            "1": {
-                              "fields": [
-                                {
-                                  "layout": {
-                                    "leaf": {
-                                      "key": "0x00000000",
-                                      "ty": 5
-                                    }
-                                  },
-                                  "name": "0"
-                                }
-                              ],
-                              "name": "Some"
-                            }
-                          }
-                        }
-                      },
-                      "name": "_reserved"
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0x49a80a3c",
+                      "ty": 3
                     }
-                  ],
-                  "name": "Data"
+                  },
+                  "root_key": "0x49a80a3c"
                 }
               },
-              "name": "ownable"
+              "name": "staking_amounts"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0x91097394",
+                      "ty": 3
+                    }
+                  },
+                  "root_key": "0x91097394"
+                }
+              },
+              "name": "account_tiers"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 4
+                }
+              },
+              "name": "tier_configs"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0xa1939a08",
+                      "ty": 3
+                    }
+                  },
+                  "root_key": "0xa1939a08"
+                }
+              },
+              "name": "account_nonce"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 0
+                }
+              },
+              "name": "signer"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 0
+                }
+              },
+              "name": "owner"
             }
           ],
           "name": "StakingContract"
@@ -1062,20 +928,12 @@
       "id": 5,
       "type": {
         "def": {
-          "tuple": []
-        }
-      }
-    },
-    {
-      "id": 6,
-      "type": {
-        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 5
+                    "type": 6
                   }
                 ],
                 "index": 0,
@@ -1096,7 +954,7 @@
         "params": [
           {
             "name": "T",
-            "type": 5
+            "type": 6
           },
           {
             "name": "E",
@@ -1106,6 +964,14 @@
         "path": [
           "Result"
         ]
+      }
+    },
+    {
+      "id": 6,
+      "type": {
+        "def": {
+          "tuple": []
+        }
       }
     },
     {
@@ -1178,7 +1044,7 @@
               {
                 "fields": [
                   {
-                    "type": 5
+                    "type": 6
                   }
                 ],
                 "index": 0,
@@ -1199,7 +1065,7 @@
         "params": [
           {
             "name": "T",
-            "type": 5
+            "type": 6
           },
           {
             "name": "E",
@@ -1225,17 +1091,17 @@
                   }
                 ],
                 "index": 0,
-                "name": "InvalidNonce"
+                "name": "Custom"
               },
               {
                 "fields": [
                   {
-                    "type": 12,
-                    "typeName": "OwnableError"
+                    "type": 11,
+                    "typeName": "String"
                   }
                 ],
                 "index": 1,
-                "name": "OwnableError"
+                "name": "InvalidNonce"
               },
               {
                 "index": 2,
@@ -1284,114 +1150,23 @@
       "id": 12,
       "type": {
         "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "CallerIsNotOwner"
-              },
-              {
-                "index": 1,
-                "name": "NewOwnerIsZero"
-              }
-            ]
-          }
-        },
-        "path": [
-          "openbrush_contracts",
-          "traits",
-          "errors",
-          "ownable",
-          "OwnableError"
-        ]
+          "primitive": "u64"
+        }
       }
     },
     {
       "id": 13,
       "type": {
         "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 14
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 7
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
+          "array": {
+            "len": 65,
+            "type": 2
           }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 14
-          },
-          {
-            "name": "E",
-            "type": 7
-          }
-        ],
-        "path": [
-          "Result"
-        ]
+        }
       }
     },
     {
       "id": 14,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 5
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 12
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 5
-          },
-          {
-            "name": "E",
-            "type": 12
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 15,
       "type": {
         "def": {
           "variant": {
@@ -1421,6 +1196,48 @@
           {
             "name": "T",
             "type": 0
+          },
+          {
+            "name": "E",
+            "type": 7
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 3
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 7
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 3
           },
           {
             "name": "E",
@@ -1525,56 +1342,6 @@
               {
                 "fields": [
                   {
-                    "type": 3
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 7
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 3
-          },
-          {
-            "name": "E",
-            "type": 7
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 19,
-      "type": {
-        "def": {
-          "primitive": "u64"
-        }
-      }
-    },
-    {
-      "id": 20,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
                     "type": 11
                   }
                 ],
@@ -1609,18 +1376,7 @@
       }
     },
     {
-      "id": 21,
-      "type": {
-        "def": {
-          "array": {
-            "len": 65,
-            "type": 2
-          }
-        }
-      }
-    },
-    {
-      "id": 22,
+      "id": 19,
       "type": {
         "def": {
           "composite": {
@@ -1640,7 +1396,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 20,
       "type": {
         "def": {
           "primitive": "u32"
@@ -1648,7 +1404,7 @@
       }
     },
     {
-      "id": 24,
+      "id": 21,
       "type": {
         "def": {
           "variant": {}

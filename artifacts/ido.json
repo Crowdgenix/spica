@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x9f6f0127495b26b7df9e8f5776973f50a33d17343b9f827d70561f4b78f447f1",
+    "hash": "0x11145abe8d3b72dc23b403c9ecdbb710ef4e66a39d5ee9edc68926fe1587e9a1",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -45,7 +45,7 @@
             "ink_primitives",
             "ConstructorResult"
           ],
-          "type": 7
+          "type": 6
         },
         "selector": "0x9bae9d5e"
       }
@@ -74,20 +74,20 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 24
+        "type": 23
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 23
+        "type": 22
       },
       "maxEventTopics": 4,
       "timestamp": {
         "displayName": [
           "Timestamp"
         ],
-        "type": 14
+        "type": 16
       }
     },
     "events": [
@@ -305,12 +305,143 @@
       {
         "args": [
           {
+            "label": "new_owner",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "transfer_ownership",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x107e33ea"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "RoleType"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "user",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "grant_role",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x2aabfab5"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "RoleType"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "user",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "revoke_role",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x35e1ef4a"
+      },
+      {
+        "args": [
+          {
+            "label": "role",
+            "type": {
+              "displayName": [
+                "RoleType"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "user",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "is_role_granted",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 14
+        },
+        "selector": "0x809c4511"
+      },
+      {
+        "args": [
+          {
             "label": "deadline",
             "type": {
               "displayName": [
                 "Timestamp"
               ],
-              "type": 14
+              "type": 16
             }
           },
           {
@@ -326,7 +457,7 @@
             "label": "received_value",
             "type": {
               "displayName": [
-                "Balance"
+                "u128"
               ],
               "type": 3
             }
@@ -342,7 +473,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 15
+          "type": 17
         },
         "selector": "0x19bab415"
       },
@@ -354,7 +485,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 14
+              "type": 16
             }
           },
           {
@@ -370,7 +501,7 @@
             "label": "amount",
             "type": {
               "displayName": [
-                "Balance"
+                "u128"
               ],
               "type": 3
             }
@@ -386,7 +517,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 15
+          "type": 17
         },
         "selector": "0x9b2671ad"
       },
@@ -402,7 +533,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 16
+          "type": 18
         },
         "selector": "0x73b017da"
       },
@@ -438,7 +569,7 @@
             "label": "signature",
             "type": {
               "displayName": [],
-              "type": 17
+              "type": 20
             }
           },
           {
@@ -461,107 +592,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 21
         },
         "selector": "0x079d8598"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [
-          " function to get price of ido token"
-        ],
-        "label": "Ido::get_price",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 9
-        },
-        "selector": "0xcfff54c3"
-      },
-      {
-        "args": [
-          {
-            "label": "account",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "GetNonceInput1"
-              ],
-              "type": 0
-            }
-          }
-        ],
-        "default": false,
-        "docs": [],
-        "label": "Ido::get_nonce",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 9
-        },
-        "selector": "0xc4ac011a"
-      },
-      {
-        "args": [
-          {
-            "label": "deadline",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "BuyIdoWithNativeInput1"
-              ],
-              "type": 14
-            }
-          },
-          {
-            "label": "nonce",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "BuyIdoWithNativeInput2"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "signature",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "BuyIdoWithNativeInput3"
-              ],
-              "type": 17
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " function to buy ido token with native"
-        ],
-        "label": "Ido::buy_ido_with_native",
-        "mutates": true,
-        "payable": true,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 10
-        },
-        "selector": "0x29e3ab5b"
       },
       {
         "args": [
@@ -569,9 +602,7 @@
             "label": "_ido_token",
             "type": {
               "displayName": [
-                "traits",
-                "ido_external",
-                "InitIdoInput1"
+                "AccountId"
               ],
               "type": 0
             }
@@ -580,9 +611,7 @@
             "label": "_signer",
             "type": {
               "displayName": [
-                "traits",
-                "ido_external",
-                "InitIdoInput2"
+                "AccountId"
               ],
               "type": 0
             }
@@ -591,9 +620,7 @@
             "label": "_price",
             "type": {
               "displayName": [
-                "traits",
-                "ido_external",
-                "InitIdoInput3"
+                "u128"
               ],
               "type": 3
             }
@@ -602,9 +629,7 @@
             "label": "_price_decimals",
             "type": {
               "displayName": [
-                "traits",
-                "ido_external",
-                "InitIdoInput4"
+                "u32"
               ],
               "type": 4
             }
@@ -613,9 +638,7 @@
             "label": "_max_issue_ido_amount",
             "type": {
               "displayName": [
-                "traits",
-                "ido_external",
-                "InitIdoInput5"
+                "u128"
               ],
               "type": 3
             }
@@ -625,7 +648,7 @@
         "docs": [
           " this function is initialised function, will init the contract properties"
         ],
-        "label": "Ido::init_ido",
+        "label": "init_ido",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -635,7 +658,7 @@
           ],
           "type": 10
         },
-        "selector": "0xea8c288e"
+        "selector": "0x581927a6"
       },
       {
         "args": [],
@@ -643,317 +666,7 @@
         "docs": [
           " get ido token"
         ],
-        "label": "Ido::get_ido_token",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 16
-        },
-        "selector": "0xe6db55e4"
-      },
-      {
-        "args": [
-          {
-            "label": "deadline",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput1"
-              ],
-              "type": 14
-            }
-          },
-          {
-            "label": "nonce",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput2"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "amount",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput3"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "signature",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "ClaimIdoTokenInput4"
-              ],
-              "type": 17
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " function to claim ido token"
-        ],
-        "label": "Ido::claim_ido_token",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 10
-        },
-        "selector": "0xd38ba04d"
-      },
-      {
-        "args": [
-          {
-            "label": "new_price",
-            "type": {
-              "displayName": [
-                "traits",
-                "ido_external",
-                "AdminSetPriceInput1"
-              ],
-              "type": 3
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " function to set price of ido token, only admin can call this function"
-        ],
-        "label": "Ido::admin_set_price",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 10
-        },
-        "selector": "0xdacc7376"
-      },
-      {
-        "args": [
-          {
-            "label": "role",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "RenounceRoleInput1"
-              ],
-              "type": 4
-            }
-          },
-          {
-            "label": "account",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "RenounceRoleInput2"
-              ],
-              "type": 0
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " Revokes `role` from the calling account.",
-          " Roles are often managed via `grant_role` and `revoke_role`: this function's",
-          " purpose is to provide a mechanism for accounts to lose their privileges",
-          " if they are compromised (such as when a trusted device is misplaced).",
-          "",
-          " On success a `RoleRevoked` event is emitted.",
-          "",
-          " # Errors",
-          "",
-          " Returns with `InvalidCaller` error if caller is not `account`.",
-          " Returns with `MissingRole` error if `account` doesn't have `role`."
-        ],
-        "label": "AccessControl::renounce_role",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 19
-        },
-        "selector": "0xeaf1248a"
-      },
-      {
-        "args": [
-          {
-            "label": "role",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "GrantRoleInput1"
-              ],
-              "type": 4
-            }
-          },
-          {
-            "label": "account",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "GrantRoleInput2"
-              ],
-              "type": 0
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " Grants `role` to `account`.",
-          "",
-          " On success a `RoleGranted` event is emitted.",
-          "",
-          " # Errors",
-          "",
-          " Returns with `MissingRole` error if caller can't grant the role.",
-          " Returns with `RoleRedundant` error `account` has `role`."
-        ],
-        "label": "AccessControl::grant_role",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 19
-        },
-        "selector": "0x4ac062fd"
-      },
-      {
-        "args": [
-          {
-            "label": "role",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "GetRoleAdminInput1"
-              ],
-              "type": 4
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " Returns the admin role that controls `role`. See `grant_role` and `revoke_role`."
-        ],
-        "label": "AccessControl::get_role_admin",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 22
-        },
-        "selector": "0x83da3bb2"
-      },
-      {
-        "args": [
-          {
-            "label": "role",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "RevokeRoleInput1"
-              ],
-              "type": 4
-            }
-          },
-          {
-            "label": "account",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "RevokeRoleInput2"
-              ],
-              "type": 0
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " Revokes `role` from `account`.",
-          "",
-          " On success a `RoleRevoked` event is emitted.",
-          "",
-          " # Errors",
-          "",
-          " Returns with `MissingRole` error if caller can't grant the `role` or if `account` doesn't have `role`."
-        ],
-        "label": "AccessControl::revoke_role",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 19
-        },
-        "selector": "0x6e4f0991"
-      },
-      {
-        "args": [
-          {
-            "label": "role",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "HasRoleInput1"
-              ],
-              "type": 4
-            }
-          },
-          {
-            "label": "address",
-            "type": {
-              "displayName": [
-                "access_control",
-                "accesscontrol_external",
-                "HasRoleInput2"
-              ],
-              "type": 0
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " Returns `true` if `account` has been granted `role`."
-        ],
-        "label": "AccessControl::has_role",
+        "label": "get_ido_token",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -963,7 +676,176 @@
           ],
           "type": 18
         },
-        "selector": "0xc1d9ac18"
+        "selector": "0x63e4d604"
+      },
+      {
+        "args": [
+          {
+            "label": "account",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "get_nonce",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 9
+        },
+        "selector": "0xd9a8c128"
+      },
+      {
+        "args": [
+          {
+            "label": "deadline",
+            "type": {
+              "displayName": [
+                "Timestamp"
+              ],
+              "type": 16
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "signature",
+            "type": {
+              "displayName": [],
+              "type": 20
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to buy ido token with native"
+        ],
+        "label": "buy_ido_with_native",
+        "mutates": true,
+        "payable": true,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x0d4f7b67"
+      },
+      {
+        "args": [
+          {
+            "label": "deadline",
+            "type": {
+              "displayName": [
+                "Timestamp"
+              ],
+              "type": 16
+            }
+          },
+          {
+            "label": "nonce",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "signature",
+            "type": {
+              "displayName": [],
+              "type": 20
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to claim ido token"
+        ],
+        "label": "claim_ido_token",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0xecc99354"
+      },
+      {
+        "args": [
+          {
+            "label": "new_price",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " function to set price of ido token, only admin can call this function"
+        ],
+        "label": "admin_set_price",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x3e27298d"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          " function to get price of ido token"
+        ],
+        "label": "get_price",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 9
+        },
+        "selector": "0xf23d4b6c"
       }
     ]
   },
@@ -974,207 +856,154 @@
           "fields": [
             {
               "layout": {
-                "struct": {
-                  "fields": [
-                    {
-                      "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 0
-                        }
-                      },
-                      "name": "ido_token"
+                "enum": {
+                  "dispatchKey": "0x00000000",
+                  "name": "Option",
+                  "variants": {
+                    "0": {
+                      "fields": [],
+                      "name": "None"
                     },
-                    {
-                      "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 3
-                        }
-                      },
-                      "name": "price"
-                    },
-                    {
-                      "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 4
-                        }
-                      },
-                      "name": "price_decimals"
-                    },
-                    {
-                      "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 0
-                        }
-                      },
-                      "name": "signer"
-                    },
-                    {
-                      "layout": {
-                        "root": {
+                    "1": {
+                      "fields": [
+                        {
                           "layout": {
                             "leaf": {
-                              "key": "0x8517d658",
-                              "ty": 3
+                              "key": "0x00000000",
+                              "ty": 0
                             }
                           },
-                          "root_key": "0x8517d658"
+                          "name": "0"
                         }
-                      },
-                      "name": "account_nonce"
-                    },
-                    {
-                      "layout": {
-                        "root": {
-                          "layout": {
-                            "leaf": {
-                              "key": "0x4a9c3373",
-                              "ty": 3
-                            }
-                          },
-                          "root_key": "0x4a9c3373"
-                        }
-                      },
-                      "name": "user_ido_balances"
-                    },
-                    {
-                      "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 3
-                        }
-                      },
-                      "name": "max_issue_ido_amount"
-                    },
-                    {
-                      "layout": {
-                        "leaf": {
-                          "key": "0x00000000",
-                          "ty": 3
-                        }
-                      },
-                      "name": "issued_ido_amount"
+                      ],
+                      "name": "Some"
                     }
-                  ],
-                  "name": "Data"
+                  }
                 }
               },
-              "name": "ido"
-            },
-            {
-              "layout": {
-                "struct": {
-                  "fields": [
-                    {
-                      "layout": {
-                        "root": {
-                          "layout": {
-                            "leaf": {
-                              "key": "0x6a2cd2b4",
-                              "ty": 4
-                            }
-                          },
-                          "root_key": "0x6a2cd2b4"
-                        }
-                      },
-                      "name": "admin_roles"
-                    },
-                    {
-                      "layout": {
-                        "struct": {
-                          "fields": [
-                            {
-                              "layout": {
-                                "root": {
-                                  "layout": {
-                                    "leaf": {
-                                      "key": "0x5d5db175",
-                                      "ty": 5
-                                    }
-                                  },
-                                  "root_key": "0x5d5db175"
-                                }
-                              },
-                              "name": "members"
-                            },
-                            {
-                              "layout": {
-                                "enum": {
-                                  "dispatchKey": "0x00000000",
-                                  "name": "Option",
-                                  "variants": {
-                                    "0": {
-                                      "fields": [],
-                                      "name": "None"
-                                    },
-                                    "1": {
-                                      "fields": [
-                                        {
-                                          "layout": {
-                                            "leaf": {
-                                              "key": "0x00000000",
-                                              "ty": 5
-                                            }
-                                          },
-                                          "name": "0"
-                                        }
-                                      ],
-                                      "name": "Some"
-                                    }
-                                  }
-                                }
-                              },
-                              "name": "_reserved"
-                            }
-                          ],
-                          "name": "Members"
-                        }
-                      },
-                      "name": "members"
-                    },
-                    {
-                      "layout": {
-                        "enum": {
-                          "dispatchKey": "0x00000000",
-                          "name": "Option",
-                          "variants": {
-                            "0": {
-                              "fields": [],
-                              "name": "None"
-                            },
-                            "1": {
-                              "fields": [
-                                {
-                                  "layout": {
-                                    "leaf": {
-                                      "key": "0x00000000",
-                                      "ty": 5
-                                    }
-                                  },
-                                  "name": "0"
-                                }
-                              ],
-                              "name": "Some"
-                            }
-                          }
-                        }
-                      },
-                      "name": "_reserved"
-                    }
-                  ],
-                  "name": "Data"
-                }
-              },
-              "name": "access"
+              "name": "ido_token"
             },
             {
               "layout": {
                 "leaf": {
                   "key": "0x00000000",
-                  "ty": 6
+                  "ty": 3
+                }
+              },
+              "name": "price"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 4
+                }
+              },
+              "name": "price_decimals"
+            },
+            {
+              "layout": {
+                "enum": {
+                  "dispatchKey": "0x00000000",
+                  "name": "Option",
+                  "variants": {
+                    "0": {
+                      "fields": [],
+                      "name": "None"
+                    },
+                    "1": {
+                      "fields": [
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x00000000",
+                              "ty": 0
+                            }
+                          },
+                          "name": "0"
+                        }
+                      ],
+                      "name": "Some"
+                    }
+                  }
+                }
+              },
+              "name": "signer"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0x36ead119",
+                      "ty": 3
+                    }
+                  },
+                  "root_key": "0x36ead119"
+                }
+              },
+              "name": "account_nonce"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0xa5ad5419",
+                      "ty": 3
+                    }
+                  },
+                  "root_key": "0xa5ad5419"
+                }
+              },
+              "name": "user_ido_balances"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 3
+                }
+              },
+              "name": "max_issue_ido_amount"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 3
+                }
+              },
+              "name": "issued_ido_amount"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "leaf": {
+                      "key": "0x695df520",
+                      "ty": 5
+                    }
+                  },
+                  "root_key": "0x695df520"
+                }
+              },
+              "name": "roles"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 0
+                }
+              },
+              "name": "owner"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 5
                 }
               },
               "name": "is_initialized"
@@ -1246,7 +1075,7 @@
       "id": 5,
       "type": {
         "def": {
-          "tuple": []
+          "primitive": "bool"
         }
       }
     },
@@ -1254,20 +1083,12 @@
       "id": 6,
       "type": {
         "def": {
-          "primitive": "bool"
-        }
-      }
-    },
-    {
-      "id": 7,
-      "type": {
-        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 5
+                    "type": 7
                   }
                 ],
                 "index": 0,
@@ -1288,7 +1109,7 @@
         "params": [
           {
             "name": "T",
-            "type": 5
+            "type": 7
           },
           {
             "name": "E",
@@ -1298,6 +1119,14 @@
         "path": [
           "Result"
         ]
+      }
+    },
+    {
+      "id": 7,
+      "type": {
+        "def": {
+          "tuple": []
+        }
       }
     },
     {
@@ -1412,7 +1241,7 @@
               {
                 "fields": [
                   {
-                    "type": 5
+                    "type": 7
                   }
                 ],
                 "index": 0,
@@ -1433,7 +1262,7 @@
         "params": [
           {
             "name": "T",
-            "type": 5
+            "type": 7
           },
           {
             "name": "E",
@@ -1498,6 +1327,14 @@
               {
                 "index": 8,
                 "name": "Initialized"
+              },
+              {
+                "index": 9,
+                "name": "NotOwner"
+              },
+              {
+                "index": 10,
+                "name": "NotAdmin"
               }
             ]
           }
@@ -1521,12 +1358,96 @@
       "id": 14,
       "type": {
         "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 15
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 15
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "type": {
+        "def": {
           "primitive": "u64"
         }
       }
     },
     {
-      "id": 15,
+      "id": 17,
       "type": {
         "def": {
           "variant": {
@@ -1568,59 +1489,6 @@
       }
     },
     {
-      "id": 16,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 0
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 8
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 0
-          },
-          {
-            "name": "E",
-            "type": 8
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 17,
-      "type": {
-        "def": {
-          "array": {
-            "len": 65,
-            "type": 2
-          }
-        }
-      }
-    },
-    {
       "id": 18,
       "type": {
         "def": {
@@ -1629,7 +1497,7 @@
               {
                 "fields": [
                   {
-                    "type": 6
+                    "type": 19
                   }
                 ],
                 "index": 0,
@@ -1650,7 +1518,7 @@
         "params": [
           {
             "name": "T",
-            "type": 6
+            "type": 19
           },
           {
             "name": "E",
@@ -1669,22 +1537,17 @@
           "variant": {
             "variants": [
               {
-                "fields": [
-                  {
-                    "type": 20
-                  }
-                ],
                 "index": 0,
-                "name": "Ok"
+                "name": "None"
               },
               {
                 "fields": [
                   {
-                    "type": 8
+                    "type": 0
                   }
                 ],
                 "index": 1,
-                "name": "Err"
+                "name": "Some"
               }
             ]
           }
@@ -1692,20 +1555,27 @@
         "params": [
           {
             "name": "T",
-            "type": 20
-          },
-          {
-            "name": "E",
-            "type": 8
+            "type": 0
           }
         ],
         "path": [
-          "Result"
+          "Option"
         ]
       }
     },
     {
       "id": 20,
+      "type": {
+        "def": {
+          "array": {
+            "len": 65,
+            "type": 2
+          }
+        }
+      }
+    },
+    {
+      "id": 21,
       "type": {
         "def": {
           "variant": {
@@ -1722,7 +1592,7 @@
               {
                 "fields": [
                   {
-                    "type": 21
+                    "type": 8
                   }
                 ],
                 "index": 1,
@@ -1738,78 +1608,6 @@
           },
           {
             "name": "E",
-            "type": 21
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 21,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "InvalidCaller"
-              },
-              {
-                "index": 1,
-                "name": "MissingRole"
-              },
-              {
-                "index": 2,
-                "name": "RoleRedundant"
-              }
-            ]
-          }
-        },
-        "path": [
-          "openbrush_contracts",
-          "traits",
-          "errors",
-          "access_control",
-          "AccessControlError"
-        ]
-      }
-    },
-    {
-      "id": 22,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 4
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 8
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 4
-          },
-          {
-            "name": "E",
             "type": 8
           }
         ],
@@ -1819,7 +1617,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 22,
       "type": {
         "def": {
           "composite": {
@@ -1839,7 +1637,7 @@
       }
     },
     {
-      "id": 24,
+      "id": 23,
       "type": {
         "def": {
           "variant": {}

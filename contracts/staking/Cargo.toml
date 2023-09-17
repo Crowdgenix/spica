@@ -12,6 +12,7 @@ hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 scale = { package = "parity-scale-codec", version = "3.5.0", default-features = false, features = ["derive"] }
 scale-info = { version = "2.7", default-features = false, features = ["derive"], optional = true }
 logics = { path = "../logics", default-features = false }
+token = { path = "../token", default-features = false, features = ["ink-as-dependency"] }
 
 [dev-dependencies]
 ink_e2e = { version = "4.2.0" }
@@ -28,6 +29,7 @@ std = [
     "scale-info/std",
     "openbrush/std",
     "logics/std",
+    "token/std",
 ]
 ink-as-dependency = []
 e2e-tests = []

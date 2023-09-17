@@ -10,12 +10,7 @@ use ink::{
 use openbrush::{
     traits::{Hash, AccountId, Timestamp, Storage, DefaultEnv},
     contracts::traits::psp22::{PSP22Ref},
-    contracts::traits::ownable::OwnableError,
 };
-
-
-#[openbrush::wrapper]
-pub type StakingRef = dyn Staking;
 
 pub trait StakingInternal {
     fn _emit_staking_event(&self, account: AccountId, nonce: u128, total_amount: u128, amount: u128, new_tier: u128, timestamp: Timestamp, stake_duration: Timestamp);
@@ -24,7 +19,7 @@ pub trait StakingInternal {
     fn _verify(&self, data: String, signer: AccountId, signature: [u8; 65]) -> bool;
 }
 
-#[openbrush::trait_definition]
+#[ink::trait_definition]
 pub trait Staking {
     /// the function allows the owner to set the signer
     #[ink(message)]
@@ -74,18 +69,12 @@ pub trait Staking {
 #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
 pub enum StakingError {
+    Custom(String),
     InvalidNonce(String),
-    OwnableError(OwnableError),
     InvalidDeadline,
     TransferFailed,
     InsufficientAllowance,
     InsufficientBalance,
     InvalidSignature,
     OnlyOwner,
-}
-
-impl From<OwnableError> for StakingError {
-    fn from(error: OwnableError) -> Self {
-        StakingError::OwnableError(error)
-    }
 }

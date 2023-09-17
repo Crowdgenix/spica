@@ -1,8 +1,10 @@
 use ink::prelude::vec::Vec;
 use openbrush::{
-    contracts::psp22::{PSP22Error, PSP22Ref},
+    contracts::psp22::{PSP22Ref, PSP22Error},
     traits::{AccountId, Balance},
 };
+// use token::token::TokenRef;
+// use logics::traits::token::{PSP22Error};
 
 #[inline]
 pub fn safe_transfer(mut token: AccountId, to: AccountId, value: Balance) -> Result<(), PSP22Error> {
