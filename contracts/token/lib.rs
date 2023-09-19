@@ -56,6 +56,8 @@ pub mod token {
         tax_fee: u128,
         tax_fee_receiver: Option<AccountId>,
         document: String,
+        // ignore from tax_fee
+        list_ignore_from_tax_fee: Mapping<AccountId, bool>,
         // metadata
         name: Option<String>,
         symbol: Option<String>,
@@ -186,6 +188,7 @@ pub mod token {
             instance.symbol = Some(symbol);
             instance.decimals = decimals;
             instance.whitelist = Mapping::default();
+            instance.list_ignore_from_tax_fee = Mapping::default();
             instance.is_required_whiteList = is_require_whitelist;
             instance.is_required_blackList = is_require_blacklist;
             instance.is_burnable = is_burnable;
@@ -224,6 +227,22 @@ pub mod token {
         #[ink(message)]
         pub fn transfer_ownership(&mut self, new_owner: AccountId) -> Result<()> {
             self.owner = Some(new_owner);
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn add_account_to_list_ignore_tax_fee(&mut self, users: Vec<AccountId>) -> Result<()> {
+            for user in users {
+                self.list_ignore_from_tax_fee.insert(user, &true);
+            }
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn remove_account_to_list_ignore_tax_fee(&mut self, users: Vec<AccountId>) -> Result<()> {
+            for user in users {
+                self.list_ignore_from_tax_fee.insert(user, &false);
+            }
             Ok(())
         }
 
@@ -456,7 +475,7 @@ pub mod token {
 
             let received_value = self.env().transferred_value();
             if received_value < self.tax_fee {
-                if self.env().caller() == self.owner.unwrap_or(ZERO_ADDRESS.into()) {
+                if self.list_ignore_from_tax_fee.get(&self.env().caller()).unwrap_or(false) == true {
                     return Ok(());
                 }
                 return Err(PSP22Error::Custom(String::from("NotExactTaxFee")));
