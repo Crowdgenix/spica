@@ -2,7 +2,6 @@
 #![feature(min_specialization)]
 #![allow(clippy::let_unit_value)]
 
-mod helpers;
 
 #[ink::contract]
 pub mod staking {
@@ -20,18 +19,17 @@ pub mod staking {
         prelude::vec::Vec,
         prelude::string::{String, ToString},
         storage::Mapping,
+        ToAccountId,
     };
     use ink::reflect::ContractEventBase;
-    use crate::helpers;
-    use openbrush::{
-        contracts::psp22::{PSP22Error, PSP22Ref},
-    };
+    use token::token::TokenRef;
+    use logics::traits::token::PSP22;
     pub const ZERO_ADDRESS: [u8; 32] = [255; 32];
     type Event = <StakingContract as ContractEventBase>::Type;
 
     #[ink(storage)]
     pub struct StakingContract {
-        stake_token: AccountId,
+        stake_token: TokenRef,
         staking_amounts: Mapping<AccountId, u128>,
         account_tiers: Mapping<AccountId, u128>,
         tier_configs: Vec<u128>,
@@ -71,16 +69,16 @@ pub mod staking {
                 return Err(StakingError::InvalidSignature);
             }
 
-            if PSP22Ref::allowance(&self.stake_token, caller, me) < amount {
+            if self.stake_token.allowance(caller, me) < amount {
                 return Err(StakingError::InsufficientAllowance)
             }
             // ensure the user has enough collateral assets
-            if PSP22Ref::balance_of(&self.stake_token, caller) < amount {
+            if self.stake_token.balance_of(caller) < amount {
                 return Err(StakingError::InsufficientBalance)
             }
 
             // transfer from caller to self
-            let result = helpers::safe_transfer_from(self.stake_token, caller, me, amount);
+            let result = self.stake_token.transfer_from(caller, me, amount, Vec::new());
             // check result
             if result.is_err() {
                 return Err(StakingError::TransferFailed);
@@ -123,7 +121,7 @@ pub mod staking {
                 return Err(StakingError::InsufficientBalance)
             }
             // ensure the user has enough collateral assets
-            if PSP22Ref::balance_of(&self.stake_token, me) < amount {
+            if self.stake_token.balance_of(me) < amount {
                 return Err(StakingError::InsufficientBalance)
             }
 
@@ -131,7 +129,7 @@ pub mod staking {
             self.staking_amounts.insert(&caller, &new_amount);
 
             // transfer from self to caller
-            PSP22Ref::transfer_builder(&(self.stake_token.clone()), caller, amount.checked_sub(fee).unwrap_or(0), Vec::<u8>::new()).call_flags(ink::env::CallFlags::default().set_allow_reentry(true)).try_invoke().map_err(|_| StakingError::TransferFailed).unwrap();
+            self.stake_token.transfer(caller, amount.checked_sub(fee).unwrap_or(0), Vec::<u8>::new()).map_err(|_| StakingError::TransferFailed).unwrap();
 
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
@@ -143,7 +141,7 @@ pub mod staking {
         /// function to get staking token address
         #[ink(message)]
         fn get_stake_token(&self) -> AccountId {
-            self.stake_token
+            self.stake_token.to_account_id()
         }
 
         #[ink(message)]
@@ -291,7 +289,7 @@ pub mod staking {
         pub fn new(signer: AccountId, stake_token: AccountId, tier_configs: Vec<u128>) -> Self {
             let caller = Self::env().caller();
             Self {
-                stake_token,
+                stake_token: ink::env::call::FromAccountId::from_account_id(stake_token),
                 staking_amounts: Mapping::default(),
                 account_tiers: Mapping::default(),
                 tier_configs: tier_configs.clone(),

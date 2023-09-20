@@ -22,17 +22,20 @@ pub mod ido {
         storage::{
             Mapping,
         },
+        ToAccountId,
+
         // primitives::{
         //     AccountId,
         // }
     };
-    use openbrush::{
-        contracts::psp22::{PSP22Error, PSP22Ref},
-    };
     use crate::{ensure, traits};
     use crate::traits::{IDOError};
+    use token::token::TokenRef;
+    use logics::traits::token::PSP22;
 
     type Event = <IdoContract as ContractEventBase>::Type;
+
+    pub const ZERO_ADDRESS: [u8; 32] = [255; 32];
 
     type RoleType = u32;
     pub const SUB_ADMIN: RoleType = ink::selector_id!("SUB_ADMIN");
@@ -66,7 +69,7 @@ pub mod ido {
 
     #[ink(storage)]
     pub struct IdoContract {
-        ido_token: Option<AccountId>,
+        ido_token: TokenRef,
         price: u128,
         price_decimals: u32,
         signer: Option<AccountId>,
@@ -84,7 +87,7 @@ pub mod ido {
         #[ink(constructor)]
         pub fn new(owner: AccountId) -> Self {
             Self {
-                ido_token: Option::None,
+                ido_token: ink::env::call::FromAccountId::from_account_id(ZERO_ADDRESS.into()),
                 price: 0,
                 price_decimals: 5,
                 signer: Option::None,
@@ -150,7 +153,7 @@ pub mod ido {
             // generate message = buy_ido + ido_token + buyer + amount
             let mut message: String = String::from("");
             message.push_str("buy_ido_");
-            message.push_str(encode(&self.ido_token.unwrap()).as_str());
+            message.push_str(encode(&self.ido_token.to_account_id()).as_str());
             message.push_str("_");
             message.push_str(encode(&self.env().caller()).as_str());
             message.push_str("_");
@@ -167,7 +170,7 @@ pub mod ido {
         pub fn gen_msg_for_claim_token(&self, deadline: Timestamp, nonce: u128, amount: u128) -> String {
             let mut message: String = String::from("");
             message.push_str("claim_ido_token_");
-            message.push_str(encode(&self.ido_token.unwrap()).as_str());
+            message.push_str(encode(&self.ido_token.to_account_id()).as_str());
             message.push_str("_");
             message.push_str(encode(&self.env().caller()).as_str());
             message.push_str("_");
@@ -202,7 +205,7 @@ pub mod ido {
         #[ink(message)]
         pub fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32, _max_issue_ido_amount: u128) -> Result<(), IDOError> {
             ensure!(self.is_initialized == false, IDOError::Initialized);
-            self.ido_token = Some(_ido_token);
+            self.ido_token = ink::env::call::FromAccountId::from_account_id(_ido_token);
             self.price = _price;
             self.price_decimals = _price_decimals;
             self.signer = Some(_signer);
@@ -215,8 +218,8 @@ pub mod ido {
 
         /// get ido token
         #[ink(message)]
-        pub fn get_ido_token(&self) -> Option<AccountId> {
-            self.ido_token
+        pub fn get_ido_token(&self) -> AccountId {
+            self.ido_token.to_account_id()
         }
 
         #[ink(message)]
@@ -288,7 +291,7 @@ pub mod ido {
 
             let caller = self.env().caller();
             // ensure the user has enough collateral assets
-            if PSP22Ref::balance_of(&self.ido_token.unwrap(), self.env().account_id()) < amount {
+            if self.ido_token.balance_of(self.env().account_id()) < amount {
                 return Err(IDOError::InsufficientBalance);
             }
             // generate message
@@ -305,7 +308,7 @@ pub mod ido {
             let new_balances = old_balances.checked_sub(amount).unwrap_or(0);
             self.user_ido_balances.insert(self.env().caller(), &new_balances);
 
-            let result = PSP22Ref::transfer(&mut self.ido_token.unwrap(), caller, amount, Vec::new());
+            let result = self.ido_token.transfer(caller, amount, Vec::new());
             // check result
             if result.is_err() {
                 return Err(IDOError::SafeTransferError);
