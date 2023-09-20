@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x11145abe8d3b72dc23b403c9ecdbb710ef4e66a39d5ee9edc68926fe1587e9a1",
+    "hash": "0x0397baa8ea58eabab5f30117372be05fd57e78926aba6a0d7f4cbb945e51b78f",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -74,13 +74,13 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 23
+        "type": 24
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 22
+        "type": 23
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -674,7 +674,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 22
         },
         "selector": "0x63e4d604"
       },
@@ -856,29 +856,29 @@
           "fields": [
             {
               "layout": {
-                "enum": {
-                  "dispatchKey": "0x00000000",
-                  "name": "Option",
-                  "variants": {
-                    "0": {
-                      "fields": [],
-                      "name": "None"
-                    },
-                    "1": {
-                      "fields": [
-                        {
-                          "layout": {
-                            "leaf": {
-                              "key": "0x00000000",
-                              "ty": 0
+                "struct": {
+                  "fields": [
+                    {
+                      "layout": {
+                        "struct": {
+                          "fields": [
+                            {
+                              "layout": {
+                                "leaf": {
+                                  "key": "0x00000000",
+                                  "ty": 0
+                                }
+                              },
+                              "name": "account_id"
                             }
-                          },
-                          "name": "0"
+                          ],
+                          "name": "CallBuilder"
                         }
-                      ],
-                      "name": "Some"
+                      },
+                      "name": "inner"
                     }
-                  }
+                  ],
+                  "name": "TokenRef"
                 }
               },
               "name": "ido_token"
@@ -1620,6 +1620,48 @@
       "id": 22,
       "type": {
         "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "type": {
+        "def": {
           "composite": {
             "fields": [
               {
@@ -1637,7 +1679,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 24,
       "type": {
         "def": {
           "variant": {}

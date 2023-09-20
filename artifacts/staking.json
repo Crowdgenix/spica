@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x5f6ac69d70abb6aa14ac7673aef0d73a3d0d44a72c1bf14e78bc747b9c80ebec",
+    "hash": "0x535096e869b0b4387f1699ac94036f2bd4ad2c99fbeb31e79bacd12a950943c0",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -783,9 +783,29 @@
           "fields": [
             {
               "layout": {
-                "leaf": {
-                  "key": "0x00000000",
-                  "ty": 0
+                "struct": {
+                  "fields": [
+                    {
+                      "layout": {
+                        "struct": {
+                          "fields": [
+                            {
+                              "layout": {
+                                "leaf": {
+                                  "key": "0x00000000",
+                                  "ty": 0
+                                }
+                              },
+                              "name": "account_id"
+                            }
+                          ],
+                          "name": "CallBuilder"
+                        }
+                      },
+                      "name": "inner"
+                    }
+                  ],
+                  "name": "TokenRef"
                 }
               },
               "name": "stake_token"
