@@ -44,6 +44,8 @@ pub mod staking {
         /// the function allows the owner to set the signer
         #[ink(message)]
         fn set_signer(&mut self, signer: AccountId) -> Result<(), StakingError> {
+            self._require_owner()?;
+
             self.signer = signer;
             Ok(())
         }
@@ -118,7 +120,7 @@ pub mod staking {
 
             let stake_amount = self.staking_amounts.get(&caller).unwrap_or(0);
             if stake_amount < amount {
-                return Err(StakingError::InsufficientBalance)
+                return Err(StakingError::InsufficientStakingAmount)
             }
             // ensure the user has enough collateral assets
             if self.stake_token.balance_of(me) < amount {
@@ -129,8 +131,11 @@ pub mod staking {
             self.staking_amounts.insert(&caller, &new_amount);
 
             // transfer from self to caller
-            self.stake_token.transfer(caller, amount.checked_sub(fee).unwrap_or(0), Vec::<u8>::new()).map_err(|_| StakingError::TransferFailed).unwrap();
-
+            let result = self.stake_token.transfer(caller, amount.checked_sub(fee).unwrap_or(0), Vec::<u8>::new());
+            // check result
+            if result.is_err() {
+                return Err(StakingError::TransferFailed);
+            }
             let tier = self.get_tier_from_amount(new_amount);
             self.account_tiers.insert(&caller, &tier);
 
@@ -301,13 +306,23 @@ pub mod staking {
 
         #[ink(message)]
         pub fn transfer_ownership(&mut self, new_owner: AccountId) -> Result<(), StakingError> {
+            self._require_owner()?;
             self.owner = new_owner;
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn admin_collect_all_token(&mut self) -> Result<(), StakingError> {
+            self._require_owner()?;
+            let balance = self.stake_token.balance_of(self.env().account_id());
+            self.stake_token.transfer(self.env().caller(), balance, Vec::new()).map_err(|_| StakingError::TransferFailed)?;
             Ok(())
         }
 
         /// function to update the contract code hash, use for proxy
         #[ink(message)]
         pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<(), StakingError> {
+            self._require_owner()?;
             ink::env::set_code_hash(&code_hash).unwrap_or_else(|err| {
                 panic!(
                     "Failed to `set_code_hash` to {:?} due to {:?}",

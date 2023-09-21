@@ -75,6 +75,7 @@ pub enum StakingError {
     TransferFailed,
     InsufficientAllowance,
     InsufficientBalance,
+    InsufficientStakingAmount,
     InvalidSignature,
     OnlyOwner,
 }
