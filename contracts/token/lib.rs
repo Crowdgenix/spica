@@ -226,12 +226,14 @@ pub mod token {
 
         #[ink(message)]
         pub fn transfer_ownership(&mut self, new_owner: AccountId) -> Result<()> {
+            self._require_owner()?;
             self.owner = Some(new_owner);
             Ok(())
         }
 
         #[ink(message)]
         pub fn add_account_to_list_ignore_tax_fee(&mut self, users: Vec<AccountId>) -> Result<()> {
+            self._require_owner()?;
             for user in users {
                 self.list_ignore_from_tax_fee.insert(user, &true);
             }
@@ -240,6 +242,7 @@ pub mod token {
 
         #[ink(message)]
         pub fn remove_account_to_list_ignore_tax_fee(&mut self, users: Vec<AccountId>) -> Result<()> {
+            self._require_owner()?;
             for user in users {
                 self.list_ignore_from_tax_fee.insert(user, &false);
             }
@@ -315,6 +318,7 @@ pub mod token {
         #[ink(message)]
         /// Burns the `amount` of underlying tokens from the balance of `account` recipient.
         pub fn burn(&mut self, amount: u128) -> Result<()> {
+            self._require_owner()?;
             if !self.is_burnable {
                 return Err(PSP22Error::Custom(String::from("not burnable")));
             }

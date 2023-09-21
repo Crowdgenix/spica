@@ -23,10 +23,6 @@ pub mod ido {
             Mapping,
         },
         ToAccountId,
-
-        // primitives::{
-        //     AccountId,
-        // }
     };
     use crate::{ensure, traits};
     use crate::traits::{IDOError};
