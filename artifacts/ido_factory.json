@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xca91e652a7922e685c93f1787a4b7e3203af8c9fe96344af549a6caa420a833e",
+    "hash": "0xf854a275497e4f987ecaedaf9da88930d4640f03305e954bf36ce17915dbe3ec",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -72,7 +72,7 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 23
+        "type": 24
       },
       "hash": {
         "displayName": [
@@ -85,7 +85,7 @@
         "displayName": [
           "Timestamp"
         ],
-        "type": 22
+        "type": 23
       }
     },
     "events": [
@@ -304,6 +304,22 @@
         "selector": "0x21e7bb4e"
       },
       {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "owner",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 20
+        },
+        "selector": "0xfeaea4fa"
+      },
+      {
         "args": [
           {
             "label": "new_owner",
@@ -430,7 +446,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 20
+          "type": 21
         },
         "selector": "0x809c4511"
       }
@@ -1058,7 +1074,7 @@
               {
                 "fields": [
                   {
-                    "type": 21
+                    "type": 0
                   }
                 ],
                 "index": 0,
@@ -1079,7 +1095,7 @@
         "params": [
           {
             "name": "T",
-            "type": 21
+            "type": 0
           },
           {
             "name": "E",
@@ -1093,6 +1109,48 @@
     },
     {
       "id": 21,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 22
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 22
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 22,
       "type": {
         "def": {
           "variant": {
@@ -1134,7 +1192,7 @@
       }
     },
     {
-      "id": 22,
+      "id": 23,
       "type": {
         "def": {
           "primitive": "u64"
@@ -1142,7 +1200,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 24,
       "type": {
         "def": {
           "variant": {}

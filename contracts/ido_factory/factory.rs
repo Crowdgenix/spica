@@ -99,6 +99,12 @@ pub mod factory {
             self.pools.get(&index)
         }
 
+
+        #[ink(message)]
+        pub fn owner(&self) -> AccountId {
+            self.owner.clone()
+        }
+
         #[ink(message)]
         pub fn transfer_ownership(&mut self, new_owner: AccountId) -> Result<(), FactoryError> {
             ensure!(self.env().caller() == self.owner, FactoryError::NotOwner);

@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xdc089daad1b5a79328d75c66c6a7a675551486b58d3f1aaf1ba67951943d03d7",
+    "hash": "0xc6b379f1936518fdd962de4f97d3612ef1a9e411d2fbd5fdfa84028b4740ca97",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -106,7 +106,7 @@
         "displayName": [
           "Timestamp"
         ],
-        "type": 12
+        "type": 13
       }
     },
     "events": [
@@ -164,7 +164,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 12
+              "type": 13
             }
           },
           {
@@ -175,7 +175,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 12
+              "type": 13
             }
           },
           {
@@ -247,7 +247,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 12
+              "type": 13
             }
           },
           {
@@ -303,6 +303,22 @@
     },
     "messages": [
       {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "owner",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 8
+        },
+        "selector": "0xfeaea4fa"
+      },
+      {
         "args": [
           {
             "label": "new_owner",
@@ -324,7 +340,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 8
+          "type": 9
         },
         "selector": "0x107e33ea"
       },
@@ -340,7 +356,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 8
+          "type": 9
         },
         "selector": "0x45946f23"
       },
@@ -366,7 +382,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 8
+          "type": 9
         },
         "selector": "0x694fb50f"
       },
@@ -394,7 +410,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 8
+          "type": 9
         },
         "selector": "0xfdf57d4d"
       },
@@ -406,7 +422,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 12
+              "type": 13
             }
           },
           {
@@ -415,7 +431,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 12
+              "type": 13
             }
           },
           {
@@ -440,7 +456,7 @@
             "label": "signature",
             "type": {
               "displayName": [],
-              "type": 13
+              "type": 14
             }
           }
         ],
@@ -456,7 +472,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 8
+          "type": 9
         },
         "selector": "0x1c9155f4"
       },
@@ -468,7 +484,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 12
+              "type": 13
             }
           },
           {
@@ -502,7 +518,7 @@
             "label": "signature",
             "type": {
               "displayName": [],
-              "type": 13
+              "type": 14
             }
           }
         ],
@@ -518,7 +534,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 8
+          "type": 9
         },
         "selector": "0x3902ec4e"
       },
@@ -536,7 +552,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 14
+          "type": 8
         },
         "selector": "0xe7ca2170"
       },
@@ -636,7 +652,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 8
+          "type": 9
         },
         "selector": "0x3d271061"
       },
@@ -692,7 +708,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 12
+              "type": 13
             }
           },
           {
@@ -701,7 +717,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 12
+              "type": 13
             }
           },
           {
@@ -745,7 +761,7 @@
               "displayName": [
                 "Timestamp"
               ],
-              "type": 12
+              "type": 13
             }
           },
           {
@@ -1038,7 +1054,7 @@
               {
                 "fields": [
                   {
-                    "type": 9
+                    "type": 0
                   }
                 ],
                 "index": 0,
@@ -1059,7 +1075,7 @@
         "params": [
           {
             "name": "T",
-            "type": 9
+            "type": 0
           },
           {
             "name": "E",
@@ -1080,7 +1096,7 @@
               {
                 "fields": [
                   {
-                    "type": 6
+                    "type": 10
                   }
                 ],
                 "index": 0,
@@ -1089,7 +1105,7 @@
               {
                 "fields": [
                   {
-                    "type": 10
+                    "type": 7
                   }
                 ],
                 "index": 1,
@@ -1101,11 +1117,11 @@
         "params": [
           {
             "name": "T",
-            "type": 6
+            "type": 10
           },
           {
             "name": "E",
-            "type": 10
+            "type": 7
           }
         ],
         "path": [
@@ -1122,7 +1138,49 @@
               {
                 "fields": [
                   {
-                    "type": 11,
+                    "type": 6
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 6
+          },
+          {
+            "name": "E",
+            "type": 11
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 12,
                     "typeName": "String"
                   }
                 ],
@@ -1132,7 +1190,7 @@
               {
                 "fields": [
                   {
-                    "type": 11,
+                    "type": 12,
                     "typeName": "String"
                   }
                 ],
@@ -1179,7 +1237,7 @@
       }
     },
     {
-      "id": 11,
+      "id": 12,
       "type": {
         "def": {
           "primitive": "str"
@@ -1187,7 +1245,7 @@
       }
     },
     {
-      "id": 12,
+      "id": 13,
       "type": {
         "def": {
           "primitive": "u64"
@@ -1195,7 +1253,7 @@
       }
     },
     {
-      "id": 13,
+      "id": 14,
       "type": {
         "def": {
           "array": {
@@ -1203,48 +1261,6 @@
             "type": 2
           }
         }
-      }
-    },
-    {
-      "id": 14,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 0
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 7
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 0
-          },
-          {
-            "name": "E",
-            "type": 7
-          }
-        ],
-        "path": [
-          "Result"
-        ]
       }
     },
     {
@@ -1349,7 +1365,7 @@
               {
                 "fields": [
                   {
-                    "type": 10
+                    "type": 11
                   }
                 ],
                 "index": 1,
@@ -1365,7 +1381,7 @@
           },
           {
             "name": "E",
-            "type": 10
+            "type": 11
           }
         ],
         "path": [
@@ -1382,7 +1398,7 @@
               {
                 "fields": [
                   {
-                    "type": 11
+                    "type": 12
                   }
                 ],
                 "index": 0,
@@ -1403,7 +1419,7 @@
         "params": [
           {
             "name": "T",
-            "type": 11
+            "type": 12
           },
           {
             "name": "E",

@@ -152,6 +152,9 @@ pub mod token {
 
         #[ink(message)]
         fn approve(&mut self, spender: AccountId, value: u128) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             let owner = Self::env().caller();
             self._approve_from_to(owner, spender, value)?;
             Ok(())
@@ -222,6 +225,11 @@ pub mod token {
         #[ink(message)]
         pub fn tax_fee(&self) -> u128 {
             self.tax_fee
+        }
+
+        #[ink(message)]
+        pub fn owner(&self) -> Option<AccountId> {
+            self.owner.clone()
         }
 
         #[ink(message)]
@@ -406,6 +414,9 @@ pub mod token {
             // if spender.is_zero() {
             //     return Err(PSP22Error::ZeroRecipientAddress)
             // }
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
 
             self.allowances.insert(&(owner, spender), &amount);
             self._emit_approval_event(owner, spender, amount);
@@ -458,6 +469,9 @@ pub mod token {
             _to: Option<&AccountId>,
             _amount: &u128,
         ) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             // if enabled whitelist and caller is not whitelisted or recipient is not whitelisted
             if self.is_required_whiteList == true {
                 if !_from.is_none() && self.whitelist.get(_from.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == false {

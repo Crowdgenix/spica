@@ -103,6 +103,12 @@ pub mod ido {
             return self.user_ido_balances.get(&account).unwrap_or(0 as u128);
         }
 
+
+        #[ink(message)]
+        pub fn owner(&self) -> AccountId {
+            self.owner.clone()
+        }
+
         // function to update code_hash (logic of IDO contract)
         #[ink(message)]
         pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<(), IDOError> {

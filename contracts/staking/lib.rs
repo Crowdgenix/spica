@@ -304,6 +304,12 @@ pub mod staking {
             }
         }
 
+
+        #[ink(message)]
+        pub fn owner(&self) -> AccountId {
+            self.owner.clone()
+        }
+
         #[ink(message)]
         pub fn transfer_ownership(&mut self, new_owner: AccountId) -> Result<(), StakingError> {
             self._require_owner()?;
