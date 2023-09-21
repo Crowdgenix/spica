@@ -234,6 +234,9 @@ pub mod token {
 
         #[ink(message)]
         pub fn transfer_ownership(&mut self, new_owner: AccountId) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             self._require_owner()?;
             self.owner = Some(new_owner);
             Ok(())
@@ -241,6 +244,9 @@ pub mod token {
 
         #[ink(message)]
         pub fn add_account_to_list_ignore_tax_fee(&mut self, users: Vec<AccountId>) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             self._require_owner()?;
             for user in users {
                 self.list_ignore_from_tax_fee.insert(user, &true);
@@ -250,6 +256,9 @@ pub mod token {
 
         #[ink(message)]
         pub fn remove_account_to_list_ignore_tax_fee(&mut self, users: Vec<AccountId>) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             self._require_owner()?;
             for user in users {
                 self.list_ignore_from_tax_fee.insert(user, &false);
@@ -260,6 +269,9 @@ pub mod token {
         #[ink(message)]
         // #[modifiers(only_owner)]
         pub fn add_whitelist(&mut self, users: Vec<AccountId>) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             self._require_owner()?;
             for user in users {
                 self.whitelist.insert(user, &true);
@@ -270,6 +282,9 @@ pub mod token {
         #[ink(message)]
         // #[modifiers(only_owner)]
         pub fn remove_whitelist(&mut self, users: Vec<AccountId>) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             self._require_owner()?;
             for user in users {
                 self.whitelist.insert(user, &false);
@@ -281,6 +296,9 @@ pub mod token {
         #[ink(message)]
         // #[modifiers(only_owner)]
         pub fn add_blacklist(&mut self, users: Vec<AccountId>) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             self._require_owner()?;
             for user in users {
                 self.blacklist.insert(user, &true);
@@ -291,6 +309,9 @@ pub mod token {
         #[ink(message)]
         // #[modifiers(only_owner)]
         pub fn remove_blacklist(&mut self, users: Vec<AccountId>) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             self._require_owner()?;
             for user in users {
                 self.blacklist.insert(user, &false);
@@ -313,6 +334,9 @@ pub mod token {
         #[ink(message)]
         /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
         pub fn claim_tax_fee(&mut self, to: AccountId, amount: u128) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             if self.env().caller() != self.tax_fee_receiver.unwrap() {
                 return Err(PSP22Error::Custom(String::from("caller is not tax_fee_receiver")));
             }
@@ -350,6 +374,9 @@ pub mod token {
         #[ink(message)]
         // #[modifiers(only_owner)]
         pub fn mint(&mut self, account: AccountId, amount: u128) -> Result<()> {
+            if self.paused() {
+                return Err(PSP22Error::Custom(String::from("Paused")));
+            }
             self._require_owner()?;
             if !self.is_mintable {
                 return Err(PSP22Error::Custom(String::from("not mintable")));
