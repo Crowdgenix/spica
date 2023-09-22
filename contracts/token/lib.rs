@@ -350,7 +350,6 @@ pub mod token {
         #[ink(message)]
         /// Burns the `amount` of underlying tokens from the balance of `account` recipient.
         pub fn burn(&mut self, amount: u128) -> Result<()> {
-            self._require_owner()?;
             if !self.is_burnable {
                 return Err(PSP22Error::Custom(String::from("not burnable")));
             }
@@ -511,10 +510,10 @@ pub mod token {
 
             if self.is_required_blackList == true {
                 if !_from.is_none() && self.blacklist.get(_from.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == true {
-                    return Err(PSP22Error::Custom(String::from("Caller is blacklisted")));
+                    return Err(PSP22Error::Custom(String::from("From address is blacklisted")));
                 }
                 if !_to.is_none() && self.blacklist.get(_to.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == true {
-                    return Err(PSP22Error::Custom(String::from("Recipient is blacklisted")));
+                    return Err(PSP22Error::Custom(String::from("To address is blacklisted")));
                 }
             }
 
