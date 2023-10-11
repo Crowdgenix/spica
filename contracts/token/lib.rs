@@ -4,6 +4,10 @@
 
 pub use crate::token::*;
 
+/// the token follow by the BitBond Tokenisation Engine (ERC20 - PSP22 token standard)
+/// we have the option for blacklist, the option whitelist, the option for charging tax fee when transferring tokens,
+/// the option for add address to list ignoring the tax_fee, forcing transferring and minting tokens for owner account,
+/// pausing, burning, set max allocation amount for each user
 #[ink::contract]
 pub mod token {
     use ink::{
@@ -24,39 +28,39 @@ pub mod token {
 
     pub const ZERO_ADDRESS: [u8; 32] = [255; 32];
 
-    pub(super) mod selectors {
-        // Selectors for the methods of interest on PSP22.
-        // NOTE: They can be found in `target/ink/metadata.json` after building the contract.
-        pub const TOTAL_SUPPLY_SELECTOR: [u8; 4] = [0x16, 0x2d, 0xf8, 0xc2];
-        pub const TRANSFER_TO_SELECTOR: [u8; 4] = [0xdb, 0x20, 0xf9, 0xf5];
-        pub const TRANSFER_FROM_SELECTOR: [u8; 4] = [0x54, 0xb3, 0xc7, 0x6e];
-        pub const BALANCE_OF_SELECTOR: [u8; 4] = [0x65, 0x68, 0x38, 0x2f];
-        pub const APPROVE_ALLOWANCE_SELECTOR: [u8; 4] = [0xb2, 0x0f, 0x1b, 0xbd];
-        pub const INCREASE_ALLOWANCE_SELECTOR: [u8; 4] = [0x96, 0xd6, 0xb5, 0x7a];
-        pub const MINT_SELECTOR: [u8; 4] = [0xfc, 0x3c, 0x75, 0xd4];
-        pub const BURN_SELECTOR: [u8; 4] = [0x7a, 0x9d, 0xa5, 0x10];
-    }
-
     #[ink(storage)]
     #[derive(Default)]
     pub struct Token {
         supply: u128,
         balances: Mapping<AccountId, u128>,
         allowances: Mapping<(AccountId, AccountId), u128>,
+        // if this option is enabled, the token requires a whitelisted account to transfer tokens
         is_required_whiteList: bool,
+        // if this option is enabled, the token requires a non-blacklisted account to transfer tokens
         is_required_blackList: bool,
+        // if this option is enabled, users can burn their tokens
         is_burnable: bool,
+        // if this option is enabled, owner can mint tokens
         is_mintable: bool,
+        // if this option is enabled, owner can pause and unpause the token contract
         is_pausable: bool,
+        // if this option is enabled, owner can set max allocation amount for each user
         is_require_max_alloc_per_address: bool,
+        // max allocation amount for each user
         max_alloc_per_user: u128,
+        // if this option is enabled, owner can force transferring tokens from any account to any account
         is_force_transfer_enable: bool,
+        // list of addresses can transfer tokens if is_required_whiteList is enabled
         whitelist: Mapping<AccountId, bool>,
+        // list of addresses can not transfer tokens if is_required_blackList is enabled
         blacklist: Mapping<AccountId, bool>,
+        // tax fee for transferring tokens, the unit is AZERO
         tax_fee: u128,
+        // this account can call claim_tax_fee to transfer the tax fee from this contract to this account
         tax_fee_receiver: Option<AccountId>,
+        // document for the token contract
         document: String,
-        // ignore from tax_fee
+        // list of addresses ignores the tax_fee when transferring tokens
         list_ignore_from_tax_fee: Mapping<AccountId, bool>,
         // metadata
         name: Option<String>,
@@ -261,7 +265,7 @@ pub mod token {
             }
             self._require_owner()?;
             for user in users {
-                self.list_ignore_from_tax_fee.insert(user, &false);
+                self.list_ignore_from_tax_fee.remove(user);
             }
             Ok(())
         }
@@ -287,7 +291,7 @@ pub mod token {
             }
             self._require_owner()?;
             for user in users {
-                self.whitelist.insert(user, &false);
+                self.whitelist.remove(user);
             }
             Ok(())
         }
@@ -314,14 +318,13 @@ pub mod token {
             }
             self._require_owner()?;
             for user in users {
-                self.blacklist.insert(user, &false);
+                self.blacklist.remove(user);
             }
             Ok(())
         }
 
         #[ink(message)]
-        // #[modifiers(only_owner)]
-        /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
+        /// Forcing a transfer from one account to another account. Requires the owner to call this function.
         pub fn force_transfer(&mut self, from_account: AccountId, to_account: AccountId, amount: u128) -> Result<()> {
             self._require_owner()?;
             if !self.is_force_transfer_enable {
@@ -332,7 +335,7 @@ pub mod token {
         }
 
         #[ink(message)]
-        /// Mints the `amount` of underlying tokens to the recipient identified by the `account` address.
+        /// Claim the tax fee, only tax_fee_receiver can call this function.
         pub fn claim_tax_fee(&mut self, to: AccountId, amount: u128) -> Result<()> {
             if self.paused() {
                 return Err(PSP22Error::Custom(String::from("Paused")));
@@ -357,7 +360,6 @@ pub mod token {
         }
 
         #[ink(message)]
-        // #[modifiers(only_owner)]
         pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<()> {
             self._require_owner()?;
             ink::env::set_code_hash(&code_hash).unwrap_or_else(|err| {
@@ -371,7 +373,7 @@ pub mod token {
         }
 
         #[ink(message)]
-        // #[modifiers(only_owner)]
+        // owner can mint token with this function.
         pub fn mint(&mut self, account: AccountId, amount: u128) -> Result<()> {
             if self.paused() {
                 return Err(PSP22Error::Custom(String::from("Paused")));
@@ -402,13 +404,6 @@ pub mod token {
             amount: u128,
             _data: Vec<u8>,
         ) -> Result<()> {
-            // if from.is_zero() {
-            //     return Err(PSP22Error::ZeroSenderAddress)
-            // }
-            // if to.is_zero() {
-            //     return Err(PSP22Error::ZeroRecipientAddress)
-            // }
-
             let from_balance = self._balance_of(&from);
 
             if from_balance < amount {
@@ -434,12 +429,6 @@ pub mod token {
             spender: AccountId,
             amount: u128,
         ) -> Result<()> {
-            // if owner.is_zero() {
-            //     return Err(PSP22Error::ZeroSenderAddress)
-            // }
-            // if spender.is_zero() {
-            //     return Err(PSP22Error::ZeroRecipientAddress)
-            // }
             if self.paused() {
                 return Err(PSP22Error::Custom(String::from("Paused")));
             }
@@ -450,10 +439,6 @@ pub mod token {
         }
 
         fn _mint_to(&mut self, account: AccountId, amount: u128) -> Result<()> {
-            // if account.is_zero() {
-            //     return Err(PSP22Error::ZeroRecipientAddress)
-            // }
-
             self._before_token_transfer(None, Some(&account), &amount)?;
             let mut new_balance = self._balance_of(&account);
             new_balance += amount;
@@ -466,10 +451,6 @@ pub mod token {
         }
 
         fn _burn_from(&mut self, account: AccountId, amount: u128) -> Result<()> {
-            // if account.is_zero() {
-            //     return Err(PSP22Error::ZeroRecipientAddress)
-            // }
-
             let mut from_balance = self._balance_of(&account);
 
             if from_balance < amount {
@@ -487,8 +468,6 @@ pub mod token {
             Ok(())
         }
 
-        /* Token Transfer Trait */
-        // #[modifiers(when_not_paused)]
         fn _before_token_transfer(
             &mut self,
             _from: Option<&AccountId>,
@@ -498,7 +477,7 @@ pub mod token {
             if self.paused() {
                 return Err(PSP22Error::Custom(String::from("Paused")));
             }
-            // if enabled whitelist and caller is not whitelisted or recipient is not whitelisted
+            // only whitelisted accounts can transfer
             if self.is_required_whiteList == true {
                 if !_from.is_none() && self.whitelist.get(_from.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == false {
                     return Err(PSP22Error::Custom(String::from("From address is not whitelisted")));
@@ -508,6 +487,7 @@ pub mod token {
                 }
             }
 
+            // only non-blacklisted accounts can transfer
             if self.is_required_blackList == true {
                 if !_from.is_none() && self.blacklist.get(_from.unwrap_or(&ZERO_ADDRESS.into())).unwrap_or(false) == true {
                     return Err(PSP22Error::Custom(String::from("From address is blacklisted")));
@@ -518,6 +498,7 @@ pub mod token {
             }
 
             let received_value = self.env().transferred_value();
+            // check tax fee
             if received_value < self.tax_fee {
                 if self.list_ignore_from_tax_fee.get(&self.env().caller()).unwrap_or(false) == true {
                     return Ok(());
