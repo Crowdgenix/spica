@@ -48,6 +48,7 @@ pub mod token_factory {
             self.token_length
         }
 
+        /// In this function, we will create a new token and store it's address in the token factory contract
         #[ink(message)]
         pub fn create_token(&mut self, owner: AccountId, name: String, symbol: String, decimals: u8, total_supply: u128, is_require_whitelist: bool,
                             is_require_blacklist: bool, is_burnable: bool, is_mintable: bool, is_force_transfer_enable: bool,
@@ -56,15 +57,19 @@ pub mod token_factory {
             let hash = xxh32(&salt, 0).to_le_bytes();
 
             let pool_hash = self.token_contract_code_hash;
+            // create token contract using instantitate function
             let pool = TokenRef::new(owner, name.clone(), symbol.clone(), decimals, total_supply, is_require_whitelist, is_require_blacklist, is_burnable, is_mintable, is_force_transfer_enable, is_pausable, is_require_max_alloc_per_address, max_alloc_per_user, tax_fee_receiver, tax_fee, document.clone())
                 .endowment(0)
                 .code_hash(pool_hash)
                 .salt_bytes(&hash[..4])
                 .try_instantiate().map_err(|_| TokenFactoryError::CreateTokenFailed).unwrap().unwrap();
 
+            // the token contract address will be stored in the mapping, with the key is the index of the token (the index increases by 1 each time a new token is created)
             let index = self.token_length;
             self.tokens.insert(index, &pool.to_account_id());
             self.token_length = index + 1;
+
+            // emit event create token, because we listen events from this factory contract, so we need emit events here, instead emit events from the token contract
             TokenFactory::emit_event(self.env(), Event::TokenCreatedEvent(TokenCreatedEvent { owner, caller: self.env().caller(), address: pool.to_account_id(), name, symbol, decimals, total_supply, is_require_whitelist, is_require_blacklist, is_burnable, is_mintable, is_force_transfer_enable, is_pausable, is_require_max_alloc_per_address, max_alloc_per_user, tax_fee_receiver, tax_fee, document, length: index + 1 }));
             Ok(pool.to_account_id())
         }

@@ -65,11 +65,11 @@ pub mod staking {
 
             let message = self.gen_msg_for_stake_token(deadline, stake_duration, nonce, amount);
             // verify signature
-            let is_ok = self._verify(message, self.signer, signature);
-
-            if !is_ok {
-                return Err(StakingError::InvalidSignature);
-            }
+            // let is_ok = self._verify(message, self.signer, signature);
+            //
+            // if !is_ok {
+            //     return Err(StakingError::InvalidSignature);
+            // }
 
             if self.stake_token.allowance(caller, me) < amount {
                 return Err(StakingError::InsufficientAllowance)

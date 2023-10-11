@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-#[openbrush::contract]
+#[ink::contract]
 pub mod factory {
     use ink::{
         codegen::{
