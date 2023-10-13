@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x314619dfb31faa4280f26e971000073e954b7170200cdbfb9cb591f03a2777b8",
+    "hash": "0x1ba4ecab9ad8f0ec6c2db7ab28beb474a47acb5f784b6b5740b863a4ef6332a7",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -506,7 +506,9 @@
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " In this function, we will create a new token and store it's address in the token factory contract"
+        ],
         "label": "create_token",
         "mutates": true,
         "payable": false,

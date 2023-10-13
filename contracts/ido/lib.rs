@@ -24,10 +24,11 @@ pub mod ido {
         },
         ToAccountId,
     };
-    use crate::{ensure, traits};
+    use crate::{traits};
     use crate::traits::{IDOError};
     use token::token::TokenRef;
     use logics::traits::token::PSP22;
+    use logics::{ensure};
 
     type Event = <IdoContract as ContractEventBase>::Type;
 
@@ -68,33 +69,34 @@ pub mod ido {
         ido_token: TokenRef,
         price: u128,
         price_decimals: u32,
-        signer: Option<AccountId>,
+        signer: AccountId,
         account_nonce: Mapping<AccountId, u128>,
         user_ido_balances: Mapping<AccountId, u128>,
         max_issue_ido_amount: u128,
         issued_ido_amount: u128,
         roles: Mapping<(AccountId, RoleType), bool>,
         owner: AccountId,
-        is_initialized: bool,
     }
 
     impl IdoContract {
         /// constructor of IDO contract
         #[ink(constructor)]
-        pub fn new(owner: AccountId) -> Self {
-            Self {
-                ido_token: ink::env::call::FromAccountId::from_account_id(ZERO_ADDRESS.into()),
-                price: 0,
-                price_decimals: 5,
-                signer: Option::None,
+        pub fn new(_owner: AccountId, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32, _max_issue_ido_amount: u128) -> Self {
+            let instance = Self {
+                ido_token: ink::env::call::FromAccountId::from_account_id(_ido_token),
+                price: _price,
+                price_decimals: _price_decimals,
+                signer: _signer,
                 account_nonce: Mapping::default(),
-                user_ido_balances: Mapping::new(),
-                max_issue_ido_amount: 0,
+                user_ido_balances: Mapping::default(),
+                max_issue_ido_amount: _max_issue_ido_amount,
                 issued_ido_amount: 0,
-                is_initialized: false,
-                owner: Self::env().caller(),
+                owner: _owner,
                 roles: Mapping::default(),
-            }
+            };
+            instance._emit_init_ido_contract_event(_ido_token, _price, _price_decimals, _signer, _max_issue_ido_amount);
+
+            instance
         }
 
         /// function to get balance of ido token
@@ -186,7 +188,7 @@ pub mod ido {
         }
 
         #[ink(message)]
-        pub fn get_signer(&self) -> Option<AccountId> {
+        pub fn get_signer(&self) -> AccountId {
             self.signer
         }
 
@@ -194,28 +196,13 @@ pub mod ido {
         pub fn set_signer(&mut self, _new_signer: AccountId) -> Result<(), IDOError> {
             let is_admin: bool = self.roles.get(&(self.env().caller(), SUB_ADMIN)).unwrap_or(false);
             ensure!(is_admin, IDOError::NotAdmin);
-            self.signer = Some(_new_signer);
+            self.signer = _new_signer;
             Ok(())
         }
 
         #[ink(message)]
         pub fn verify_signature(&self, signature: [u8; 65], msg: String) -> bool {
-            self._verify(msg, self.signer.unwrap(), signature)
-        }
-
-        /// this function is initialised function, will init the contract properties
-        #[ink(message)]
-        pub fn init_ido(&mut self, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32, _max_issue_ido_amount: u128) -> Result<(), IDOError> {
-            ensure!(self.is_initialized == false, IDOError::Initialized);
-            self.ido_token = ink::env::call::FromAccountId::from_account_id(_ido_token);
-            self.price = _price;
-            self.price_decimals = _price_decimals;
-            self.signer = Some(_signer);
-            self.max_issue_ido_amount = _max_issue_ido_amount;
-            self.is_initialized = true;
-
-            self._emit_init_ido_contract_event(_ido_token, _price, _price_decimals, _signer, _max_issue_ido_amount);
-            Ok(())
+            self._verify(msg, self.signer, signature)
         }
 
         /// get ido token
@@ -250,11 +237,10 @@ pub mod ido {
             let message = self.gen_msg_for_buy_token(deadline, nonce, received_value);
 
             // verify signature
-            let is_ok = self._verify(message, self.signer.unwrap(), signature);
+            let is_ok = self._verify(message, self.signer, signature);
 
-            if !is_ok {
-                return Err(IDOError::InvalidSignature);
-            }
+            ensure!(is_ok, IDOError::InvalidSignature);
+
 
             // calculate IDO amount = received_value * price / 10^price_decimals
             let ido_amount = received_value.checked_mul(self.price).unwrap().checked_div((10 as u128).checked_pow(self.price_decimals).unwrap()).unwrap();
@@ -293,18 +279,15 @@ pub mod ido {
 
             let caller = self.env().caller();
             // ensure the user has enough collateral assets
-            if self.ido_token.balance_of(self.env().account_id()) < amount {
-                return Err(IDOError::InsufficientBalance);
-            }
+            ensure!(self.ido_token.balance_of(self.env().account_id()) >= amount, IDOError::InsufficientBalance);
+
             // generate message
             let message = self.gen_msg_for_claim_token(deadline, nonce, amount);
 
             // verify signature
-            let is_ok = self._verify(message, self.signer.unwrap(), signature);
+            let is_ok = self._verify(message, self.signer, signature);
 
-            if !is_ok {
-                return Err(IDOError::InvalidSignature);
-            }
+            ensure!(is_ok, IDOError::InvalidSignature);
 
             let old_balances = self.user_ido_balances.get(&self.env().caller()).unwrap_or(0);
             let new_balances = old_balances.checked_sub(amount).unwrap_or(0);
@@ -312,9 +295,8 @@ pub mod ido {
 
             let result = self.ido_token.transfer(caller, amount, Vec::new());
             // check result
-            if result.is_err() {
-                return Err(IDOError::SafeTransferError);
-            }
+            ensure!(!result.is_err(), IDOError::SafeTransferError);
+
 
             self._emit_claim_token_event(caller, amount, nonce);
             Ok(())

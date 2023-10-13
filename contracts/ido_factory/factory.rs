@@ -16,7 +16,7 @@ pub mod factory {
     use scale::Encode;
 
     use crate::traits::{*};
-    use crate::{ensure};
+    use logics::{ensure};
     use ido::ido::{IdoContractRef};
 
     type RoleType = u32;
@@ -75,9 +75,7 @@ pub mod factory {
             let is_deployer: bool = self.roles.get(&(self.env().caller(), DEPLOYER)).unwrap_or(false);
             ensure!(is_deployer, FactoryError::NotDeployer);
 
-            let pool_contract = self._instantiate_pool()?;
-            let mut callee: IdoContractRef = ink::env::call::FromAccountId::from_account_id(pool_contract);
-            callee.init_ido(ido_token, signer, price, price_decimals, max_issue_ido_amount).map_err(|_| FactoryError::PoolInitFailed).unwrap();
+            let pool_contract = self._instantiate_pool(ido_token, signer, price, price_decimals, max_issue_ido_amount)?;
 
             let index = self.pool_length;
             self.pools
@@ -122,7 +120,7 @@ pub mod factory {
         #[ink(message)]
         pub fn revoke_role(&mut self, role: RoleType, user: AccountId) -> Result<(), FactoryError> {
             ensure!(self.env().caller() == self.owner, FactoryError::NotOwner);
-            self.roles.insert(&(user, role), &false);
+            self.roles.remove(&(user, role));
             Ok(())
         }
 
@@ -132,12 +130,12 @@ pub mod factory {
             Ok(ok)
         }
 
-        fn _instantiate_pool(&mut self) -> Result<AccountId, FactoryError> {
+        fn _instantiate_pool(&mut self, ido_token: AccountId, signer: AccountId, price: u128, price_decimals: u32, max_issue_ido_amount: u128) -> Result<AccountId, FactoryError> {
             let salt = (self.env().block_timestamp(), b"ido_factory").encode();
             let hash = xxh32(&salt, 0).to_le_bytes();
 
             let pool_hash = self.pool_contract_code_hash;
-            let pool = IdoContractRef::new(self.env().caller())
+            let pool = IdoContractRef::new(self.env().caller(), ido_token, signer, price, price_decimals, max_issue_ido_amount)
                 .endowment(0)
                 .code_hash(pool_hash)
                 .salt_bytes(&hash[..4])
@@ -161,25 +159,6 @@ pub mod factory {
                     pool_len,
                 },
             )
-        }
-    }
-
-    #[cfg(test)]
-    mod tests {
-        use ink::{
-            env::test::default_accounts,
-            primitives::Hash,
-        };
-        use openbrush::traits::AccountIdExt;
-
-        use super::*;
-
-        #[ink::test]
-        fn initialize_works() {
-            ink::env::debug_println!("data {:?}", DEPLOYER);
-            let accounts = default_accounts::<ink::env::DefaultEnvironment>();
-            let mut factory = FactoryContract::new(Hash::default());
-            let pool_address = factory.create_pool(1, accounts.alice, accounts.alice, 100, 10, 100000).unwrap();
         }
     }
 }

@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x625d0148d874af72addbb9989c9541797cf9fac75c7bac61f364ae274ca7c884",
+    "hash": "0x4637718fe9f86643a0ef7fb7524cfa7b026ac240d6c71f8a8e35b7f8159a5eb7",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -25,12 +25,57 @@
       {
         "args": [
           {
-            "label": "owner",
+            "label": "_owner",
             "type": {
               "displayName": [
                 "AccountId"
               ],
               "type": 0
+            }
+          },
+          {
+            "label": "_ido_token",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "_signer",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "_price",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "_price_decimals",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "_max_issue_ido_amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
             }
           }
         ],
@@ -74,13 +119,13 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 24
+        "type": 22
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 23
+        "type": 21
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -549,7 +594,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 19
+          "type": 10
         },
         "selector": "0x73b017da"
       },
@@ -585,7 +630,7 @@
             "label": "signature",
             "type": {
               "displayName": [],
-              "type": 21
+              "type": 19
             }
           },
           {
@@ -608,73 +653,9 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 20
         },
         "selector": "0x079d8598"
-      },
-      {
-        "args": [
-          {
-            "label": "_ido_token",
-            "type": {
-              "displayName": [
-                "AccountId"
-              ],
-              "type": 0
-            }
-          },
-          {
-            "label": "_signer",
-            "type": {
-              "displayName": [
-                "AccountId"
-              ],
-              "type": 0
-            }
-          },
-          {
-            "label": "_price",
-            "type": {
-              "displayName": [
-                "u128"
-              ],
-              "type": 3
-            }
-          },
-          {
-            "label": "_price_decimals",
-            "type": {
-              "displayName": [
-                "u32"
-              ],
-              "type": 4
-            }
-          },
-          {
-            "label": "_max_issue_ido_amount",
-            "type": {
-              "displayName": [
-                "u128"
-              ],
-              "type": 3
-            }
-          }
-        ],
-        "default": false,
-        "docs": [
-          " this function is initialised function, will init the contract properties"
-        ],
-        "label": "init_ido",
-        "mutates": true,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 11
-        },
-        "selector": "0x581927a6"
       },
       {
         "args": [],
@@ -744,7 +725,7 @@
             "label": "signature",
             "type": {
               "displayName": [],
-              "type": 21
+              "type": 19
             }
           }
         ],
@@ -797,7 +778,7 @@
             "label": "signature",
             "type": {
               "displayName": [],
-              "type": 21
+              "type": 19
             }
           }
         ],
@@ -919,29 +900,9 @@
             },
             {
               "layout": {
-                "enum": {
-                  "dispatchKey": "0x00000000",
-                  "name": "Option",
-                  "variants": {
-                    "0": {
-                      "fields": [],
-                      "name": "None"
-                    },
-                    "1": {
-                      "fields": [
-                        {
-                          "layout": {
-                            "leaf": {
-                              "key": "0x00000000",
-                              "ty": 0
-                            }
-                          },
-                          "name": "0"
-                        }
-                      ],
-                      "name": "Some"
-                    }
-                  }
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 0
                 }
               },
               "name": "signer"
@@ -1014,15 +975,6 @@
                 }
               },
               "name": "owner"
-            },
-            {
-              "layout": {
-                "leaf": {
-                  "key": "0x00000000",
-                  "ty": 5
-                }
-              },
-              "name": "is_initialized"
             }
           ],
           "name": "IdoContract"
@@ -1550,81 +1502,6 @@
       "id": 19,
       "type": {
         "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 20
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 8
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 20
-          },
-          {
-            "name": "E",
-            "type": 8
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 20,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "index": 0,
-                "name": "None"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 0
-                  }
-                ],
-                "index": 1,
-                "name": "Some"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 0
-          }
-        ],
-        "path": [
-          "Option"
-        ]
-      }
-    },
-    {
-      "id": 21,
-      "type": {
-        "def": {
           "array": {
             "len": 65,
             "type": 2
@@ -1633,7 +1510,7 @@
       }
     },
     {
-      "id": 22,
+      "id": 20,
       "type": {
         "def": {
           "variant": {
@@ -1675,7 +1552,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 21,
       "type": {
         "def": {
           "composite": {
@@ -1695,7 +1572,7 @@
       }
     },
     {
-      "id": 24,
+      "id": 22,
       "type": {
         "def": {
           "variant": {}

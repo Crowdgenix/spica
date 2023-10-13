@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xc6b379f1936518fdd962de4f97d3612ef1a9e411d2fbd5fdfa84028b4740ca97",
+    "hash": "0x8f25090c770aa8299624761fcdb9c08a4be0408b05ae4b2c53ec5485f9699e64",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -87,19 +87,19 @@
         "displayName": [
           "BlockNumber"
         ],
-        "type": 20
+        "type": 22
       },
       "chainExtension": {
         "displayName": [
           "ChainExtension"
         ],
-        "type": 21
+        "type": 23
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 19
+        "type": 21
       },
       "maxEventTopics": 4,
       "timestamp": {
@@ -696,7 +696,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 15
+          "type": 18
         },
         "selector": "0xeb6ee123"
       },
@@ -749,7 +749,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 20
         },
         "selector": "0xb431a097"
       },
@@ -802,7 +802,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 20
         },
         "selector": "0x9eae6e19"
       }
@@ -1398,6 +1398,81 @@
               {
                 "fields": [
                   {
+                    "type": 19
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 7
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 19
+          },
+          {
+            "name": "E",
+            "type": 7
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "None"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 3
+                  }
+                ],
+                "index": 1,
+                "name": "Some"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 3
+          }
+        ],
+        "path": [
+          "Option"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
                     "type": 12
                   }
                 ],
@@ -1432,7 +1507,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 21,
       "type": {
         "def": {
           "composite": {
@@ -1452,7 +1527,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 22,
       "type": {
         "def": {
           "primitive": "u32"
@@ -1460,7 +1535,7 @@
       }
     },
     {
-      "id": 21,
+      "id": 23,
       "type": {
         "def": {
           "variant": {}

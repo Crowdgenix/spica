@@ -1,4 +1,3 @@
-use crate::types::staking::{StakingData};
 use hex::*;
 use ink::{
     env::{
@@ -6,12 +5,15 @@ use ink::{
     },
     prelude::string::{String, ToString},
     prelude::vec::Vec,
-};
-use openbrush::{
-    traits::{Hash, AccountId, Timestamp, Storage, DefaultEnv},
-    contracts::traits::psp22::{PSP22Ref},
-};
+    primitives::AccountId,
+    storage::Mapping,
+    codegen::{
+        EmitEvent,
+        Env,
+    },
 
+};
+pub type Timestamp = u64;
 pub trait StakingInternal {
     fn _emit_staking_event(&self, account: AccountId, nonce: u128, total_amount: u128, amount: u128, new_tier: u128, timestamp: Timestamp, stake_duration: Timestamp);
     fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, total_amount: u128, amount: u128, new_tier: u128, timestamp: Timestamp, fee: u128);
@@ -57,7 +59,7 @@ pub trait Staking {
     fn get_tiers(&self) -> Result<Vec<u128>, StakingError>;
 
     #[ink(message)]
-    fn get_tier_from_amount(&self, amount: u128) -> u128;
+    fn get_tier_from_amount(&self, amount: u128) -> Option<u128>;
 
     #[ink(message)]
     fn gen_msg_for_stake_token(&self, deadline: Timestamp, stake_duration: Timestamp, nonce: u128, stake_amount: u128) -> String;
