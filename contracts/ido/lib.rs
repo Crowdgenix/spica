@@ -29,10 +29,9 @@ pub mod ido {
     use token::token::TokenRef;
     use logics::traits::token::PSP22;
     use logics::{ensure};
+    use logics::traits::common::ZERO_ADDRESS;
 
     type Event = <IdoContract as ContractEventBase>::Type;
-
-    pub const ZERO_ADDRESS: [u8; 32] = [255; 32];
 
     type RoleType = u32;
     pub const SUB_ADMIN: RoleType = ink::selector_id!("SUB_ADMIN");
@@ -40,46 +39,48 @@ pub mod ido {
     #[ink(event)]
     pub struct InitIdoContract {
         #[ink(topic)]
-        pub ido_token: AccountId,
-        pub price: u128,
-        pub price_decimals: u32,
-        pub signer: AccountId,
-        pub max_issue_ido_amount: u128,
+        pub ido_token: AccountId, // token for presale
+        pub price: u128, // price of token, IDO amount = received_value * price / 10^price_decimals
+        pub price_decimals: u32, // decimals of price
+        pub signer: AccountId, // signer of smart contract, signer has the role to sign the message that approving the user to buy the IDO token
+        pub max_issue_ido_amount: u128, // max amount of IDO that can be issued by the smart contract for each user
     }
 
+    // we need to emit the event for the backend crawler can handle the buy token event of each user
     #[ink(event)]
     pub struct BuyTokenWithNative {
         #[ink(topic)]
-        pub buyer: AccountId,
-        pub native_amount: u128,
-        pub ido_token_amount: u128,
-        pub nonce: u128,
+        pub buyer: AccountId, // the buyer
+        pub native_amount: u128, // the native amount to swap to IDO token
+        pub ido_token_amount: u128, // the IDO token amount, calculated by native_amount * price / 10^price_decimals
+        pub nonce: u128, // nonce to defend against attack (user can use the signature twice or more times if we don't have the nonce)
     }
 
+    // we need to emit the event for the backend crawler can handle the claim token event of each user
     #[ink(event)]
     pub struct ClaimToken {
         #[ink(topic)]
-        pub buyer: AccountId,
-        pub ido_token_amount: u128,
-        pub nonce: u128,
+        pub buyer: AccountId, // the claimer
+        pub ido_token_amount: u128, // the claimed amount of IDO token
+        pub nonce: u128, // nonce to defend against attack
     }
 
     #[ink(storage)]
     pub struct IdoContract {
-        ido_token: TokenRef,
-        price: u128,
-        price_decimals: u32,
-        signer: AccountId,
-        account_nonce: Mapping<AccountId, u128>,
-        user_ido_balances: Mapping<AccountId, u128>,
-        max_issue_ido_amount: u128,
-        issued_ido_amount: u128,
-        roles: Mapping<(AccountId, RoleType), bool>,
-        owner: AccountId,
+        ido_token: TokenRef, // IDO token for presale
+        price: u128, // price of token, IDO amount = received_value * price / 10^price_decimals
+        price_decimals: u32, // decimals of price
+        signer: AccountId, // signer of smart contract, signer has the role to sign the message that approving the user to buy the IDO token
+        account_nonce: Mapping<AccountId, u128>, // nonce of each user to defend against attack
+        user_ido_balances: Mapping<AccountId, u128>, // bought amounts balances of each user
+        max_issue_ido_amount: u128, // max amount of IDO that can be issued by the smart contract for each user
+        issued_ido_amount: u128, // total issued IDO amount
+        roles: Mapping<(AccountId, RoleType), bool>, // roles mapping
+        owner: AccountId, // owner of smart contract
     }
 
     impl IdoContract {
-        /// constructor of IDO contract
+        /// constructor of IDO contract, we set _owner: AccountId, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32, _max_issue_ido_amount: u128
         #[ink(constructor)]
         pub fn new(_owner: AccountId, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32, _max_issue_ido_amount: u128) -> Self {
             let instance = Self {
@@ -106,6 +107,7 @@ pub mod ido {
         }
 
 
+        // get owner of the smart contract
         #[ink(message)]
         pub fn owner(&self) -> AccountId {
             self.owner.clone()
@@ -125,6 +127,7 @@ pub mod ido {
             Ok(())
         }
 
+        // owner can transfer ownership of the smart contract to another account
         #[ink(message)]
         pub fn transfer_ownership(&mut self, new_owner: AccountId) -> Result<(), IDOError> {
             ensure!(self.env().caller() == self.owner, IDOError::NotOwner);
@@ -132,6 +135,7 @@ pub mod ido {
             Ok(())
         }
 
+        // owner can grant role for user to be the sub admin
         #[ink(message)]
         pub fn grant_role(&mut self, role: RoleType, user: AccountId) -> Result<(), IDOError> {
             ensure!(self.env().caller() == self.owner, IDOError::NotOwner);
@@ -139,6 +143,7 @@ pub mod ido {
             Ok(())
         }
 
+        // owner can revoke role of user
         #[ink(message)]
         pub fn revoke_role(&mut self, role: RoleType, user: AccountId) -> Result<(), IDOError> {
             ensure!(self.env().caller() == self.owner, IDOError::NotOwner);
@@ -146,12 +151,14 @@ pub mod ido {
             Ok(())
         }
 
+        // check that is user has the given role or not
         #[ink(message)]
         pub fn is_role_granted(&self, role: RoleType, user: AccountId) -> Result<bool, IDOError> {
             let ok = self.roles.get(&(user, role)).unwrap_or(false);
             Ok(ok)
         }
 
+        // this function is used to generate the message that will be signed by the signer, the message contains the buy_ido_ signature, ido token, caller, amount, deadline, nonce, this ensures the message is unique
         #[ink(message)]
         pub fn gen_msg_for_buy_token(&self, deadline: Timestamp, nonce: u128, received_value: u128) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
@@ -170,6 +177,7 @@ pub mod ido {
             message
         }
 
+        // this function is used to generate the message that will be signed by the signer, the message contains the buy_ido_ claim_ido_token_, ido token, caller, amount, deadline, nonce, this ensures the message is unique
         #[ink(message)]
         pub fn gen_msg_for_claim_token(&self, deadline: Timestamp, nonce: u128, amount: u128) -> String {
             let mut message: String = String::from("");
@@ -187,11 +195,13 @@ pub mod ido {
             message
         }
 
+        // get the signer of the smart contract
         #[ink(message)]
         pub fn get_signer(&self) -> AccountId {
             self.signer
         }
 
+        // sub admin can set the signer of the smart contract
         #[ink(message)]
         pub fn set_signer(&mut self, _new_signer: AccountId) -> Result<(), IDOError> {
             let is_admin: bool = self.roles.get(&(self.env().caller(), SUB_ADMIN)).unwrap_or(false);
@@ -200,6 +210,7 @@ pub mod ido {
             Ok(())
         }
 
+        // this function use to verify the message and the signature, it returns false if the signature isn't signed by the signer
         #[ink(message)]
         pub fn verify_signature(&self, signature: [u8; 65], msg: String) -> bool {
             self._verify(msg, self.signer, signature)
@@ -211,6 +222,7 @@ pub mod ido {
             self.ido_token.to_account_id()
         }
 
+        // get nonce of user
         #[ink(message)]
         pub fn get_nonce(&self, account: AccountId) -> u128 {
             self.account_nonce.get(&account).unwrap_or(0)
@@ -219,6 +231,7 @@ pub mod ido {
         /// function to buy ido token with native
         #[ink(message, payable)]
         pub fn buy_ido_with_native(&mut self, deadline: Timestamp, nonce: u128, signature: [u8; 65]) -> Result<(), IDOError> {
+            // we ensure the deadline and nonce are correct
             ensure!(
                 deadline >= self.env().block_timestamp(),
                 IDOError::Expired
@@ -229,6 +242,7 @@ pub mod ido {
             );
 
 
+            // increase nonce of user
             self.account_nonce.insert(&self.env().caller(), &(nonce + 1));
 
             let received_value = Self::env().transferred_value();
@@ -244,10 +258,12 @@ pub mod ido {
 
             // calculate IDO amount = received_value * price / 10^price_decimals
             let ido_amount = received_value.checked_mul(self.price).unwrap().checked_div((10 as u128).checked_pow(self.price_decimals).unwrap()).unwrap();
+            // ensure that the amount is less than the max_issue_ido_amount
             ensure!(
                 self.issued_ido_amount.checked_add(ido_amount).unwrap() <= self.max_issue_ido_amount,
                 IDOError::MaxIssueIdoAmount,
             );
+            // update the issued_ido_amount
             self.issued_ido_amount = self.issued_ido_amount.checked_add(ido_amount).unwrap();
 
             let old_balances = match self.user_ido_balances.get(&self.env().caller()) {
@@ -255,6 +271,7 @@ pub mod ido {
                 None => 0 as u128,
             };
             let new_balances = old_balances.checked_add(ido_amount).unwrap();
+            // update the user_ido_balances
             self.user_ido_balances.insert(self.env().caller(), &new_balances);
 
             // emit event
@@ -265,6 +282,7 @@ pub mod ido {
         /// function to claim ido token
         #[ink(message)]
         pub fn claim_ido_token(&mut self, deadline: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), IDOError> {
+            // we ensure the deadline and nonce are correct
             ensure!(
                 deadline >= self.env().block_timestamp(),
                 IDOError::Expired
@@ -275,6 +293,7 @@ pub mod ido {
                 IDOError::InvalidNonce(nonce.to_string())
             );
 
+            // update nonce of user
             self.account_nonce.insert(&self.env().caller(), &(nonce + 1));
 
             let caller = self.env().caller();
@@ -286,17 +305,16 @@ pub mod ido {
 
             // verify signature
             let is_ok = self._verify(message, self.signer, signature);
-
             ensure!(is_ok, IDOError::InvalidSignature);
 
             let old_balances = self.user_ido_balances.get(&self.env().caller()).unwrap_or(0);
             let new_balances = old_balances.checked_sub(amount).unwrap_or(0);
+            // update the user_ido_balances
             self.user_ido_balances.insert(self.env().caller(), &new_balances);
 
             let result = self.ido_token.transfer(caller, amount, Vec::new());
             // check result
             ensure!(!result.is_err(), IDOError::SafeTransferError);
-
 
             self._emit_claim_token_event(caller, amount, nonce);
             Ok(())

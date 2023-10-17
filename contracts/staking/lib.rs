@@ -24,7 +24,7 @@ pub mod staking {
     use logics::ensure;
     use token::token::TokenRef;
     use logics::traits::token::PSP22;
-    pub const ZERO_ADDRESS: [u8; 32] = [255; 32];
+    use logics::traits::common::ZERO_ADDRESS;
     type Event = <StakingContract as ContractEventBase>::Type;
 
     #[ink(storage)]
