@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x4637718fe9f86643a0ef7fb7524cfa7b026ac240d6c71f8a8e35b7f8159a5eb7",
+    "hash": "0xe8edcc909e44ab1f9565cdf45ad6fce5b15f2b257e9e2153d1f193ba5cb639fd",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -81,7 +81,7 @@
         ],
         "default": false,
         "docs": [
-          "constructor of IDO contract"
+          "constructor of IDO contract, we set _owner: AccountId, _ido_token: AccountId, _signer: AccountId, _price: u128, _price_decimals: u32, _max_issue_ido_amount: u128"
         ],
         "label": "new",
         "payable": false,

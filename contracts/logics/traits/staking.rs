@@ -14,10 +14,13 @@ use ink::{
 
 };
 pub type Timestamp = u64;
+
+// we have staking internal trait, this trait is used to include the private functions of the staking contract
 pub trait StakingInternal {
     fn _emit_staking_event(&self, account: AccountId, nonce: u128, total_amount: u128, amount: u128, new_tier: u128, timestamp: Timestamp, stake_duration: Timestamp);
     fn _emit_unstaking_event(&self, account: AccountId, nonce: u128, total_amount: u128, amount: u128, new_tier: u128, timestamp: Timestamp, fee: u128);
     fn _emit_set_tiers_event(&self, tiers: Vec<u128>);
+    // this function is used to verify the signature of the given data, the signer is the signer of the staking contract
     fn _verify(&self, data: String, signer: AccountId, signature: [u8; 65]) -> bool;
 }
 
@@ -58,12 +61,15 @@ pub trait Staking {
     #[ink(message)]
     fn get_tiers(&self) -> Result<Vec<u128>, StakingError>;
 
+    // get tier of user from the input account
     #[ink(message)]
     fn get_tier_from_amount(&self, amount: u128) -> Option<u128>;
 
+    // generate the message for staking signing
     #[ink(message)]
     fn gen_msg_for_stake_token(&self, deadline: Timestamp, stake_duration: Timestamp, nonce: u128, stake_amount: u128) -> String;
 
+    // generate the message for unstaking signing
     #[ink(message)]
     fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128, fee: u128) -> String;
 }
@@ -73,11 +79,11 @@ pub trait Staking {
 pub enum StakingError {
     Custom(String),
     InvalidNonce(String),
-    InvalidDeadline,
-    TransferFailed,
-    InsufficientAllowance,
-    InsufficientBalance,
-    InsufficientStakingAmount,
-    InvalidSignature,
-    OnlyOwner,
+    InvalidDeadline, // the deadline should be in the future
+    TransferFailed, // transfer failed
+    InsufficientAllowance, // insufficient allowance for the staking contract
+    InsufficientBalance, // insufficient balance
+    InsufficientStakingAmount, // insufficient stake amount when unstaking
+    InvalidSignature, // invalid signature when verifying the staking contract
+    OnlyOwner, // only the owner can call
 }

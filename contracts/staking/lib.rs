@@ -29,14 +29,13 @@ pub mod staking {
 
     #[ink(storage)]
     pub struct StakingContract {
-        stake_token: TokenRef,
-        staking_amounts: Mapping<AccountId, u128>,
-        account_tiers: Mapping<AccountId, u128>,
-        tier_configs: Vec<u128>,
-        account_nonce: Mapping<AccountId, u128>,
-        signer: AccountId,
-        // ownable
-        owner: AccountId,
+        stake_token: TokenRef, // staking token
+        staking_amounts: Mapping<AccountId, u128>, // staking amount of each account
+        account_tiers: Mapping<AccountId, u128>, // tier of each account
+        tier_configs: Vec<u128>, // tier configurations for each tier
+        account_nonce: Mapping<AccountId, u128>, // nonce of each account
+        signer: AccountId, // the signer of the staking contract
+        owner: AccountId, // owner of the staking contract
     }
 
 
@@ -55,15 +54,20 @@ pub mod staking {
         fn stake(&mut self, deadline: Timestamp, stake_duration: Timestamp, nonce: u128, amount: u128, signature: [u8; 65]) -> Result<(), StakingError> {
             let caller = self.env().caller();
             let me = self.env().account_id();
+            // ensure the nonce and deadline are valid
             ensure!(deadline >= self.env().block_timestamp(), StakingError::InvalidDeadline);
             ensure!(nonce == self.account_nonce.get(&caller).unwrap_or(0), StakingError::InvalidNonce(nonce.to_string()));
 
+            // update the nonce
             self.account_nonce.insert(&caller, &(nonce.wrapping_add(1)));
 
+            // generate the message to be verify
             let message = self.gen_msg_for_stake_token(deadline, stake_duration, nonce, amount);
             // verify signature
             let is_ok = self._verify(message, self.signer, signature);
             ensure!(is_ok, StakingError::InvalidSignature);
+
+            // ensure the token balance and the allowance are sufficient
             ensure!(self.stake_token.allowance(caller, me) >= amount, StakingError::InsufficientAllowance);
             ensure!(self.stake_token.balance_of(caller) >= amount, StakingError::InsufficientBalance);
 
@@ -71,9 +75,11 @@ pub mod staking {
             let result = self.stake_token.transfer_from(caller, me, amount, Vec::new());
             ensure!(!result.is_err(), StakingError::TransferFailed);
 
+            // update the staking amounts
             let new_amount = self.staking_amounts.get(&caller).unwrap_or(0).wrapping_add(amount);
             self.staking_amounts.insert(&caller, &new_amount);
 
+            // update the account tiers
             let tier = self.get_tier_from_amount(new_amount).unwrap_or(0);
             self.account_tiers.insert(&caller, &tier);
 
@@ -87,22 +93,25 @@ pub mod staking {
         fn unstake(&mut self, deadline: Timestamp, nonce: u128, amount: u128, fee: u128, signature: [u8; 65]) -> Result<(), StakingError> {
             let caller = self.env().caller();
             let me = self.env().account_id();
+            // ensure the nonce and deadline are valid
             ensure!(deadline >= self.env().block_timestamp(), StakingError::InvalidDeadline);
             ensure!(nonce == self.account_nonce.get(&caller).unwrap_or(0), StakingError::InvalidNonce(nonce.to_string()));
 
+            // update the nonce
             self.account_nonce.insert(&caller, &(nonce.wrapping_add(1)));
             let message = self.gen_msg_for_unstake_token(deadline, nonce, amount, fee);
             // verify signature
             let is_ok = self._verify(message, self.signer, signature);
-
             ensure!(is_ok, StakingError::InvalidSignature);
 
+            // ensure staking amount is sufficient
             let stake_amount = self.staking_amounts.get(&caller).unwrap_or(0);
             ensure!(stake_amount >= amount, StakingError::InsufficientStakingAmount);
 
             // ensure the user has enough collateral assets
             ensure!(self.stake_token.balance_of(me) >= amount, StakingError::InsufficientBalance);
 
+            // update the staking amount after unstaking
             let new_amount = self.staking_amounts.get(&caller).unwrap_or(0).wrapping_sub(amount);
             self.staking_amounts.insert(&caller, &new_amount);
 
@@ -111,6 +120,7 @@ pub mod staking {
             // check result
             ensure!(!result.is_err(), StakingError::TransferFailed);
 
+            // update the account tiers after unstaking
             let tier = self.get_tier_from_amount(new_amount).unwrap_or(0);
             self.account_tiers.insert(&caller, &tier);
 
@@ -124,6 +134,7 @@ pub mod staking {
             self.stake_token.to_account_id()
         }
 
+        // get the nonce of the caller
         #[ink(message)]
         fn get_nonce(&self) -> u128 {
             let caller = self.env().caller();
@@ -158,6 +169,7 @@ pub mod staking {
             Ok(self.tier_configs.clone())
         }
 
+        // get the tier for the given amount
         #[ink(message)]
         fn get_tier_from_amount(&self, amount: u128) -> Option<u128> {
             for (i, tier_config) in self.tier_configs.iter().enumerate() {
@@ -168,6 +180,7 @@ pub mod staking {
             None
         }
 
+        // this function used to generate the message to be verify, we need nonce, amount, deadline, duration and nonce to verify the user use exactly data when staking
         #[ink(message)]
         fn gen_msg_for_stake_token(&self, deadline: Timestamp, stake_duration: Timestamp, nonce: u128, stake_amount: u128) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
@@ -187,6 +200,7 @@ pub mod staking {
             message
         }
 
+        // this function used to generate the message to be verify, we need nonce, amount, deadline, and nonce to verify the user use exactly data when unstaking
         #[ink(message)]
         fn gen_msg_for_unstake_token(&self, deadline: Timestamp, nonce: u128, unstake_amount: u128, fee: u128) -> String {
             // generate message = buy_ido + ido_token + buyer + amount
@@ -278,11 +292,13 @@ pub mod staking {
         }
 
 
+        // get the owner of the contract
         #[ink(message)]
         pub fn owner(&self) -> AccountId {
             self.owner.clone()
         }
 
+        // owner can transfer the ownership of the contract
         #[ink(message)]
         pub fn transfer_ownership(&mut self, new_owner: AccountId) -> Result<(), StakingError> {
             self._require_owner()?;
@@ -290,6 +306,7 @@ pub mod staking {
             Ok(())
         }
 
+        // admin collect the staking token that contract is holding
         #[ink(message)]
         pub fn admin_collect_all_token(&mut self) -> Result<(), StakingError> {
             self._require_owner()?;
@@ -312,6 +329,7 @@ pub mod staking {
             Ok(())
         }
 
+        // ensure that only the owner can call this function
         fn _require_owner(&self) -> Result<(), StakingError> {
             ensure!(self.owner == self.env().caller(), StakingError::Custom("Not owner".to_string()));
             Ok(())
@@ -326,6 +344,7 @@ pub mod staking {
     }
 
 
+    // the BE requires all of below information to handle in the BE
     #[ink(event)]
     #[derive(Debug)]
     pub struct StakingEvent {
@@ -338,6 +357,7 @@ pub mod staking {
         pub nonce: u128,
     }
 
+    // the BE requires all of below information to handle in the BE
     #[ink(event)]
     #[derive(Debug)]
     pub struct UnstakingEvent {

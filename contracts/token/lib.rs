@@ -144,7 +144,6 @@ pub mod token {
 
             ensure!(allowance >= value, PSP22Error::InsufficientAllowance);
 
-
             self._approve_from_to(from, caller, allowance.wrapping_sub(value))?;
             self._transfer_from_to(from, to, value, data)?;
             Ok(())
@@ -463,6 +462,7 @@ pub mod token {
         }
 
         fn _after_token_transfer(&mut self, _from: Option<&AccountId>, _to: Option<&AccountId>, _amount: &u128) -> Result<()> {
+            // we need to check the after amount of the account is less than the max allocation per address, if not, we return an error.
             if self.is_require_max_alloc_per_address {
                 if _to.is_none() || self.owner == *_to.unwrap() {
                     return Ok(());

@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x7150a8a8b4aaca3e9758cef94b7adf0cdefd681fac3f64c598446147c88b6afb",
+    "hash": "0x687ba9a6620891d766f31f1cfb43a34200039c279ae635a0a4722c938f40c4d4",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -850,34 +850,14 @@
               },
               {
                 "index": 1,
-                "name": "CallerIsNotFeeSetter"
-              },
-              {
-                "index": 2,
-                "name": "ZeroAddress"
-              },
-              {
-                "index": 3,
-                "name": "IdenticalAddresses"
-              },
-              {
-                "index": 4,
-                "name": "PoolExists"
-              },
-              {
-                "index": 5,
                 "name": "PoolInstantiationFailed"
               },
               {
-                "index": 6,
-                "name": "PoolInitFailed"
-              },
-              {
-                "index": 7,
+                "index": 2,
                 "name": "NotDeployer"
               },
               {
-                "index": 8,
+                "index": 3,
                 "name": "NotOwner"
               }
             ]
